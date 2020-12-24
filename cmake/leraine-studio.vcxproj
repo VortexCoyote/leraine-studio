@@ -1,0 +1,448 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5E07D8FB-A320-3D2A-9449-B2FEB09FCF24}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>leraine-studio</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="do_not_import_user.props" Condition="exists('do_not_import_user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\dev\leraine-studio\leraine-studio\binaries\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">leraine-studio.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">leraine-studio</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\dev\leraine-studio\leraine-studio\binaries\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">leraine-studio.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">leraine-studio</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\dev\leraine-studio\leraine-studio\cmake\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">leraine-studio.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">leraine-studio</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\dev\leraine-studio\leraine-studio\cmake\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">leraine-studio.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">leraine-studio</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;IMGUI_USER_CONFIG="imconfig-SFML.h";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;IMGUI_USER_CONFIG=\"imconfig-SFML.h\";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/dev/leraine-studio/leraine-studio/binaries/leraine-studio.exe -installedDir C:/dev/vcpkg/installed/x64-windows/debug/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\dev\vcpkg\installed\x64-windows\debug\lib\ImGui-SFML.lib;C:\dev\vcpkg\installed\x64-windows\debug\lib\sfml-graphics-d.lib;C:\dev\vcpkg\installed\x64-windows\debug\lib\sfml-window-d.lib;C:\dev\vcpkg\installed\x64-windows\debug\lib\sfml-audio-d.lib;C:\dev\vcpkg\installed\x64-windows\debug\lib\sfml-system-d.lib;bass.lib;bass_fx.lib;zlib.lib;C:\dev\vcpkg\installed\x64-windows\debug\lib\imguid.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/dev/vcpkg/installed/x64-windows/lib;C:/dev/vcpkg/installed/x64-windows/lib/$(Configuration);C:/dev/leraine-studio/leraine-studio/libraries;C:/dev/leraine-studio/leraine-studio/libraries/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/dev/leraine-studio/leraine-studio/cmake/Debug/leraine-studio.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/dev/leraine-studio/leraine-studio/binaries/leraine-studio.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IMGUI_USER_CONFIG="imconfig-SFML.h";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IMGUI_USER_CONFIG=\"imconfig-SFML.h\";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/dev/leraine-studio/leraine-studio/binaries/leraine-studio.exe -installedDir C:/dev/vcpkg/installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\dev\vcpkg\installed\x64-windows\lib\ImGui-SFML.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-graphics.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-window.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-audio.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-system.lib;bass.lib;bass_fx.lib;zlib.lib;C:\dev\vcpkg\installed\x64-windows\lib\imgui.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/dev/vcpkg/installed/x64-windows/lib;C:/dev/vcpkg/installed/x64-windows/lib/$(Configuration);C:/dev/leraine-studio/leraine-studio/libraries;C:/dev/leraine-studio/leraine-studio/libraries/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/dev/leraine-studio/leraine-studio/cmake/Release/leraine-studio.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/dev/leraine-studio/leraine-studio/binaries/leraine-studio.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IMGUI_USER_CONFIG="imconfig-SFML.h";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IMGUI_USER_CONFIG=\"imconfig-SFML.h\";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/dev/leraine-studio/leraine-studio/cmake/MinSizeRel/leraine-studio.exe -installedDir C:/dev/vcpkg/installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\dev\vcpkg\installed\x64-windows\lib\ImGui-SFML.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-graphics.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-window.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-audio.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-system.lib;bass.lib;bass_fx.lib;zlib.lib;C:\dev\vcpkg\installed\x64-windows\lib\imgui.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/dev/vcpkg/installed/x64-windows/lib;C:/dev/vcpkg/installed/x64-windows/lib/$(Configuration);C:/dev/leraine-studio/leraine-studio/libraries;C:/dev/leraine-studio/leraine-studio/libraries/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/dev/leraine-studio/leraine-studio/cmake/MinSizeRel/leraine-studio.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/dev/leraine-studio/leraine-studio/cmake/MinSizeRel/leraine-studio.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IMGUI_USER_CONFIG="imconfig-SFML.h";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IMGUI_USER_CONFIG=\"imconfig-SFML.h\";FLAC__NO_DLL;OV_EXCLUDE_STATIC_CALLBACKS;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\dev\leraine-studio\leraine-studio\include;C:\dev\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/dev/leraine-studio/leraine-studio/cmake/RelWithDebInfo/leraine-studio.exe -installedDir C:/dev/vcpkg/installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\dev\vcpkg\installed\x64-windows\lib\ImGui-SFML.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-graphics.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-window.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-audio.lib;C:\dev\vcpkg\installed\x64-windows\lib\sfml-system.lib;bass.lib;bass_fx.lib;zlib.lib;C:\dev\vcpkg\installed\x64-windows\lib\imgui.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/dev/vcpkg/installed/x64-windows/lib;C:/dev/vcpkg/installed/x64-windows/lib/$(Configuration);C:/dev/leraine-studio/leraine-studio/libraries;C:/dev/leraine-studio/leraine-studio/libraries/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/dev/leraine-studio/leraine-studio/cmake/RelWithDebInfo/leraine-studio.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/dev/leraine-studio/leraine-studio/cmake/RelWithDebInfo/leraine-studio.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\dev\leraine-studio\leraine-studio\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/dev/leraine-studio/leraine-studio/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/dev/leraine-studio/leraine-studio -BC:/dev/leraine-studio/leraine-studio/cmake --check-stamp-file C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\WindowsPaths.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCXXCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeRCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeSystem.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigDependencies.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigVersion.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets.cmake;C:\dev\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/dev/leraine-studio/leraine-studio/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/dev/leraine-studio/leraine-studio -BC:/dev/leraine-studio/leraine-studio/cmake --check-stamp-file C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\WindowsPaths.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCXXCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeRCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeSystem.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigDependencies.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigVersion.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets.cmake;C:\dev\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/dev/leraine-studio/leraine-studio/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/dev/leraine-studio/leraine-studio -BC:/dev/leraine-studio/leraine-studio/cmake --check-stamp-file C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\WindowsPaths.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCXXCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeRCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeSystem.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigDependencies.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigVersion.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets.cmake;C:\dev\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/dev/leraine-studio/leraine-studio/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/dev/leraine-studio/leraine-studio -BC:/dev/leraine-studio/leraine-studio/cmake --check-stamp-file C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\Platform\WindowsPaths.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeCXXCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeRCCompiler.cmake;C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\3.18.4\CMakeSystem.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui-sfml\ImGui-SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\imgui\imgui-config.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfig.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigDependencies.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLConfigVersion.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-debug.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets-release.cmake;C:\dev\vcpkg\installed\x64-windows\share\sfml\SFMLSharedTargets.cmake;C:\dev\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\dev\leraine-studio\leraine-studio\cmake\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\editing\base\edit-mode.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\editing\note-edit-mode.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\editing\select-edit-mode.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\global\global-functions.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\main.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\audio-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\background-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\base\module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\beat-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\chart-parser-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\dialog-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\edit-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\imgui-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\input-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\manager\module-manager.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\minimap-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\modules\timefield-render-module.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\program\program-meta.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\program\program.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\structures\chart.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\structures\skin.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\structures\timefield-render-graph.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguidock\imguidock.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\imguifilesystem.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\minizip\ioapi.c" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\minizip\unzip.c" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\minizip\zip.c" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguilistview\imguilistview.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguistring\imguistring.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguitabwindow\imguitabwindow.cpp" />
+    <ClCompile Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguitoolbar\imguitoolbar.cpp" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\editing\base\edit-mode.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\editing\note-edit-mode.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\editing\select-edit-mode.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\global\global-functions.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\global\global-types.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\audio-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\background-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\base\module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\beat-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\chart-parser-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\dialog-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\edit-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\imgui-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\input-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\manager\module-manager.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\minimap-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\modules\timefield-render-module.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\program\program.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\structures\chart.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\structures\cursor.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\structures\skin.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\structures\timefield-metrics.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\structures\timefield-render-graph.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\structures\window-metrics.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imgui_user.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguidock\imguidock.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\dirent_portable.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\imguifilesystem.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\minizip\crypt.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\minizip\ioapi.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\minizip\unzip.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguifilesystem\minizip\zip.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguilistview\imguilistview.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguistring\imguistring.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguitabwindow\imguitabwindow.h" />
+    <ClInclude Include="C:\dev\leraine-studio\leraine-studio\source\utilities\imgui\addons\imguitoolbar\imguitoolbar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\dev\leraine-studio\leraine-studio\cmake\ZERO_CHECK.vcxproj">
+      <Project>{52C0A7DE-5657-3397-AE29-5147275FE1A4}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

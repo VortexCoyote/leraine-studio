@@ -1,0 +1,37 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeCInformation.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeCXXInformation.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeDependentOption.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeGenericSystem.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeInitializeConfigs.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeLanguageInformation.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeRCInformation.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeSystemSpecificInformation.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/CMakeSystemSpecificInitialize.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Compiler/MSVC-C.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Compiler/MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Platform/Windows-MSVC-C.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Platform/Windows-MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Platform/Windows-MSVC.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Platform/Windows.cmake
+C:/Program Files/CMake/share/cmake-3.18/Modules/Platform/WindowsPaths.cmake
+C:/dev/leraine-studio/leraine-studio/CMakeLists.txt
+C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/3.18.4/CMakeCCompiler.cmake
+C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/3.18.4/CMakeCXXCompiler.cmake
+C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/3.18.4/CMakeRCCompiler.cmake
+C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/3.18.4/CMakeSystem.cmake
+C:/dev/vcpkg/installed/x64-windows/share/imgui-sfml/ImGui-SFMLConfig-debug.cmake
+C:/dev/vcpkg/installed/x64-windows/share/imgui-sfml/ImGui-SFMLConfig-release.cmake
+C:/dev/vcpkg/installed/x64-windows/share/imgui-sfml/ImGui-SFMLConfig.cmake
+C:/dev/vcpkg/installed/x64-windows/share/imgui/imgui-config-debug.cmake
+C:/dev/vcpkg/installed/x64-windows/share/imgui/imgui-config-release.cmake
+C:/dev/vcpkg/installed/x64-windows/share/imgui/imgui-config.cmake
+C:/dev/vcpkg/installed/x64-windows/share/sfml/SFMLConfig.cmake
+C:/dev/vcpkg/installed/x64-windows/share/sfml/SFMLConfigDependencies.cmake
+C:/dev/vcpkg/installed/x64-windows/share/sfml/SFMLConfigVersion.cmake
+C:/dev/vcpkg/installed/x64-windows/share/sfml/SFMLSharedTargets-debug.cmake
+C:/dev/vcpkg/installed/x64-windows/share/sfml/SFMLSharedTargets-release.cmake
+C:/dev/vcpkg/installed/x64-windows/share/sfml/SFMLSharedTargets.cmake
+C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake

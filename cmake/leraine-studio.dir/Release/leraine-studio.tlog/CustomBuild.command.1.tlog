@@ -1,0 +1,10 @@
+^C:\DEV\LERAINE-STUDIO\LERAINE-STUDIO\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/dev/leraine-studio/leraine-studio -BC:/dev/leraine-studio/leraine-studio/cmake --check-stamp-file C:/dev/leraine-studio/leraine-studio/cmake/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
