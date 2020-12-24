@@ -119,7 +119,7 @@ void Program::MenuBarRoutines()
 				
 					_SelectedChart->RegisterOnModifiedCallback([this]()
 					{
-						//replicate the timeslice method to optimize when "re-generating" 
+						//TODO: replicate the timeslice method to optimize when "re-generating" 
 						MOD(MiniMapModule).Generate(_SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 					});
 				});
@@ -140,6 +140,8 @@ void Program::MenuBarRoutines()
 
 void Program::InputActions() 
 {
+	//TODO: set up input action priorities
+
 	if (MOD(InputModule).IsTogglingPause())
 		MOD(AudioModule).TogglePause();
 
