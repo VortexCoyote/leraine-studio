@@ -11,13 +11,16 @@ public:
 	bool StartUp() override;
 	bool Tick(const float& InDeltaTime) override;
 
+	bool RenderBack(sf::RenderTarget* const InOutRenderTarget) override;
+	bool RenderFront(sf::RenderTarget* const InOutRenderTarget) override;
+
+
 public: //rendering
 
-	void RenderTimefieldGraph(sf::RenderTarget* const InOutRenderTarget, TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTime, const float InZoomLevel, const bool InRegisterToOnscreenNotes = true);
-	void RenderBeatLine(sf::RenderTarget* const InOutRenderTarget, const Time InBeatTimePoint, const int InBeatSnap, const Time InTime, const float InZoomLevel);
+	void RenderTimefieldGraph(sf::RenderTarget* const InOutRenderTarget, TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTime, const float InZoomLevel, const bool InRegisterToOnscreenNotes = true);	
+	sf::RenderTexture* const GetRenderedTimefieldGraphSegment(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTime, const float InZoomLevel);
 
-	void RenderTimefieldBackground(sf::RenderTarget* const InOutRenderTarget);
-	void RenderTimefieldForeground(sf::RenderTarget* const InOutRenderTarget);
+	void RenderBeatLine(sf::RenderTarget* const InOutRenderTarget, const Time InBeatTimePoint, const int InBeatSnap, const Time InTime, const float InZoomLevel);
 
 public: //data gathering
 
@@ -31,6 +34,7 @@ public: //data gathering
 	void GetOverlappedOnScreenNotes(const Column InColumn, const int InScreenPointY, std::vector<const Note*>& OutNoteCollection);
 
 	Skin& GetSkin();
+	const TimefieldMetrics& GetTimefieldMetrics();
 
 public: //data setting
 
@@ -44,6 +48,11 @@ private: //data ownership
 
 	sf::Sprite _NoteRenderLayerSprite;
 	sf::Sprite _HoldRenderLayerSprite;
+
+	sf::RenderTexture _SegmentedRenderTexture;
+	sf::RenderTexture _ResultingSegmentedRenderTexture;
+	sf::Sprite _SegmentedSprite;
+
 
 	TimefieldMetrics _TimefieldMetrics;
 	WindowMetrics _WindowMetrics;

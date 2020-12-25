@@ -6,8 +6,6 @@ void TimefieldRenderGraph::Render(std::function<void(const NoteRenderCommand&)> 
     {
         InWork(renderCommand);
     }
-
-    _NoteRenderCommands.clear();
 }
 
 void TimefieldRenderGraph::Render(std::function<void(const TimefieldRenderCommand&)> InWork) 
@@ -16,8 +14,12 @@ void TimefieldRenderGraph::Render(std::function<void(const TimefieldRenderComman
     {
         InWork(timefieldCommand);
     }
+}
 
+void TimefieldRenderGraph::ClearRenderCommands() 
+{
     _TimefieldRenderCommands.clear();
+    _NoteRenderCommands.clear();    
 }
 
 void TimefieldRenderGraph::SubmitCommonNoteRenderCommand(const Column InColumn, const Time InTime, const int InBeatSnap, const sf::Int8 InAlpha) 

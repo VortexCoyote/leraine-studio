@@ -13,11 +13,11 @@ public: //inner program sequences
 
 public: //abstractions
 
-	void MenuBarRoutines();
+	void MenuBar();
 	void ScrollShortcutRoutines();
 	void InputActions();
 	void ApplyDeltaToZoom(const float InDelta);
-	void UpdateCursorData();
+	void UpdateCursor();
 
 public: //meta program sequences
 
@@ -41,8 +41,6 @@ private: //program data ownership
 
 	ChartSet* _SelectedChartSet = nullptr;
 	Chart* _SelectedChart = nullptr;
-
-	Cursor _Cursor;
 
 	float _ZoomLevel = 1.0f;
 	int _CurrentSnap = 2;

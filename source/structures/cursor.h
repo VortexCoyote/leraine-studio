@@ -4,6 +4,15 @@
 
 struct Cursor
 {
+	enum class FieldPosition
+	{
+		Left,
+		Middle,
+		Right,
+
+		COUNT
+	} TimefieldSide;
+
 	Time TimePoint = 0;
 	Time UnsnappedTimePoint = 0;
 	Column Column = 0;

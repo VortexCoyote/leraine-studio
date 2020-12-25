@@ -15,9 +15,16 @@
 #include "../modules/background-module.h"
 #include "../modules/minimap-module.h"
 
+//file exclusive globals
+Time WindowTimeBegin;
+Time WindowTimeEnd;
+
+Cursor EditCursor;
+
 void Program::RegisterModules()
 {
 	ModuleManager::Register<BackgroundModule>();
+	ModuleManager::Register<TimefieldRenderModule>();
 	ModuleManager::Register<ImGuiModule>();
 	ModuleManager::Register<DialogModule>();
 	ModuleManager::Register<InputModule>();
@@ -26,7 +33,6 @@ void Program::RegisterModules()
 	ModuleManager::Register<AudioModule>();
 	ModuleManager::Register<BeatModule>();
 	ModuleManager::Register<EditModule>();
-	ModuleManager::Register<TimefieldRenderModule>();
 }
 
 void Program::InnerStartUp()
@@ -36,29 +42,23 @@ void Program::InnerStartUp()
 
 void Program::InnerTick()
 {
-	MenuBarRoutines();
+	MenuBar();
 
-	if (!_SelectedChart || MOD(DialogModule).IsDialogOpen())
+	if (!_SelectedChart)
 		return;
 
-	UpdateCursorData();
-	MOD(EditModule).SetCursorData(_Cursor);
+	UpdateCursor();
+	MOD(EditModule).SetCursorData(EditCursor);
 	
+	WindowTimeBegin = MOD(TimefieldRenderModule).GetWindowTimePointBegin(MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
+	WindowTimeEnd   = MOD(TimefieldRenderModule).GetWindowTimePointEnd(MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
+
 	InputActions();
 
-	const Time windowTimeBegin = MOD(TimefieldRenderModule).GetWindowTimePointBegin(MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
-	const Time windowTimeEnd   = MOD(TimefieldRenderModule).GetWindowTimePointEnd(MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
-
-	if(MOD(MiniMapModule).IsHoveringTimeline(32, _WindowMetrics.MenuBarHeight, _WindowMetrics.Height - _WindowMetrics.MenuBarHeight, 16, MOD(AudioModule).GetTimeMilliSeconds(), windowTimeBegin, windowTimeEnd, _Cursor))
-	{
-		if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Left))		
-			MOD(AudioModule).SetTimeMilliSeconds((MOD(MiniMapModule).GetHoveredTime()));	
-	}
-
 	MOD(TimefieldRenderModule).UpdateMetrics(_WindowMetrics);
-	MOD(BeatModule).GenerateTimeRangeBeatLines(windowTimeBegin, windowTimeEnd, _SelectedChart, _CurrentSnap);
+	MOD(BeatModule).GenerateTimeRangeBeatLines(WindowTimeBegin, WindowTimeEnd, _SelectedChart, _CurrentSnap);
 
-	_SelectedChart->IterateNotesInTimeRange(windowTimeBegin - TIMESLICE_LENGTH, windowTimeEnd, [this](Note& InNote, const Column InColumn)
+	_SelectedChart->IterateNotesInTimeRange(WindowTimeBegin - TIMESLICE_LENGTH, WindowTimeEnd, [this](Note& InNote, const Column InColumn)
 	{
 		_ChartRenderGraph.SubmitNoteRenderCommand(InNote, InColumn);
 	});
@@ -71,10 +71,6 @@ void Program::InnerRender(sf::RenderTarget* const InOutRenderTarget)
 	if (!_SelectedChart)
 		return;
 
-	MOD(TimefieldRenderModule).RenderTimefieldBackground(InOutRenderTarget);
-
-	MOD(MiniMapModule).Render(InOutRenderTarget);
-
 	MOD(BeatModule).IterateThroughBeatlines([this, &InOutRenderTarget](const BeatLine& InBeatLine)
 	{
 		MOD(TimefieldRenderModule).RenderBeatLine(InOutRenderTarget, InBeatLine.TimePoint, InBeatLine.BeatSnap, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
@@ -82,8 +78,14 @@ void Program::InnerRender(sf::RenderTarget* const InOutRenderTarget)
 
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget ,_ChartRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, _PreviewRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel, false);
+	
+	MOD(MiniMapModule).Render(InOutRenderTarget);
 
-	MOD(TimefieldRenderModule).RenderTimefieldForeground(InOutRenderTarget);
+	if(MOD(MiniMapModule).ShouldPreview()) // :D ???
+		MOD(MiniMapModule).RenderPreview(InOutRenderTarget, MOD(TimefieldRenderModule).GetRenderedTimefieldGraphSegment(MOD(MiniMapModule).GetPreviewRenderGraph(_SelectedChart), MOD(MiniMapModule).GetHoveredTime(), _ZoomLevel));
+
+	_ChartRenderGraph.ClearRenderCommands();
+	_PreviewRenderGraph.ClearRenderCommands();
 }
 
 void Program::InnerShutDown()
@@ -93,7 +95,7 @@ void Program::InnerShutDown()
 
 //************************************************************************************************************************************************************************************
 
-void Program::MenuBarRoutines()
+void Program::MenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -140,7 +142,7 @@ void Program::MenuBarRoutines()
 
 void Program::InputActions() 
 {
-	//TODO: set up input action priorities
+	//TODO: set up input action priorities (maybe make some sort of dependency graph module?)
 
 	if (MOD(InputModule).IsTogglingPause())
 		MOD(AudioModule).TogglePause();
@@ -187,6 +189,32 @@ void Program::InputActions()
 			MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
 	}
 
+
+	if (ImGui::GetIO().WantCaptureMouse)
+		return;
+
+	if(MOD(MiniMapModule).IsDragging())
+	{
+		if (MOD(InputModule).WasMouseButtonReleased(sf::Mouse::Left))
+			return MOD(MiniMapModule).EndDragging();		
+			
+		MOD(AudioModule).SetTimeMilliSeconds((MOD(MiniMapModule).GetHoveredTime()));
+	}
+	
+	if(MOD(MiniMapModule).IsHoveringTimeline(32, _WindowMetrics.MenuBarHeight, _WindowMetrics.Height - _WindowMetrics.MenuBarHeight, 16, MOD(AudioModule).GetTimeMilliSeconds(), WindowTimeBegin, WindowTimeEnd, EditCursor))
+	{
+		if(MOD(MiniMapModule).IsPossibleToDrag())
+		{
+			if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Left))	
+				return MOD(MiniMapModule).StartDragging();
+		}
+		else if(!MOD(MiniMapModule).IsDragging())
+		{
+			if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Left))		
+				return MOD(AudioModule).SetTimeMilliSeconds((MOD(MiniMapModule).GetHoveredTime()));
+		}
+	}
+
 	if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Left))
 		MOD(EditModule).OnMouseLeftButtonClicked(MOD(InputModule).IsShiftKeyDown());
 
@@ -211,29 +239,41 @@ void Program::ApplyDeltaToZoom(const float InDelta)
 		_ZoomLevel = 2.0f;
 }
 
-void Program::UpdateCursorData()
+void Program::UpdateCursor()
 {
 	//TODO: clean?
-	_Cursor.X = (int)ImGui::GetMousePos().x;
-	_Cursor.Y = (int)ImGui::GetMousePos().y;
-	
-	BeatLine snappedBeatLine = MOD(BeatModule).GetCurrentBeatLine(MOD(TimefieldRenderModule).GetTimeFromScreenPoint(_Cursor.Y, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel, true), 1);
-	_Cursor.TimeFieldY = MOD(TimefieldRenderModule).GetScreenTimePoint(snappedBeatLine.TimePoint, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
+	if (ImGui::GetIO().WantCaptureMouse)
+		return;
 
-	if (_Cursor.TimeFieldY > _WindowMetrics.Height)
+	const auto& timefieldMetrics = MOD(TimefieldRenderModule).GetTimefieldMetrics();
+
+	EditCursor.X = (int)ImGui::GetMousePos().x;
+	EditCursor.Y = (int)ImGui::GetMousePos().y;
+	
+	BeatLine snappedBeatLine = MOD(BeatModule).GetCurrentBeatLine(MOD(TimefieldRenderModule).GetTimeFromScreenPoint(EditCursor.Y, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel, true), 1);
+	EditCursor.TimeFieldY = MOD(TimefieldRenderModule).GetScreenTimePoint(snappedBeatLine.TimePoint, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
+
+	if (EditCursor.TimeFieldY > _WindowMetrics.Height)
 	{
-		snappedBeatLine = MOD(BeatModule).GetCurrentBeatLine(MOD(TimefieldRenderModule).GetTimeFromScreenPoint(_Cursor.Y, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel, true), 0, false);
-		_Cursor.TimeFieldY = MOD(TimefieldRenderModule).GetScreenTimePoint(snappedBeatLine.TimePoint, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
+		snappedBeatLine = MOD(BeatModule).GetCurrentBeatLine(MOD(TimefieldRenderModule).GetTimeFromScreenPoint(EditCursor.Y, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel, true), 0, false);
+		EditCursor.TimeFieldY = MOD(TimefieldRenderModule).GetScreenTimePoint(snappedBeatLine.TimePoint, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
 	}
 
-	_Cursor.TimePoint = snappedBeatLine.TimePoint;
-	_Cursor.UnsnappedTimePoint = MOD(TimefieldRenderModule).GetTimeFromScreenPoint(_Cursor.Y, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
-	_Cursor.Column = MOD(TimefieldRenderModule).GetColumnFromScreenPoint(_Cursor.X);
-	_Cursor.BeatSnap = snappedBeatLine.BeatSnap;
+	EditCursor.TimePoint = snappedBeatLine.TimePoint;
+	EditCursor.UnsnappedTimePoint = MOD(TimefieldRenderModule).GetTimeFromScreenPoint(EditCursor.Y, MOD(AudioModule).GetTimeMilliSeconds(), _ZoomLevel);
+	EditCursor.Column = MOD(TimefieldRenderModule).GetColumnFromScreenPoint(EditCursor.X);
+	EditCursor.BeatSnap = snappedBeatLine.BeatSnap;
+ 
+	if(EditCursor.X < timefieldMetrics.LeftSidePosition)
+		EditCursor.TimefieldSide = Cursor::FieldPosition::Left;
+	else if(EditCursor.X > timefieldMetrics.LeftSidePosition + timefieldMetrics.FieldWidth)
+		EditCursor.TimefieldSide = Cursor::FieldPosition::Right;
+	else
+		EditCursor.TimefieldSide = Cursor::FieldPosition::Middle;
 
-	_Cursor.HoveredNotes.clear();
+	EditCursor.HoveredNotes.clear();
 
-	MOD(TimefieldRenderModule).GetOverlappedOnScreenNotes(_Cursor.Column, _Cursor.Y, _Cursor.HoveredNotes);
+	MOD(TimefieldRenderModule).GetOverlappedOnScreenNotes(EditCursor.Column, EditCursor.Y, EditCursor.HoveredNotes);
 
-	std::sort(_Cursor.HoveredNotes.begin(), _Cursor.HoveredNotes.end(), [](const Note* lhs, const Note* rhs)  {return lhs->TimePoint < rhs->TimePoint; });
+	std::sort(EditCursor.HoveredNotes.begin(), EditCursor.HoveredNotes.end(), [](const Note* lhs, const Note* rhs)  {return lhs->TimePoint < rhs->TimePoint; });
 }

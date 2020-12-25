@@ -5,6 +5,9 @@ bool TimefieldRenderModule::StartUp()
 	_HoldRenderLayer.create(3840, 2160);
 	_NoteRenderLayer.create(3840, 2160);
 
+	_SegmentedRenderTexture.create(3840, 2160);
+
+
 	_OnScreenNotes.reserve(1000);
 
 	return true;
@@ -17,7 +20,21 @@ bool TimefieldRenderModule::Tick(const float& InDeltaTime)
 	return true;
 }
 
-void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRenderTarget, TimefieldRenderGraph& InOutTimefieldRenderGrap, const Time InTime, const float InZoomLevel, const bool InRegisterToOnscreenNotes) 
+bool TimefieldRenderModule::RenderBack(sf::RenderTarget* const InOutRenderTarget) 
+{
+	_Skin.RenderTimeFieldBackground(InOutRenderTarget);
+
+	return true;
+}
+
+bool TimefieldRenderModule::RenderFront(sf::RenderTarget* const InOutRenderTarget) 
+{
+	_Skin.RenderHitline(InOutRenderTarget);
+
+	return true;
+}
+
+void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRenderTarget, TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTime, const float InZoomLevel, const bool InRegisterToOnscreenNotes) 
 {
 	if(InRegisterToOnscreenNotes)
 		_OnScreenNotes.clear();
@@ -25,7 +42,7 @@ void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRe
 	_HoldRenderLayer.clear({ 0,0,0,0 });
 	_NoteRenderLayer.clear({ 0,0,0,0 });
 
-	InOutTimefieldRenderGrap.Render([this, &InTime, &InZoomLevel, &InRegisterToOnscreenNotes](const NoteRenderCommand& InNoteRenderCommand)
+	InOutTimefieldRenderGraph.Render([this, &InTime, &InZoomLevel, &InRegisterToOnscreenNotes](const NoteRenderCommand& InNoteRenderCommand)
 	{
 		const Note& note = InNoteRenderCommand.RenderNote;
 		const Column column = InNoteRenderCommand.NoteColumn;
@@ -75,10 +92,34 @@ void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRe
 	InOutRenderTarget->draw(_HoldRenderLayerSprite);
 	InOutRenderTarget->draw(_NoteRenderLayerSprite);
 
-	InOutTimefieldRenderGrap.Render([this, &InOutRenderTarget, &InTime, &InZoomLevel](const TimefieldRenderCommand& InRenderCommand)
+	InOutTimefieldRenderGraph.Render([this, &InOutRenderTarget, &InTime, &InZoomLevel](const TimefieldRenderCommand& InRenderCommand)
 	{
 		InRenderCommand.RenderWork(InOutRenderTarget, _TimefieldMetrics, _TimefieldMetrics.FirstColumnPosition + InRenderCommand.ColumnPoint * _TimefieldMetrics.ColumnSize, GetScreenTimePoint(InRenderCommand.TimePoint, InTime, InZoomLevel));
 	});
+}
+
+sf::RenderTexture* const TimefieldRenderModule::GetRenderedTimefieldGraphSegment(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTime, const float InZoomLevel)
+{
+	_SegmentedRenderTexture.clear({0, 0, 0, 0});
+	_ResultingSegmentedRenderTexture.clear({0, 0, 0, 0});
+
+	RenderTimefieldGraph(&_SegmentedRenderTexture, InOutTimefieldRenderGraph, InTime, InZoomLevel, false);
+
+	sf::IntRect segment;
+
+	segment.width = _ResultingSegmentedRenderTexture.getSize().x;
+	segment.height = _ResultingSegmentedRenderTexture.getSize().y;
+
+	segment.top = 0;
+	segment.left = _TimefieldMetrics.FirstColumnPosition;
+
+	_SegmentedSprite.setTexture(_SegmentedRenderTexture.getTexture());
+	_SegmentedSprite.setTextureRect(segment);
+	_SegmentedSprite.setPosition(0, 0);
+
+	_ResultingSegmentedRenderTexture.draw(_SegmentedSprite);
+
+	return &_ResultingSegmentedRenderTexture;
 }
 
 void TimefieldRenderModule::RenderBeatLine(sf::RenderTarget* const InOutRenderTarget, const Time InBeatTimePoint, const int InBeatSnap, const Time InTime, const float InZoomLevel) 
@@ -91,15 +132,6 @@ void TimefieldRenderModule::RenderBeatLine(sf::RenderTarget* const InOutRenderTa
 	InOutRenderTarget->draw(line);
 }
 
-void TimefieldRenderModule::RenderTimefieldBackground(sf::RenderTarget* const InOutRenderTarget) 
-{
-	_Skin.RenderTimeFieldBackground(InOutRenderTarget);
-}
-
-void TimefieldRenderModule::RenderTimefieldForeground(sf::RenderTarget* const InOutRenderTarget) 
-{
-	_Skin.RenderHitline(InOutRenderTarget);
-}
 
 int TimefieldRenderModule::GetScreenTimePoint(const Time InTimePoint, const Time InTime, const float InZoomLevel)
 {
@@ -178,6 +210,11 @@ Skin& TimefieldRenderModule::GetSkin()
 	return _Skin;
 }
 
+const TimefieldMetrics& TimefieldRenderModule::GetTimefieldMetrics() 
+{
+	return _TimefieldMetrics;
+}
+
 void TimefieldRenderModule::SetKeyAmount(const int InKeyAmount) 
 {
 	_KeyAmount = InKeyAmount;
@@ -185,18 +222,20 @@ void TimefieldRenderModule::SetKeyAmount(const int InKeyAmount)
 	_TimefieldMetrics.KeyAmount = _KeyAmount;
 	_TimefieldMetrics.NoteScreenPivot = _TimefieldMetrics.NoteScreenPivotsLookup[_KeyAmount];
 
+	_TimefieldMetrics.FieldWidth = _TimefieldMetrics.ColumnSize * _TimefieldMetrics.KeyAmount + _TimefieldMetrics.SideSpace * 2;
+	_TimefieldMetrics.FieldWidthHalf = _TimefieldMetrics.FieldWidth / 2;
+	
+	_TimefieldMetrics.NoteFieldWidth = _TimefieldMetrics.ColumnSize * _TimefieldMetrics.KeyAmount;
+	_TimefieldMetrics.NoteFieldWidthHalf = _TimefieldMetrics.FieldWidth / 2;
+
+	_ResultingSegmentedRenderTexture.create(_TimefieldMetrics.NoteFieldWidth, 2160);
+
 	_Skin.LoadResources(InKeyAmount);
 }
 
 void TimefieldRenderModule::UpdateMetrics(const WindowMetrics& InWindowMetrics) 
 {
 	_WindowMetrics = InWindowMetrics;
-
-	_TimefieldMetrics.FieldWidth = _TimefieldMetrics.ColumnSize * _TimefieldMetrics.KeyAmount + _TimefieldMetrics.SideSpace * 2;
-	_TimefieldMetrics.FieldWidthHalf = _TimefieldMetrics.FieldWidth / 2;
-	
-	_TimefieldMetrics.NoteFieldWidth = _TimefieldMetrics.ColumnSize * _TimefieldMetrics.KeyAmount;
-	_TimefieldMetrics.NoteFieldWidthHalf = _TimefieldMetrics.FieldWidth / 2;
 
 	_TimefieldMetrics.LeftSidePosition = _WindowMetrics.MiddlePoint - _TimefieldMetrics.FieldWidthHalf;
 	_TimefieldMetrics.LeftSidePositionFromCenter = -_TimefieldMetrics.FieldWidthHalf;

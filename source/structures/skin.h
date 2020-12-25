@@ -45,5 +45,6 @@ private:
 	void ResetTexturesAndSprites();
 
 	bool _HasOverlay;
+
 	TimefieldMetrics _TimefieldMetrics;
 };

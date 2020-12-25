@@ -34,6 +34,8 @@ public:
     void Render(std::function<void(const NoteRenderCommand&)> InWork);
     void Render(std::function<void(const TimefieldRenderCommand&)> InWork);
 
+    void ClearRenderCommands();
+
 public:
 
     void SubmitCommonNoteRenderCommand(const Column InColumn, const Time InTime, const int InBeatSnap = -1, const sf::Int8 InAlpha = 255);

@@ -13,6 +13,9 @@ bool NoteEditMode::OnMouseRightButtonClicked(const bool InIsShiftDown)
 
 bool NoteEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
+    if(static_Cursor.TimefieldSide != Cursor::FieldPosition::Middle)
+        return false;
+
     if(InIsShiftDown)
     {
         _AnchoredHoldCursor = static_Cursor;
@@ -48,7 +51,7 @@ void NoteEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRende
             InOutTimefieldRenderGraph.SubmitHoldNoteRenderCommand(_AnchoredHoldCursor.Column, _AnchoredHoldCursor.TimePoint, static_Cursor.TimePoint, _AnchoredHoldCursor.BeatSnap, static_Cursor.BeatSnap, 156);
         else
             InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(_AnchoredHoldCursor.Column, _AnchoredHoldCursor.TimePoint, _AnchoredHoldCursor.BeatSnap, 156);
-    else   
+    else if(static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle)
         InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(static_Cursor.Column, static_Cursor.TimePoint, static_Cursor.BeatSnap, 156);
 }
 
