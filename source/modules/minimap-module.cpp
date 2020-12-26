@@ -6,9 +6,13 @@ void MiniMapModule::Generate(Chart* const InChart, Skin& InSkin, const Time InSo
 {
     _Width = _BorderPadding * 2 + _NoteWidth + (InChart->KeyAmount * _NoteWidth + (InChart->KeyAmount - 1)) + _NoteWidth;
     _ScaledSongLength = InSongLength / _HeightScale;
-    _SongLength = InSongLength;
-
-    _MiniMapRenderTexture.create(_Width, _ScaledSongLength);
+    
+    if(_SongLength != InSongLength)
+    {
+        _MiniMapRenderTexture.create(_Width, _ScaledSongLength);
+        _SongLength = InSongLength;
+    }
+    
     _MiniMapRenderTexture.clear({0, 0, 0, 216});
 
     InChart->IterateNotesInTimeRange(0, InSongLength, [this, &InSkin, &InSongLength](Note& InOutNote, const Column InColumn)
@@ -186,8 +190,12 @@ void MiniMapModule::RenderPreview(sf::RenderTarget* InOutRenderTarget, sf::Rende
 {
      sf::IntRect previewSegment;
     
+    float scale = 0.7f;
+
+    InPreviewRenderTexture->setSmooth(true);
+
     previewSegment.width = InPreviewRenderTexture->getSize().x;
-    previewSegment.height = 356;
+    previewSegment.height = 456;
 
     previewSegment.left = 0;
     previewSegment.top = InOutRenderTarget->getSize().y / 2 - previewSegment.height / 4;
@@ -197,17 +205,18 @@ void MiniMapModule::RenderPreview(sf::RenderTarget* InOutRenderTarget, sf::Rende
     if(position.y <= _TimelinePositionTop)
         position.y = _TimelinePositionTop;
 
-    if(position.y + previewSegment.height >= _TimelinePositionBottom)
-        position.y = _TimelinePositionBottom - previewSegment.height;
+    if(position.y + float(previewSegment.height) * scale >= _TimelinePositionBottom)
+        position.y = _TimelinePositionBottom - float(previewSegment.height) * scale;
 
     _PreviewSprite.setTexture(InPreviewRenderTexture->getTexture());
     _PreviewSprite.setTextureRect(previewSegment);
     _PreviewSprite.setPosition(position);
+    _PreviewSprite.setScale(sf::Vector2f(scale, scale));
 
     sf::RectangleShape backgroundRectangle;
 
     backgroundRectangle.setPosition(position);
-    backgroundRectangle.setSize(sf::Vector2f(previewSegment.width, previewSegment.height));
+    backgroundRectangle.setSize(sf::Vector2f(previewSegment.width, previewSegment.height) * scale);
     backgroundRectangle.setFillColor({0, 0, 0, 216});
     backgroundRectangle.setOutlineColor({255, 255, 255, 255});
     backgroundRectangle.setOutlineThickness(1.f);

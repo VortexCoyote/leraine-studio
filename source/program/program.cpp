@@ -21,6 +21,7 @@ Time WindowTimeEnd;
 
 Cursor EditCursor;
 
+
 void Program::RegisterModules()
 {
 	ModuleManager::Register<BackgroundModule>();
@@ -163,33 +164,38 @@ void Program::InputActions()
 
 		if (MOD(InputModule).IsScrollingDown())
 			ApplyDeltaToZoom(-0.1f);
+
+		return;
 	}
-	else  if (MOD(InputModule).IsAltKeyDown())
+	
+	if (MOD(InputModule).IsAltKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
 			_CurrentSnap = MOD(BeatModule).GetNextSnap(_CurrentSnap);
 
 		if (MOD(InputModule).IsScrollingDown())
 			_CurrentSnap = MOD(BeatModule).GetPreviousSnap(_CurrentSnap);
+
+		return;
 	}
-	else if (MOD(InputModule).IsShiftKeyDown())
+	
+	if (MOD(InputModule).IsShiftKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
 			MOD(AudioModule).ChangeSpeed(0.05f);
 
 		if (MOD(InputModule).IsScrollingDown())
 			MOD(AudioModule).ChangeSpeed(-0.05f);
+
+		return;
 	}
-	else
-	{
-		if (MOD(InputModule).IsScrollingUp())
-			MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetPreviousBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
+	
+	if (MOD(InputModule).IsScrollingUp())
+		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetPreviousBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
 
-		if (MOD(InputModule).IsScrollingDown())
-			MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
-	}
-
-
+	if (MOD(InputModule).IsScrollingDown())
+		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
+	
 	if (ImGui::GetIO().WantCaptureMouse)
 		return;
 
