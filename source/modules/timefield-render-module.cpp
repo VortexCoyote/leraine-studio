@@ -30,7 +30,7 @@ bool TimefieldRenderModule::RenderBack(sf::RenderTarget* const InOutRenderTarget
 bool TimefieldRenderModule::RenderFront(sf::RenderTarget* const InOutRenderTarget) 
 {
 	_Skin.RenderHitline(InOutRenderTarget);
-
+	
 	return true;
 }
 

@@ -34,16 +34,6 @@ public: //meta program sequences
 	void Render();
 	void ShutDown();
 
-private: //program data ownership
-
-	TimefieldRenderGraph _ChartRenderGraph;
-	TimefieldRenderGraph _PreviewRenderGraph;
-
-	Chart* _SelectedChart = nullptr;
-
-	float _ZoomLevel = 1.0f;
-	int _CurrentSnap = 2;
-
 private: //meta data ownership
 
 	sf::Clock _DeltaClock;
