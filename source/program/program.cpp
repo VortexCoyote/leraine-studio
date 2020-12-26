@@ -139,7 +139,7 @@ void Program::MenuBar()
 void Program::InputActions() 
 {
 	//TODO: set up input action priorities (maybe make some sort of dependency graph module?)
-
+	
 	if (MOD(InputModule).IsTogglingPause())
 		MOD(AudioModule).TogglePause();
 
@@ -190,9 +190,9 @@ void Program::InputActions()
 
 	if (MOD(InputModule).IsScrollingDown())
 		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
-	
 
-	
+
+
 	if (ImGui::GetIO().WantCaptureMouse)
 		return;
 
@@ -212,10 +212,10 @@ void Program::InputActions()
 	{
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 			return MOD(MiniMapModule).EndDragging();		
-			
+
 		MOD(AudioModule).SetTimeMilliSeconds((MOD(MiniMapModule).GetHoveredTime()));
 	}
-	
+
 	if(MOD(MiniMapModule).IsHoveringTimeline(32, _WindowMetrics.MenuBarHeight, _WindowMetrics.Height - _WindowMetrics.MenuBarHeight, 16, MOD(AudioModule).GetTimeMilliSeconds(), WindowTimeBegin, WindowTimeEnd, EditCursor))
 	{
 		if(MOD(MiniMapModule).IsPossibleToDrag())
