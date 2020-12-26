@@ -19,7 +19,7 @@ public:
 public:
 
 	void OpenFolderDialog(std::function<void(const std::string&)> InSelectedFolderAction);
-	void OpenFileDialog(std::function<void(const std::string&)> InSelectedFileAction);
+	void OpenFileDialog(const std::string& InFileExtension, std::function<void(const std::string&)> InSelectedFileAction);
 
 	bool IsDialogOpen();
 
@@ -27,6 +27,8 @@ private:
 
 	bool _IsOpen = false;
 	bool _ShouldOpenDialog = false;
+
+	std::string _FileExtension = "";
 
 	sf::RenderTarget* _RenderWindow = nullptr;
 

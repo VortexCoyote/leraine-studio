@@ -8,7 +8,7 @@ class ChartParserModule : public Module
 {
 public:
 
-	ChartSet* ParseAndGenerateChartSet(std::string InPath);
+	Chart* ParseAndGenerateChartSet(std::string InPath);
 
 private:
 

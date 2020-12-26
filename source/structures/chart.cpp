@@ -286,16 +286,6 @@ const std::vector<BpmPoint>& Chart::GetBpmPointsRelatedToTimeRange(const Time In
 	return CachedBpmPoints;
 }
 
-void ChartSet::AddChart(Chart* const InChart)
-{
-	Charts[InChart->DifficultyName] = InChart;
-}
-
-bool ChartSet::IsEmpty()
-{
-	return Charts.empty();
-}
-
 Chart::Chart() 
 {
 	_OnModified = [](){};

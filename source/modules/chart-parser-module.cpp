@@ -6,26 +6,11 @@
 
 #define PARSE_COMMA_VALUE(stringstream, target) stringstream >> target; if (stringstream.peek() == ',') stringstream.ignore()
 
-ChartSet* ChartParserModule::ParseAndGenerateChartSet(std::string InPath)
+Chart* ChartParserModule::ParseAndGenerateChartSet(std::string InPath)
 {
-	ChartSet* chartSet = new ChartSet();
-	
-	for (const auto& dirEntry : std::filesystem::directory_iterator(InPath))
-	{
-		std::ifstream chartFile(dirEntry.path());
+	std::ifstream chartFile(InPath);
 
-		if (dirEntry.path().extension() == ".osu")
-		{
-			chartSet->AddChart(ParseChartOsuImpl(chartFile, InPath));
-		}
-
-		if (dirEntry.path().extension() == ".sm")
-		{
-			chartSet->AddChart(ParseChartStepmaniaImpl(chartFile, InPath));
-		}
-	}
-
-	return chartSet;
+	return ParseChartOsuImpl(chartFile, InPath);
 }
 
 Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::string InPath)
@@ -33,6 +18,9 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 	Chart* chart = new Chart();
 
 	std::string line;
+
+	std::filesystem::path path = InPath;
+	std::string parentPath = path.parent_path().string();
 
 	while (std::getline(InIfstream, line))
 	{
@@ -61,7 +49,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 				if (meta == "AudioFilename")
 				{
-					std::string songPath = InPath + "\\" + value;
+					std::string songPath = parentPath + "\\" + value;
 					chart->AudioPath = songPath;
 					//chartData->audioFileName = value;
 				}
@@ -161,7 +149,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 					background += timePointLine[charIndex];
 				while (timePointLine[++charIndex] != '"');
 
-				chart->BackgroundPath = InPath + "\\" + background;
+				chart->BackgroundPath = parentPath + "\\" + background;
 				
 				break;
 			}

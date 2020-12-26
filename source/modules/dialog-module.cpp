@@ -52,7 +52,7 @@ bool DialogModule::Tick(const float& InDeltaTime)
 		break;
 	
 	case DialogModule::EDialogType::File:
-		chosenPath = dialog.chooseFileDialog(_ShouldOpenDialog, 0, 0, 0, { width  / size, height/ size }, { width / (10.f), height / (10.f) }, 1.f);
+		chosenPath = dialog.chooseFileDialog(_ShouldOpenDialog, 0, _FileExtension.c_str(), 0, { width  / size, height/ size }, { width / (10.f), height / (10.f) }, 1.f);
 		break;
 
 	default:
@@ -92,11 +92,13 @@ void DialogModule::OpenFolderDialog(std::function<void(const std::string&)> InSe
 	_DialogType = EDialogType::Folder;
 }
 
-void DialogModule::OpenFileDialog(std::function<void(const std::string&)> InSelectedFileAction)
+void DialogModule::OpenFileDialog(const std::string& InFileExtension, std::function<void(const std::string&)> InSelectedFileAction)
 {
 	_ShouldOpenDialog = true;
 	_IsOpen = true;
 	_SelectedItemAction = InSelectedFileAction;
+
+	_FileExtension = InFileExtension;
 
 	_DialogType = EDialogType::File;
 }

@@ -104,14 +104,9 @@ void Program::MenuBar()
 		{
 			if (ImGui::MenuItem("Open", "CTRL+O"))
 			{
-				MOD(DialogModule).OpenFolderDialog([this](const std::string& InPath)
+				MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string& InPath)
 				{
-					_SelectedChartSet = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
-					
-					if (_SelectedChartSet->IsEmpty())
-						return;
-
-					_SelectedChart = _SelectedChartSet->Charts.begin()->second;
+					_SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
 
 					MOD(BeatModule).AssignSnapsToNotesInChart(_SelectedChart);
 					MOD(AudioModule).LoadAudio(_SelectedChart->AudioPath);
@@ -196,12 +191,26 @@ void Program::InputActions()
 	if (MOD(InputModule).IsScrollingDown())
 		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
 	
+
+	
 	if (ImGui::GetIO().WantCaptureMouse)
 		return;
 
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		MOD(EditModule).OnMouseLeftButtonClicked(MOD(InputModule).IsShiftKeyDown());
+
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		MOD(EditModule).OnMouseLeftButtonReleased();
+
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+		MOD(EditModule).OnMouseRightButtonClicked(MOD(InputModule).IsShiftKeyDown());
+
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+		MOD(EditModule).OnMouseRightButtonReleased();
+
 	if(MOD(MiniMapModule).IsDragging())
 	{
-		if (MOD(InputModule).WasMouseButtonReleased(sf::Mouse::Left))
+		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 			return MOD(MiniMapModule).EndDragging();		
 			
 		MOD(AudioModule).SetTimeMilliSeconds((MOD(MiniMapModule).GetHoveredTime()));
@@ -211,27 +220,15 @@ void Program::InputActions()
 	{
 		if(MOD(MiniMapModule).IsPossibleToDrag())
 		{
-			if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Left))	
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))	
 				return MOD(MiniMapModule).StartDragging();
 		}
 		else if(!MOD(MiniMapModule).IsDragging())
 		{
-			if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Left))		
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))		
 				return MOD(AudioModule).SetTimeMilliSeconds((MOD(MiniMapModule).GetHoveredTime()));
 		}
 	}
-
-	if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Left))
-		MOD(EditModule).OnMouseLeftButtonClicked(MOD(InputModule).IsShiftKeyDown());
-
-	if (MOD(InputModule).WasMouseButtonReleased(sf::Mouse::Left))
-		MOD(EditModule).OnMouseLeftButtonReleased();
-
-	if (MOD(InputModule).WasMouseButtonPressed(sf::Mouse::Right))
-		MOD(EditModule).OnMouseRightButtonClicked(MOD(InputModule).IsShiftKeyDown());
-
-	if (MOD(InputModule).WasMouseButtonReleased(sf::Mouse::Right))
-		MOD(EditModule).OnMouseRightButtonReleased();
 }
 
 void Program::ApplyDeltaToZoom(const float InDelta)

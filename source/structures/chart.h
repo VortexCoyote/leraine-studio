@@ -115,15 +115,3 @@ private:
 
 	std::function<void()> _OnModified;	
 };
-
-struct ChartSet
-{
-public: //accessors
-
-	void AddChart(Chart* const InChart);
-	bool IsEmpty();
-
-public: //data ownership
-
-	std::map<std::string, Chart*> Charts;
-};

@@ -39,7 +39,6 @@ private: //program data ownership
 	TimefieldRenderGraph _ChartRenderGraph;
 	TimefieldRenderGraph _PreviewRenderGraph;
 
-	ChartSet* _SelectedChartSet = nullptr;
 	Chart* _SelectedChart = nullptr;
 
 	float _ZoomLevel = 1.0f;

@@ -1,6 +1,5 @@
 #include "input-module.h"
 
-
 bool InputModule::ProcessEvent(const sf::Event& InEvent)
 {
 	if (_GainedFocusLastFrame)
