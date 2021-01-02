@@ -3,18 +3,6 @@
 #include "imgui.h"
 #include "../utilities/imgui/addons/imgui_user.h"
 
-//module includes
-#include "../modules/imgui-module.h"
-#include "../modules/chart-parser-module.h"
-#include "../modules/dialog-module.h"
-#include "../modules/timefield-render-module.h"
-#include "../modules/audio-module.h"
-#include "../modules/input-module.h"
-#include "../modules/beat-module.h"
-#include "../modules/edit-module.h"
-#include "../modules/background-module.h"
-#include "../modules/minimap-module.h"
-
 //file exclusive globals
 Time WindowTimeBegin;
 Time WindowTimeEnd;
@@ -29,6 +17,17 @@ Chart* SelectedChart = nullptr;
 float ZoomLevel = 1.0f;
 int CurrentSnap = 2;
 
+//module includes
+#include "../modules/imgui-module.h"
+#include "../modules/chart-parser-module.h"
+#include "../modules/dialog-module.h"
+#include "../modules/timefield-render-module.h"
+#include "../modules/audio-module.h"
+#include "../modules/input-module.h"
+#include "../modules/beat-module.h"
+#include "../modules/edit-module.h"
+#include "../modules/background-module.h"
+#include "../modules/minimap-module.h"
 
 void Program::RegisterModules()
 {
@@ -163,34 +162,28 @@ void Program::InputActions()
 	if (MOD(InputModule).IsCtrlKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
-			ApplyDeltaToZoom(0.1f);
+			return ApplyDeltaToZoom(0.1f);
 
 		if (MOD(InputModule).IsScrollingDown())
-			ApplyDeltaToZoom(-0.1f);
-
-		return;
+			return ApplyDeltaToZoom(-0.1f);
 	}
 	
 	if (MOD(InputModule).IsAltKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
-			CurrentSnap = MOD(BeatModule).GetNextSnap(CurrentSnap);
+			return void(CurrentSnap = MOD(BeatModule).GetNextSnap(CurrentSnap));
 
 		if (MOD(InputModule).IsScrollingDown())
-			CurrentSnap = MOD(BeatModule).GetPreviousSnap(CurrentSnap);
-
-		return;
+			return void(CurrentSnap = MOD(BeatModule).GetPreviousSnap(CurrentSnap));
 	}
 	
 	if (MOD(InputModule).IsShiftKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
-			MOD(AudioModule).ChangeSpeed(0.05f);
+			return MOD(AudioModule).ChangeSpeed(0.05f);
 
 		if (MOD(InputModule).IsScrollingDown())
-			MOD(AudioModule).ChangeSpeed(-0.05f);
-
-		return;
+			return MOD(AudioModule).ChangeSpeed(-0.05f);
 	}
 	
 	if (MOD(InputModule).IsScrollingUp())
@@ -198,7 +191,6 @@ void Program::InputActions()
 
 	if (MOD(InputModule).IsScrollingDown())
 		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
-
 
 
 	if (ImGui::GetIO().WantCaptureMouse)

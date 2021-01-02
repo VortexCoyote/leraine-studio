@@ -29,6 +29,9 @@ void BeatModule::AssignSnapsToNotesInChart(Chart* const InChart)
 		auto& slice = InChart->FindOrAddTimeSlice(time);
 
 		GenerateTimeRangeBeatLines(slice.TimePoint, slice.TimePoint + TIMESLICE_LENGTH, InChart, 48);
+		GenerateTimeRangeBeatLines(slice.TimePoint, slice.TimePoint + TIMESLICE_LENGTH, InChart, 5, true);
+
+		std::sort(_OnFieldBeatLines.begin(), _OnFieldBeatLines.end(), [](const auto& lhs, const auto& rhs) { return lhs.TimePoint < rhs.TimePoint; });
 
 		for (auto& column : slice.Notes)
 		{
@@ -41,7 +44,7 @@ void BeatModule::AssignSnapsToNotesInChart(Chart* const InChart)
 
 				for (auto beatLine = _OnFieldBeatLines.rbegin(); beatLine != _OnFieldBeatLines.rend(); ++beatLine)
 				{
-					if (beatLine->TimePoint + 1 < note.TimePoint)
+					if (beatLine->TimePoint + 2 < note.TimePoint)
 						break;
 
 					attachedBeatLine = *beatLine;
@@ -55,12 +58,12 @@ void BeatModule::AssignSnapsToNotesInChart(Chart* const InChart)
 	_OnFieldBeatLines.clear();
 }
 
-void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time InTimeEnd, Chart* const InChart, const int InBeatDivision)
+void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time InTimeEnd, Chart* const InChart, const int InBeatDivision, const bool InSkipClearCollection)
 {
 	//edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases edge cases
-	
-	_OnFieldBeatLines.clear();
-	
+	if(!InSkipClearCollection)
+		_OnFieldBeatLines.clear();
+
 	const auto& bpmPoints = InChart->GetBpmPointsRelatedToTimeRange(InTimeBegin, InTimeEnd);
 
 	size_t index = 0;
@@ -75,26 +78,27 @@ void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time I
 		if (index + 1 <= bpmPoints.size() - 1)
 			timeEnd = bpmPoints[index + 1].TimePoint;
 
-		const float timeBetweenSnaps = 60000.f / bpmPoint.Bpm / float(InBeatDivision);
-		float firstPosition = bpmPoint.TimePoint + ceilf((timeBegin - bpmPoint.TimePoint) / timeBetweenSnaps) * timeBetweenSnaps + 0.5f;
+		const double timeBetweenSnaps = 60000.0 / bpmPoint.Bpm / double(InBeatDivision);
+		double firstPosition = double(bpmPoint.TimePoint) + ceil(double(timeBegin - bpmPoint.TimePoint) / timeBetweenSnaps) * timeBetweenSnaps;
 
 		if (timeBegin == InTimeBegin)
 			firstPosition -= timeBetweenSnaps;
 
 		if (timeEnd == InTimeEnd)
-			timeEnd += timeBetweenSnaps;
+			timeEnd += Time(timeBetweenSnaps);
 
-		int beatCount = std::max(0.f, float(firstPosition - float(bpmPoint.TimePoint)) / timeBetweenSnaps + 0.5f);
-
-		for (float timePosition = firstPosition; timePosition + 0.5f < timeEnd; timePosition += timeBetweenSnaps)
+		int beatCount = (int)std::max(0.0, double(firstPosition - double(bpmPoint.TimePoint)) / timeBetweenSnaps + 0.5);
+ 
+		for (double timePosition = firstPosition; timePosition + 0.5 < double(timeEnd); timePosition += timeBetweenSnaps)
 		{
-			Time actualTime = Time(timePosition + 0.5f) - 1;
+			Time actualTime = Time(timePosition);
+			Time analyticalTime = bpmPoint.TimePoint + Time(timeBetweenSnaps * double(beatCount)); //this is apparently more accurate than the one above, so it's used for the actual beatlines
 
-			if (actualTime + 0.5f < bpmPoint.TimePoint)
+			if (actualTime < bpmPoint.TimePoint)
 				_OnFieldBeatLines.push_back({ actualTime , -1, InBeatDivision, -1});
 			else
 			{
-				_OnFieldBeatLines.push_back({ actualTime, beatCount, InBeatDivision, GetBeatSnap(beatCount, InBeatDivision) });
+				_OnFieldBeatLines.push_back({ analyticalTime, beatCount, InBeatDivision, GetBeatSnap(beatCount, InBeatDivision) });
 				beatCount++;
 			}
 		}
@@ -211,5 +215,5 @@ const int BeatModule::GetPreviousSnap(const int InCurrentSnap)
 bool BeatModule::IsBeatThisDivision(const int InBeatCount, const int InBeatDivision, const int InDenominator)
 {
 	const float occurrences = (float(InBeatDivision) / float(InDenominator));
-	return GlobalFunctions::FloatCompare(fmodf(InBeatCount, occurrences) + occurrences, occurrences, 0.001f);
+	return GlobalFunctions::FloatCompare(fmodf(float(InBeatCount), occurrences) + occurrences, occurrences, 0.001f);
 }

@@ -165,7 +165,8 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 				std::stringstream timePointStream(line);
 
-				float timePoint, bpm;
+				float timePoint;
+				double bpm;
 				int meter, sampleSet, sampleIndex, volume, uninherited, effects;
 
 				PARSE_COMMA_VALUE(timePointStream, timePoint);

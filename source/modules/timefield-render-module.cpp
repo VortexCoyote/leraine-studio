@@ -124,7 +124,7 @@ sf::RenderTexture* const TimefieldRenderModule::GetRenderedTimefieldGraphSegment
 
 void TimefieldRenderModule::RenderBeatLine(sf::RenderTarget* const InOutRenderTarget, const Time InBeatTimePoint, const int InBeatSnap, const Time InTime, const float InZoomLevel) 
 {
-	sf::RectangleShape line(sf::Vector2f(_TimefieldMetrics.FieldWidth, 2));
+	sf::RectangleShape line(sf::Vector2f(_TimefieldMetrics.FieldWidth, 1));
 	line.setPosition(_TimefieldMetrics.LeftSidePosition, GetScreenTimePoint(InBeatTimePoint, InTime, InZoomLevel));
 	
 	line.setFillColor(_Skin.SnapColorTable[InBeatSnap]);

@@ -27,7 +27,7 @@ public:
 public:
 
 	void AssignSnapsToNotesInChart(Chart* const InChart);
-	void GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time InTimeEnd, Chart* const InChart, const int InBeatDivision);
+	void GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time InTimeEnd, Chart* const InChart, const int InBeatDivision, const bool InSkipClearCollection = false);
 	void IterateThroughBeatlines(std::function<void(const BeatLine&)> InWork);
 	
 	int GetBeatSnap(const BeatLine& InBeatLine, const int InBeatDivision);

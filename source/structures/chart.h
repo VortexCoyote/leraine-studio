@@ -40,12 +40,12 @@ struct Note
 struct BpmPoint
 {
 	Time TimePoint;
-	float Bpm;
+	double Bpm;
 };
 struct ScrollVelocityMultiplier
 {
 	Time TimePoint;
-	float Multiplier;
+	double Multiplier;
 };
 struct TimeSlice
 {
