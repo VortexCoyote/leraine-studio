@@ -165,12 +165,12 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 				std::stringstream timePointStream(line);
 
-				float timePoint;
-				double bpm;
+				Time timePoint;
+				double beatLength;
 				int meter, sampleSet, sampleIndex, volume, uninherited, effects;
 
 				PARSE_COMMA_VALUE(timePointStream, timePoint);
-				PARSE_COMMA_VALUE(timePointStream, bpm);
+				PARSE_COMMA_VALUE(timePointStream, beatLength);
 				PARSE_COMMA_VALUE(timePointStream, meter);
 				PARSE_COMMA_VALUE(timePointStream, sampleSet);
 				PARSE_COMMA_VALUE(timePointStream, sampleIndex);
@@ -181,17 +181,17 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 				//BPMData* bpmData = new BPMData();
 				//bpmData->BPMSaved = bpm;
 
-				if (bpm < 0)
+				if (beatLength < 0)
 					continue;
 
-				bpm = 60000.0 / bpm;
+				double bpm = 60000.0 / beatLength;
 
 				//bpmData->BPM = bpm;
 				//bpmData->timePoint = int(timePoint);
 				//bpmData->meter = meter;
 				//bpmData->uninherited = uninherited;
 
-				chart->InjectBpmPoint(Time(timePoint), bpm);
+				chart->InjectBpmPoint(Time(timePoint), bpm, beatLength);
 			}
 		}
 

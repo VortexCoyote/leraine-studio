@@ -108,13 +108,14 @@ void Chart::InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Colum
 	InjectNote(InTimeEnd, InColumn, Note::EType::HoldEnd, InTimeBegin, InTimeEnd, InBeatSnapEnd);
 }
 
-void Chart::InjectBpmPoint(const Time InTime, const float InBpm)
+void Chart::InjectBpmPoint(const Time InTime, const double InBpm, const double InBeatLength)
 {
 	auto& timeSlice = FindOrAddTimeSlice(InTime);
 
 	BpmPoint bpmPoint;
 	bpmPoint.TimePoint = InTime;
 	bpmPoint.Bpm = InBpm;
+	bpmPoint.BeatLength = InBeatLength;
 
 	timeSlice.BpmPoints.push_back(bpmPoint);
 

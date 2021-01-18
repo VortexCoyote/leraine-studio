@@ -78,7 +78,7 @@ void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time I
 		if (index + 1 <= bpmPoints.size() - 1)
 			timeEnd = bpmPoints[index + 1].TimePoint;
 
-		const double timeBetweenSnaps = 60000.0 / bpmPoint.Bpm / double(InBeatDivision);
+		const double timeBetweenSnaps = bpmPoint.BeatLength / double(InBeatDivision);
 		double firstPosition = double(bpmPoint.TimePoint) + ceil(double(timeBegin - bpmPoint.TimePoint) / timeBetweenSnaps) * timeBetweenSnaps;
 
 		if (timeBegin == InTimeBegin)
@@ -88,14 +88,14 @@ void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time I
 			timeEnd += Time(timeBetweenSnaps);
 
 		int beatCount = (int)std::max(0.0, double(firstPosition - double(bpmPoint.TimePoint)) / timeBetweenSnaps + 0.5);
- 
+		
 		for (double timePosition = firstPosition; timePosition + 0.5 < double(timeEnd); timePosition += timeBetweenSnaps)
 		{
 			Time actualTime = Time(timePosition);
-			Time analyticalTime = bpmPoint.TimePoint + Time(timeBetweenSnaps * double(beatCount)); //this is apparently more accurate than the one above, so it's used for the actual beatlines
+			Time analyticalTime = bpmPoint.TimePoint + Time(bpmPoint.BeatLength * double(beatCount)) / InBeatDivision; //this is apparently more accurate than the one above, so it's used for the actual beatlines
 
 			if (actualTime < bpmPoint.TimePoint)
-				_OnFieldBeatLines.push_back({ actualTime , -1, InBeatDivision, -1});
+				_OnFieldBeatLines.push_back({ actualTime, -1, InBeatDivision, -1});
 			else
 			{
 				_OnFieldBeatLines.push_back({ analyticalTime, beatCount, InBeatDivision, GetBeatSnap(beatCount, InBeatDivision) });
