@@ -40,6 +40,8 @@ struct Note
 struct BpmPoint
 {
 	Time TimePoint;
+
+	double BeatLength;
 	double Bpm;
 };
 struct ScrollVelocityMultiplier
@@ -85,7 +87,7 @@ public: //accessors
 
 	Note& InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin = -1, const Time InTimeEnd = -1, const int InBeatSnap = -1);
 	void InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn,  const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
-	void InjectBpmPoint(const Time InTime, const float InBpm);
+	void InjectBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
 	bool IsAPotentialNoteDuplicate(const Time InTime, const Column InColumn);
 	TimeSlice& FindOrAddTimeSlice(const Time InTime);
