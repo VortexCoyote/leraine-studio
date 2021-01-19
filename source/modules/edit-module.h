@@ -27,6 +27,9 @@ public: //edit-mode overrides
 
 	bool OnMouseDrag() override;
 
+	bool OnCopy() override;
+	bool OnPaste() override;
+
 	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph) override;
 
 public:

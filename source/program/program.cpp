@@ -3,19 +3,22 @@
 #include "imgui.h"
 #include "../utilities/imgui/addons/imgui_user.h"
 
-//file exclusive globals
-Time WindowTimeBegin;
-Time WindowTimeEnd;
+namespace
+{
+	Time WindowTimeBegin;
+	Time WindowTimeEnd;
 
-Cursor EditCursor;
+	Cursor EditCursor;
 
-TimefieldRenderGraph ChartRenderGraph;
-TimefieldRenderGraph PreviewRenderGraph;
+	TimefieldRenderGraph ChartRenderGraph;
+	TimefieldRenderGraph PreviewRenderGraph;
 
-Chart* SelectedChart = nullptr;
+	Chart* SelectedChart = nullptr;
 
-float ZoomLevel = 1.0f;
-int CurrentSnap = 2;
+	float ZoomLevel = 1.0f;
+	int CurrentSnap = 2;
+}
+
 
 //module includes
 #include "../modules/imgui-module.h"
@@ -122,10 +125,12 @@ void Program::MenuBar()
 					MOD(TimefieldRenderModule).SetKeyAmount(SelectedChart->KeyAmount);
 					MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 				
-					SelectedChart->RegisterOnModifiedCallback([this]()
+					SelectedChart->RegisterOnModifiedCallback([this](TimeSlice& InTimeSlice)
 					{
-						//TODO: replicate the timeslice method to optimize when "re-generating" 
-						MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
+						//TODO: replicate the timeslice method to optimize when "re-generating"
+						//MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
+
+						MOD(BeatModule).AssignSnapsToNotesInTimeSlice(SelectedChart, InTimeSlice, true);
 					});
 				});
 			}
@@ -166,6 +171,12 @@ void Program::InputActions()
 
 		if (MOD(InputModule).IsScrollingDown())
 			return ApplyDeltaToZoom(-0.1f);
+
+		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::C))
+			return void(MOD(EditModule).OnCopy());
+	
+		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::V))
+			return void(MOD(EditModule).OnPaste());
 	}
 	
 	if (MOD(InputModule).IsAltKeyDown())

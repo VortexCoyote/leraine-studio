@@ -13,7 +13,8 @@ public:
 	bool OnMouseLeftButtonClicked(const bool InIsShiftDown) override;
 	bool OnMouseLeftButtonReleased() override;
 
-	void Tick() override;
+	bool OnCopy() override;
+	bool OnPaste() override;
 
 	void OnReset() override;
 	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph) override;
@@ -21,7 +22,11 @@ public:
 private:
 
 	std::unordered_map<Column, std::unordered_set<Note*>> _SelectedNotes;
+	std::vector<std::pair<Column, Note>> _PastePreviewNotes;
 
+	Time _LowestPasteTimePoint = INT_MAX;
 	Cursor _AnchoredCursor;
+
 	bool _IsAreaSelecting = false;
+	bool _IsPreviewingPaste = false;
 };

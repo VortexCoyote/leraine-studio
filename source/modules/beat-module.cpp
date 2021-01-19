@@ -28,34 +28,47 @@ void BeatModule::AssignSnapsToNotesInChart(Chart* const InChart)
 	{
 		auto& slice = InChart->FindOrAddTimeSlice(time);
 
-		GenerateTimeRangeBeatLines(slice.TimePoint, slice.TimePoint + TIMESLICE_LENGTH, InChart, 48);
-		GenerateTimeRangeBeatLines(slice.TimePoint, slice.TimePoint + TIMESLICE_LENGTH, InChart, 5, true);
-
-		std::sort(_OnFieldBeatLines.begin(), _OnFieldBeatLines.end(), [](const auto& lhs, const auto& rhs) { return lhs.TimePoint < rhs.TimePoint; });
-
-		for (auto& column : slice.Notes)
-		{
-			for (auto& note : column.second)
-			{
-				if (note.Type == Note::EType::HoldEnd || note.Type == Note::EType::HoldIntermediate)
-					continue;
-
-				BeatLine attachedBeatLine = _OnFieldBeatLines.back();
-
-				for (auto beatLine = _OnFieldBeatLines.rbegin(); beatLine != _OnFieldBeatLines.rend(); ++beatLine)
-				{
-					if (beatLine->TimePoint + 2 < note.TimePoint)
-						break;
-
-					attachedBeatLine = *beatLine;
-				}
-
-				note.BeatSnap = GetBeatSnap(attachedBeatLine, attachedBeatLine.BeatDivision);
-			}
-		}
+		AssignSnapsToNotesInTimeSlice(InChart, slice);
+		
 	}
 
 	_OnFieldBeatLines.clear();
+}
+
+void BeatModule::AssignSnapsToNotesInTimeSlice(Chart* const InChart, TimeSlice& InOutTimeSlice, const bool InResnapNotes) 
+{
+	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 48);
+	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 5, true);
+
+	std::sort(_OnFieldBeatLines.begin(), _OnFieldBeatLines.end(), [](const auto& lhs, const auto& rhs) { return lhs.TimePoint < rhs.TimePoint; });
+
+	for (auto& column : InOutTimeSlice.Notes)
+	{
+		for (auto& note : column.second)
+		{
+			if (note.Type == Note::EType::HoldIntermediate)
+				continue;
+
+			BeatLine attachedBeatLine = _OnFieldBeatLines.back();
+
+			for (auto beatLine = _OnFieldBeatLines.rbegin(); beatLine != _OnFieldBeatLines.rend(); ++beatLine)
+			{
+				if (beatLine->TimePoint + 2 < note.TimePoint)
+					break;
+
+				attachedBeatLine = *beatLine;
+			}
+
+			note.BeatSnap = GetBeatSnap(attachedBeatLine, attachedBeatLine.BeatDivision);
+
+			if(InResnapNotes)
+			{
+				note.TimePoint  += attachedBeatLine.TimePoint - note.TimePoint;
+				note.TimePointBegin += attachedBeatLine.TimePoint - note.TimePointBegin;
+				note.TimePointEnd  += attachedBeatLine.TimePoint - note.TimePointEnd;
+			}
+		}
+	}
 }
 
 void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time InTimeEnd, Chart* const InChart, const int InBeatDivision, const bool InSkipClearCollection)

@@ -18,9 +18,11 @@ public:
 
 	virtual bool OnMouseDrag();
 
+	virtual bool OnCopy();
+	virtual bool OnPaste();
+
 	virtual void OnReset();
 	virtual void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph);
-
 	virtual void Tick();
 
 public:

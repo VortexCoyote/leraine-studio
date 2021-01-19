@@ -38,6 +38,16 @@ bool EditMode::OnMouseDrag()
 	return false;
 }
 
+bool EditMode::OnCopy() 
+{
+	return false;
+}
+
+bool EditMode::OnPaste() 
+{
+	return false;
+}
+
 void EditMode::OnReset() 
 {
 

@@ -20,6 +20,16 @@ bool EditModule::OnMouseDrag()
 	return _EditModes[_SelectedEditMode]->OnMouseDrag();
 }
 
+bool EditModule::OnCopy() 
+{
+	return _EditModes[_SelectedEditMode]->OnCopy();
+}
+
+bool EditModule::OnPaste() 
+{
+	return _EditModes[_SelectedEditMode]->OnPaste();
+}
+
 bool EditModule::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
 	return _EditModes[_SelectedEditMode]->OnMouseLeftButtonClicked(InIsShiftDown);

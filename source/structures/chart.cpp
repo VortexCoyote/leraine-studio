@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <set>
 
 bool Chart::PlaceNote(const Time InTime, const Column InColumn, const int InBeatSnap)
 {
@@ -10,8 +11,6 @@ bool Chart::PlaceNote(const Time InTime, const Column InColumn, const int InBeat
 
 	RegisterTimeSliceHistory(InTime);
 	InjectNote(InTime, InColumn, Note::EType::Common, -1, -1, InBeatSnap);
-
-	_OnModified();
 
 	return true;
 }
@@ -28,14 +27,35 @@ bool Chart::PlaceHold(const Time InTimeBegin, const Time InTimeEnd, const Column
 
 	InjectHold(InTimeBegin, InTimeEnd, InColumn, InBeatSnap);
 
-	_OnModified();
-
 	return true;
+}
+
+void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes) 
+{
+	Time timePointMin = InNotes.front().second.TimePoint;
+	Time timePointMax = InNotes.back().second.TimePoint;
+
+	RegisterTimeSliceHistoryRanged(timePointMin, timePointMax);
+
+	for(const auto& [column, note] : InNotes)
+	{
+		switch(note.Type)
+		{
+		case Note::EType::Common:
+			InjectNote(note.TimePoint, column, note.Type);
+			break;
+
+		case Note::EType::HoldBegin:
+			InjectHold(note.TimePointBegin, note.TimePointEnd, column);
+			break;
+		}
+	}
 }
 
 bool Chart::RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHoldChecks)
 {
-	auto& noteCollection = FindOrAddTimeSlice(InTime).Notes[InColumn];
+	auto& timeSlice = FindOrAddTimeSlice(InTime);
+	auto& noteCollection = timeSlice.Notes[InColumn];
 
 	auto noteIt = std::find_if(noteCollection.begin(), noteCollection.end(), [InTime](const Note& InNote) { return InNote.TimePoint == InTime; });
 
@@ -69,7 +89,7 @@ bool Chart::RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHo
 		noteCollection.erase(noteIt);	
 	}
 	
-	_OnModified();
+	_OnModified(timeSlice);
 
 	return true;
 }
@@ -89,6 +109,8 @@ Note& Chart::InjectNote(const Time InTime, const Column InColumn, const Note::ET
 	timeSlice.Notes[InColumn].push_back(note);
 
 	std::sort(timeSlice.Notes[InColumn].begin(), timeSlice.Notes[InColumn].end(), [](const auto& lhs, const auto& rhs) { return (lhs.TimePoint < rhs.TimePoint); });
+
+	_OnModified(timeSlice);
 
 	return note;
 }
@@ -163,7 +185,7 @@ void Chart::DebugPrint()
 	std::cout << std::endl;
 }
 
-void Chart::RegisterOnModifiedCallback(std::function<void()> InCallback) 
+void Chart::RegisterOnModifiedCallback(std::function<void(TimeSlice&)> InCallback) 
 {
 	_OnModified = InCallback;
 }
@@ -212,11 +234,9 @@ bool Chart::Undo()
 		return false;
 
 	for(auto& timeSlice : TimeSliceHistory.top())
-		TimeSlices[timeSlice.Index] = timeSlice;
+		_OnModified(TimeSlices[timeSlice.Index] = timeSlice);
 
 	TimeSliceHistory.pop();
-
-	_OnModified();
 
 	return true;
 }
@@ -289,5 +309,5 @@ const std::vector<BpmPoint>& Chart::GetBpmPointsRelatedToTimeRange(const Time In
 
 Chart::Chart() 
 {
-	_OnModified = [](){};
+	_OnModified = [](TimeSlice& InOutTimeSlice){};
 }

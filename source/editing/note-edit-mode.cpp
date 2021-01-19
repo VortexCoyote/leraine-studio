@@ -23,7 +23,7 @@ bool NoteEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
     }
     else
     {
-        return static_Chart->PlaceNote(static_Cursor.TimePoint, static_Cursor.Column, static_Cursor.BeatSnap);
+        return static_Chart->PlaceNote(static_Cursor.TimePoint, static_Cursor.Column);
     }
     
     return false;
@@ -36,9 +36,9 @@ bool NoteEditMode::OnMouseLeftButtonReleased()
         _IsPlacingHold = false;
 
         if(_AnchoredHoldCursor.TimePoint < static_Cursor.TimePoint)
-            return static_Chart->PlaceHold(_AnchoredHoldCursor.TimePoint, static_Cursor.TimePoint, _AnchoredHoldCursor.Column, _AnchoredHoldCursor.BeatSnap);
+            return static_Chart->PlaceHold(_AnchoredHoldCursor.TimePoint, static_Cursor.TimePoint, _AnchoredHoldCursor.Column);
         else
-            return static_Chart->PlaceHold(_AnchoredHoldCursor.TimePoint, _AnchoredHoldCursor.TimePoint, _AnchoredHoldCursor.Column, _AnchoredHoldCursor.BeatSnap);
+            return static_Chart->PlaceHold(_AnchoredHoldCursor.TimePoint, _AnchoredHoldCursor.TimePoint, _AnchoredHoldCursor.Column);
     }
 
     return false;
@@ -53,9 +53,4 @@ void NoteEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRende
             InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(_AnchoredHoldCursor.Column, _AnchoredHoldCursor.TimePoint, _AnchoredHoldCursor.BeatSnap, 156);
     else if(static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle)
         InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(static_Cursor.Column, static_Cursor.TimePoint, static_Cursor.BeatSnap, 156);
-}
-
-void NoteEditMode::Tick() 
-{
-    
 }

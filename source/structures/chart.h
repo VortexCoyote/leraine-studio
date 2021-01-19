@@ -83,6 +83,8 @@ public: //accessors
 	bool PlaceNote(const Time InTime, const Column InColumn, const int InBeatSnap = -1);
 	bool PlaceHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
 
+	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes);
+
 	bool RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHoldChecks = false);
 
 	Note& InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin = -1, const Time InTimeEnd = -1, const int InBeatSnap = -1);
@@ -102,7 +104,7 @@ public: //accessors
 	const std::vector<BpmPoint>& GetBpmPointsRelatedToTimeRange(const Time InTimeBegin, const Time InTimeEnd);
 
 	void DebugPrint();
-	void RegisterOnModifiedCallback(std::function<void()> InCallback);
+	void RegisterOnModifiedCallback(std::function<void(TimeSlice&)> InCallback);
 
 public: //data ownership
 
@@ -115,5 +117,5 @@ public: //data ownership
 
 private:
 
-	std::function<void()> _OnModified;	
+	std::function<void(TimeSlice&)> _OnModified;	
 };

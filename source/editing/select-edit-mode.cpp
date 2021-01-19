@@ -24,15 +24,79 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
     return true;
 }
 
-void SelectEditMode::Tick() 
+bool SelectEditMode::OnCopy() 
 {
+    return false;
+}
+
+bool SelectEditMode::OnPaste() 
+{
+    //I hate parsing strings in c++ 
+
+    _PastePreviewNotes.clear();
+    _LowestPasteTimePoint = INT_MAX;
+
+    _IsPreviewingPaste = true;
+
+    std::string parsableNotes = sf::Clipboard::getString();
+
+    std::string time;
+    std::string column;
+
+    bool leftParenthesis = false;
+    bool rightParenthesis = false;
+
+    for (size_t letterIndex = 0; letterIndex < parsableNotes.size(); ++letterIndex)
+    {
+        char letter = parsableNotes[letterIndex];
+
+        if(leftParenthesis && !rightParenthesis)
+        {
+            if(letter == '|')
+            {
+                letterIndex++;
+                 
+                column += parsableNotes[letterIndex];
+
+                Note note;
+                note.BeatSnap = -1;
+                note.TimePoint = std::stoi(time);
+                note.Type = Note::EType::Common;
+
+                _LowestPasteTimePoint = std::min(_LowestPasteTimePoint, std::stoi(time));
+                _PastePreviewNotes.push_back({ std::stoi(column), note});
+
+                column = "";
+                time = "";
+
+                letterIndex++;
+                letterIndex++;
+
+                letter = parsableNotes[letterIndex];
+            }
+
+            time += letter;
+        }
+
+        if(letter == '(')
+            leftParenthesis = true;
     
+        if(letter == ')')
+            rightParenthesis = true;
+    }
+
+    return false;
 }
 
 void SelectEditMode::OnReset() 
 {
+    _PastePreviewNotes.reserve(100);
+
+    _IsPreviewingPaste = false;
     _IsAreaSelecting = false;
+
     _SelectedNotes.clear();
+    _PastePreviewNotes.clear();
 }
 
 
@@ -43,11 +107,28 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 
     _SelectedNotes.clear();
 
+    if(_IsPreviewingPaste)
+    {
+        for(auto& [column, note] : _PastePreviewNotes)
+            note.TimePoint = static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint;
+
+        static_Chart->BulkPlaceNotes(_PastePreviewNotes);
+        _IsPreviewingPaste = false;
+    }
+
     return true;
 }
 
 void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph)
 {
+    if(_IsPreviewingPaste)
+    {
+        for(const auto [column, note] : _PastePreviewNotes)
+            InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(column, static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint, note.BeatSnap, 128);
+
+        return;
+    }
+
     for(const auto [column, noteCollection] : _SelectedNotes)
     {
         for(auto selectedNote : noteCollection)
