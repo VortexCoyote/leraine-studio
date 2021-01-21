@@ -1,8 +1,3 @@
 # leraine-studio
 
-
-# building
-
-## windows
-
-## linux
+VSRG editor, description coming soon
