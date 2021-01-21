@@ -1,6 +1,7 @@
 #include "select-edit-mode.h"
 
 #include <SFML/Graphics.hpp>
+#include <sstream>
 
 bool SelectEditMode::OnMouseLeftButtonReleased()
 {
@@ -26,7 +27,40 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
 
 bool SelectEditMode::OnCopy() 
 {
-    return false;
+    std::string clipboard =  "LeraineStudio:";
+
+    for(const auto [column, noteCollection] : _SelectedNotes)
+    {
+        for(auto selectedNote : noteCollection)
+        {
+            std::string noteSegment = "";
+            switch(selectedNote->Type)
+            {
+                case Note::EType::Common:
+                {
+                    noteSegment += "N";
+                    noteSegment += std::to_string(column) + "|";
+                    noteSegment += std::to_string(selectedNote->TimePoint) + ";";
+                }
+                break;
+
+                case Note::EType::HoldBegin:
+                {
+                    noteSegment += "H";
+                    noteSegment += std::to_string(column) + "|";
+                    noteSegment += std::to_string(selectedNote->TimePointBegin) + ",";
+                    noteSegment += std::to_string(selectedNote->TimePointEnd) + ";";
+                }
+                break;
+            }
+
+            clipboard += noteSegment;
+        }
+    }
+
+    sf::Clipboard::setString(clipboard);
+
+    return true;
 }
 
 bool SelectEditMode::OnPaste() 
@@ -38,54 +72,99 @@ bool SelectEditMode::OnPaste()
 
     _IsPreviewingPaste = true;
 
-    std::string parsableNotes = sf::Clipboard::getString();
+    std::string clipboard = sf::Clipboard::getString();
 
-    std::string time;
-    std::string column;
+    std::string signature = "";
 
-    bool leftParenthesis = false;
-    bool rightParenthesis = false;
-
-    for (size_t letterIndex = 0; letterIndex < parsableNotes.size(); ++letterIndex)
+    for (auto character : clipboard)
     {
-        char letter = parsableNotes[letterIndex];
+        if(character == ':')
+            break;
 
-        if(leftParenthesis && !rightParenthesis)
-        {
-            if(letter == '|')
-            {
-                letterIndex++;
-                 
-                column += parsableNotes[letterIndex];
-
-                Note note;
-                note.BeatSnap = -1;
-                note.TimePoint = std::stoi(time);
-                note.Type = Note::EType::Common;
-
-                _LowestPasteTimePoint = std::min(_LowestPasteTimePoint, std::stoi(time));
-                _PastePreviewNotes.push_back({ std::stoi(column), note});
-
-                column = "";
-                time = "";
-
-                letterIndex++;
-                letterIndex++;
-
-                letter = parsableNotes[letterIndex];
-            }
-
-            time += letter;
-        }
-
-        if(letter == '(')
-            leftParenthesis = true;
-    
-        if(letter == ')')
-            rightParenthesis = true;
+        signature += character;
     }
 
-    return false;
+    if(signature == "LeraineStudio")
+    {
+        clipboard.erase(0, std::string("LeraineStudio:").size());
+
+        for(size_t index = 0; index < clipboard.size(); ++index)
+        {
+            char character = clipboard[index];
+
+            Note note;
+            Column column;
+
+            switch (character)
+            {
+            case 'N':
+            {
+                character = clipboard[++index];
+
+                std::string parsedColumn;
+                parsedColumn += character;
+                column = std::stoi(parsedColumn);
+
+                character = clipboard[++index];
+
+                std::string parsedTimePoint = "";
+                while(character != ';')
+                    character = clipboard[++index], parsedTimePoint += character;
+
+                note.Type = Note::EType::Common;
+                note.TimePoint = std::stoi(parsedTimePoint);
+
+                _LowestPasteTimePoint = std::min( _LowestPasteTimePoint, note.TimePoint);
+                _PastePreviewNotes.push_back({column, note});
+            }
+            break;
+
+            case 'H':
+            {
+                character = clipboard[++index];
+
+                std::string parsedColumn;
+                parsedColumn += character;
+                column = std::stoi(parsedColumn);
+
+                character = clipboard[++index];
+                character = clipboard[++index];
+
+                std::string parsedTimePointBegin = "";
+                std::string parsedTimePointEnd = "";
+                
+                bool endParse = false;
+
+                while(character != ';')
+                {
+                    if(character == ',')
+                        endParse = true, character = clipboard[++index];
+
+                    if(!endParse)
+                        parsedTimePointBegin += character;
+                    else
+                        parsedTimePointEnd += character;
+
+                    character = clipboard[++index];
+                }
+
+                note.Type = Note::EType::HoldBegin;
+                note.TimePoint = std::stoi(parsedTimePointBegin);
+                note.TimePointBegin = std::stoi(parsedTimePointBegin);
+                note.TimePointEnd = std::stoi(parsedTimePointEnd);
+
+                _LowestPasteTimePoint = std::min( _LowestPasteTimePoint, note.TimePoint);
+                _PastePreviewNotes.push_back({column, note});
+            }
+            break;
+            
+            default:
+                break;
+            }
+        }
+    }
+
+    return true;
 }
 
 void SelectEditMode::OnReset() 
@@ -110,7 +189,11 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
     if(_IsPreviewingPaste)
     {
         for(auto& [column, note] : _PastePreviewNotes)
+        {
             note.TimePoint = static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint;
+            note.TimePointBegin = static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint;
+            note.TimePointEnd = static_Cursor.TimePoint + note.TimePointEnd - _LowestPasteTimePoint;
+        }
 
         static_Chart->BulkPlaceNotes(_PastePreviewNotes);
         _IsPreviewingPaste = false;
@@ -124,8 +207,19 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
     if(_IsPreviewingPaste)
     {
         for(const auto [column, note] : _PastePreviewNotes)
-            InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(column, static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint, note.BeatSnap, 128);
+        {
+            switch(note.Type)
+            {
+                case Note::EType::Common:
+                    InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(column, static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint, note.BeatSnap, 128);
+                break;
 
+                case Note::EType::HoldBegin:
+                    InOutTimefieldRenderGraph.SubmitHoldNoteRenderCommand(column, static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint, 
+                                                                                  static_Cursor.TimePoint + note.TimePointEnd   - _LowestPasteTimePoint, -1, -1, 128);
+                break;
+            }
+        }
         return;
     }
 

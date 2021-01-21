@@ -46,7 +46,7 @@ void BeatModule::AssignSnapsToNotesInTimeSlice(Chart* const InChart, TimeSlice& 
 	{
 		for (auto& note : column.second)
 		{
-			if (note.Type == Note::EType::HoldIntermediate)
+			if (note.Type == Note::EType::HoldEnd || note.Type == Note::EType::HoldIntermediate)
 				continue;
 
 			BeatLine attachedBeatLine = _OnFieldBeatLines.back();
@@ -61,12 +61,8 @@ void BeatModule::AssignSnapsToNotesInTimeSlice(Chart* const InChart, TimeSlice& 
 
 			note.BeatSnap = GetBeatSnap(attachedBeatLine, attachedBeatLine.BeatDivision);
 
-			if(InResnapNotes)
-			{
+			if(InResnapNotes) //TODO: resnap holds properly
 				note.TimePoint  += attachedBeatLine.TimePoint - note.TimePoint;
-				note.TimePointBegin += attachedBeatLine.TimePoint - note.TimePointBegin;
-				note.TimePointEnd  += attachedBeatLine.TimePoint - note.TimePointEnd;
-			}
 		}
 	}
 }
