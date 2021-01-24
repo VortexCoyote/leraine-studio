@@ -21,6 +21,7 @@ public: //rendering
 	sf::RenderTexture* const GetRenderedTimefieldGraphSegment(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTime, const float InZoomLevel);
 
 	void RenderBeatLine(sf::RenderTarget* const InOutRenderTarget, const Time InBeatTimePoint, const int InBeatSnap, const Time InTime, const float InZoomLevel);
+	void RenderReceptors(sf::RenderTarget* const InOutRenderTarget, const int InBeatSnap);
 
 public: //data gathering
 

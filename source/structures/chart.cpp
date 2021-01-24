@@ -211,6 +211,19 @@ TimeSlice& Chart::FindOrAddTimeSlice(const Time InTime)
 	return TimeSlices[index];
 }
 
+void Chart::RegisterTimeSliceHistoryIfNotAdded(const Time InTime) 
+{
+	auto& collection = TimeSliceHistory.top();
+
+	for(auto& timeSlice : collection)
+	{
+		if(InTime >= timeSlice.TimePoint && InTime <= timeSlice.TimePoint + TIMESLICE_LENGTH)
+			return;
+	}
+
+	collection.push_back(FindOrAddTimeSlice(InTime));
+}
+
 void Chart::RegisterTimeSliceHistory(const Time InTime) 
 {
 	TimeSliceHistory.push({FindOrAddTimeSlice(InTime)});

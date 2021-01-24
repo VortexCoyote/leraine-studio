@@ -29,9 +29,7 @@ bool TimefieldRenderModule::RenderBack(sf::RenderTarget* const InOutRenderTarget
 
 bool TimefieldRenderModule::RenderFront(sf::RenderTarget* const InOutRenderTarget) 
 {
-	_Skin.RenderHitline(InOutRenderTarget);
-	
-	return true;
+	return false;
 }
 
 void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRenderTarget, TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTime, const float InZoomLevel, const bool InRegisterToOnscreenNotes) 
@@ -130,6 +128,11 @@ void TimefieldRenderModule::RenderBeatLine(sf::RenderTarget* const InOutRenderTa
 	line.setFillColor(_Skin.SnapColorTable[InBeatSnap]);
 
 	InOutRenderTarget->draw(line);
+}
+
+void TimefieldRenderModule::RenderReceptors(sf::RenderTarget* const InOutRenderTarget, const int InBeatSnap) 
+{
+	_Skin.RenderReceptors(InOutRenderTarget, InBeatSnap);
 }
 
 

@@ -26,8 +26,8 @@ public:
 
 public:
 
-	void AssignSnapsToNotesInChart(Chart* const InChart);
-	void AssignSnapsToNotesInTimeSlice(Chart* const InChart, TimeSlice& InOutTimeSlice, const bool InResnapNotes = false);
+	void AssignNotesToSnapsInChart(Chart* const InChart);
+	void AssignNotesToSnapsInTimeSlice(Chart* const InChart, TimeSlice& InOutTimeSlice, const bool InResnapNotes = false);
 	void GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time InTimeEnd, Chart* const InChart, const int InBeatDivision, const bool InSkipClearCollection = false);
 	void IterateThroughBeatlines(std::function<void(const BeatLine&)> InWork);
 	
@@ -44,6 +44,8 @@ public:
 private:
 
 	bool IsBeatThisDivision(const int InBeatCount, const int InBeatDivision, const int InDenominator);
+	BeatLine GetClosestBeatLineToTimePoint(const Time InTimePoint);
+	void GenerateBeatLinesFromTimePointIfInvalid(Chart* const InChart, const Time InTime);
 
 	std::vector<BeatLine> _OnFieldBeatLines;
 	

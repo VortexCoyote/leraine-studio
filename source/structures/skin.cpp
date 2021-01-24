@@ -119,6 +119,12 @@ void Skin::RenderHitline(sf::RenderTarget* InOutRenderTarget)
 	InOutRenderTarget->draw(HitlineSprite);
 }
 
+void Skin::RenderReceptors(sf::RenderTarget* InRenderTarget, const int InBeatSnap) 
+{
+	for(int column = 0; column <= _TimefieldMetrics.KeyAmount; ++column)
+		RenderNote(column, _TimefieldMetrics.HitLinePosition +_TimefieldMetrics.ColumnSize / 2, InRenderTarget, InBeatSnap, 96);
+}
+
 void Skin::RenderTimeFieldBackground(sf::RenderTarget* InOutRenderTarget)
 {
 	sf::RectangleShape rectangle;

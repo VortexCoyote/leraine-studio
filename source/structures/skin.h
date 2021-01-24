@@ -17,6 +17,7 @@ struct Skin
 	void RenderHoldCap(const int InColumn, const int InPositionY, sf::RenderTarget* InRenderTarget, const sf::Int8 InAlpha = 255);
 
 	void RenderHitline(sf::RenderTarget* InRenderTarget);
+	void RenderReceptors(sf::RenderTarget* InRenderTarget, const int InBeatSnap = -1);
 	void RenderTimeFieldBackground(sf::RenderTarget* InRenderTarget);
 
 	sf::Texture NoteTextures[16];

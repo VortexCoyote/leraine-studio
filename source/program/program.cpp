@@ -87,6 +87,8 @@ void Program::InnerRender(sf::RenderTarget* const InOutRenderTarget)
 		MOD(TimefieldRenderModule).RenderBeatLine(InOutRenderTarget, InBeatLine.TimePoint, InBeatLine.BeatSnap, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	});
 
+	MOD(TimefieldRenderModule).RenderReceptors(InOutRenderTarget, CurrentSnap);
+	
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget ,ChartRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, PreviewRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel, false);
 	
@@ -101,7 +103,7 @@ void Program::InnerRender(sf::RenderTarget* const InOutRenderTarget)
 
 void Program::InnerShutDown()
 {
-	
+	delete SelectedChart;
 }
 
 //************************************************************************************************************************************************************************************
@@ -118,7 +120,7 @@ void Program::MenuBar()
 				{
 					SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
 
-					MOD(BeatModule).AssignSnapsToNotesInChart(SelectedChart);
+					MOD(BeatModule).AssignNotesToSnapsInChart(SelectedChart);
 					MOD(AudioModule).LoadAudio(SelectedChart->AudioPath);
 					MOD(EditModule).SetChart(SelectedChart);
 					MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
@@ -130,7 +132,7 @@ void Program::MenuBar()
 						//TODO: replicate the timeslice method to optimize when "re-generating"
 						//MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 
-						MOD(BeatModule).AssignSnapsToNotesInTimeSlice(SelectedChart, InTimeSlice, true);
+						MOD(BeatModule).AssignNotesToSnapsInTimeSlice(SelectedChart, InTimeSlice, true);
 					});
 				});
 			}

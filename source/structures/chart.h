@@ -94,6 +94,7 @@ public: //accessors
 	bool IsAPotentialNoteDuplicate(const Time InTime, const Column InColumn);
 	TimeSlice& FindOrAddTimeSlice(const Time InTime);
 	
+	void RegisterTimeSliceHistoryIfNotAdded(const Time InTime);
 	void RegisterTimeSliceHistory(const Time InTime);
 	void RegisterTimeSliceHistoryRanged(const Time InTimeBegin, const Time InTimeEnd);
 
