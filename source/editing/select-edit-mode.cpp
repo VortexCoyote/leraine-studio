@@ -67,6 +67,9 @@ bool SelectEditMode::OnPaste()
 {
     //I hate parsing strings in c++ 
 
+    _MostRightColumn = 0;
+    _MostLeftColumn = static_Chart->KeyAmount - 1;;
+
     _PastePreviewNotes.clear();
     _LowestPasteTimePoint = INT_MAX;
 
@@ -116,6 +119,7 @@ bool SelectEditMode::OnPaste()
 
                 _LowestPasteTimePoint = std::min( _LowestPasteTimePoint, note.TimePoint);
                 _PastePreviewNotes.push_back({column, note});
+
             }
             break;
 
@@ -161,6 +165,9 @@ bool SelectEditMode::OnPaste()
             default:
                 break;
             }
+
+            _MostRightColumn = std::max(_MostRightColumn, column);
+            _MostLeftColumn = std::min(_MostLeftColumn, column);
         }
     }
 
@@ -178,7 +185,6 @@ void SelectEditMode::OnReset()
     _PastePreviewNotes.clear();
 }
 
-
 bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
     _AnchoredCursor = static_Cursor;
@@ -188,11 +194,24 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 
     if(_IsPreviewingPaste)
     {
+        int deltaColumn = int(static_Cursor.Column) - int(_MostLeftColumn);
+        int keyAmount = static_Chart->KeyAmount - 1;
+
+        if(int(_MostRightColumn) + deltaColumn > keyAmount)
+            deltaColumn = deltaColumn - (int(_MostRightColumn) + deltaColumn - keyAmount);
+
+        if(int(_MostLeftColumn) + deltaColumn < 0)
+            deltaColumn = deltaColumn - (int(_MostLeftColumn) + deltaColumn);
+
         for(auto& [column, note] : _PastePreviewNotes)
         {
+            Column newColumn = column + deltaColumn;
+
             note.TimePoint = static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint;
             note.TimePointBegin = static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint;
             note.TimePointEnd = static_Cursor.TimePoint + note.TimePointEnd - _LowestPasteTimePoint;
+
+            column = newColumn;
         }
 
         static_Chart->BulkPlaceNotes(_PastePreviewNotes);
@@ -206,17 +225,28 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
 {
     if(_IsPreviewingPaste)
     {
+        int deltaColumn = int(static_Cursor.Column) - int(_MostLeftColumn);
+        int keyAmount = static_Chart->KeyAmount - 1;
+
+        if(int(_MostRightColumn) + deltaColumn > keyAmount)
+            deltaColumn = deltaColumn - (int(_MostRightColumn) + deltaColumn - keyAmount);
+
+        if(int(_MostLeftColumn) + deltaColumn < 0)
+            deltaColumn = deltaColumn - (int(_MostLeftColumn) + deltaColumn);
+
         for(const auto [column, note] : _PastePreviewNotes)
         {
+            Column newColumn = column + deltaColumn;
+
             switch(note.Type)
             {
                 case Note::EType::Common:
-                    InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(column, static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint, note.BeatSnap, 128);
+                    InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(newColumn, static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint, note.BeatSnap, 128);
                 break;
 
                 case Note::EType::HoldBegin:
-                    InOutTimefieldRenderGraph.SubmitHoldNoteRenderCommand(column, static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint, 
-                                                                                  static_Cursor.TimePoint + note.TimePointEnd   - _LowestPasteTimePoint, -1, -1, 128);
+                    InOutTimefieldRenderGraph.SubmitHoldNoteRenderCommand(newColumn, static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint, 
+                                                                                     static_Cursor.TimePoint + note.TimePointEnd   - _LowestPasteTimePoint, -1, -1, 128);
                 break;
             }
         }

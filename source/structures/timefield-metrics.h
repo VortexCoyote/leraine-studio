@@ -6,11 +6,11 @@ public: //constants
 
 	int ColumnSize = 64;
 
-	int NoteScreenPivotsLookup[16] = { 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	int NoteScreenPivotsLookup[16] = { 0, 0, 0, 0, 32, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	int HitLine = 196;
 	int KeyAmount = 0;
-	int SideSpace = 32;
+	int SideSpace = 64;
 	
 public: //dynamics
 	

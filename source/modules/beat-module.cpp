@@ -32,7 +32,7 @@ void BeatModule::AssignNotesToSnapsInChart(Chart* const InChart)
 	}
 }
 
-void BeatModule::AssignNotesToSnapsInTimeSlice(Chart* const InChart, TimeSlice& InOutTimeSlice, const bool InResnapNotes) 
+void BeatModule::AssignNotesToSnapsInTimeSlice(Chart* const InChart, TimeSlice& InOutTimeSlice) 
 {
 	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 48);
 	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 5, true);
@@ -45,31 +45,6 @@ void BeatModule::AssignNotesToSnapsInTimeSlice(Chart* const InChart, TimeSlice& 
 		{
 			auto attachedBeatLine = GetClosestBeatLineToTimePoint(note.TimePoint);
 			note.BeatSnap = GetBeatSnap(attachedBeatLine, attachedBeatLine.BeatDivision);
-
-			if(!InResnapNotes)
-				continue;
-			
-			switch(note.Type)
-			{
-				case Note::EType::Common:
-				{
-					InChart->RegisterTimeSliceHistoryIfNotAdded(note.TimePoint += attachedBeatLine.TimePoint - note.TimePoint);
-				}
-				break;
-
-				case Note::EType::HoldIntermediate:
-				case Note::EType::HoldBegin:
-				case Note::EType::HoldEnd:
-				{
-					GenerateBeatLinesFromTimePointIfInvalid(InChart, note.TimePointBegin);
-					GenerateBeatLinesFromTimePointIfInvalid(InChart, note.TimePointEnd);
-					
-					InChart->RegisterTimeSliceHistoryIfNotAdded(note.TimePoint += attachedBeatLine.TimePoint - note.TimePoint);
-					InChart->RegisterTimeSliceHistoryIfNotAdded(note.TimePointBegin += GetClosestBeatLineToTimePoint(note.TimePointBegin).TimePoint - note.TimePointBegin);
-					InChart->RegisterTimeSliceHistoryIfNotAdded(note.TimePointEnd += GetClosestBeatLineToTimePoint(note.TimePointEnd).TimePoint - note.TimePointEnd);
-				}
-				break;
-			}
 		}
 	}
 
@@ -126,19 +101,23 @@ void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time I
 
 void BeatModule::GenerateBeatLinesFromTimePointIfInvalid(Chart* const InChart, const Time InTime) 
 {
-	const Time timeBegin =  _OnFieldBeatLines.front().TimePoint;
-	const Time timeEnd =  _OnFieldBeatLines.back().TimePoint;
+	const Time timeBegin = _OnFieldBeatLines.front().TimePoint;
+	const Time timeEnd = _OnFieldBeatLines.back().TimePoint;
 
 	if(InTime < timeBegin)
 	{
-		GenerateTimeRangeBeatLines(InTime - TIMESLICE_LENGTH, timeBegin, InChart, 48, true);
-		GenerateTimeRangeBeatLines(InTime - TIMESLICE_LENGTH, timeBegin, InChart, 5, true);
+		Time deltaTime = abs(timeBegin - InTime) + TIMESLICE_LENGTH;
+
+		GenerateTimeRangeBeatLines(timeBegin - deltaTime, timeBegin, InChart, 48, true);
+		GenerateTimeRangeBeatLines(timeBegin - deltaTime, timeBegin, InChart, 5, true);
 	}
 
 	if(InTime > timeEnd)
 	{
-		GenerateTimeRangeBeatLines(timeEnd, InTime + TIMESLICE_LENGTH, InChart, 48, true);
-		GenerateTimeRangeBeatLines(timeEnd, InTime + TIMESLICE_LENGTH, InChart, 5, true);
+		Time deltaTime = abs(timeEnd - InTime) + TIMESLICE_LENGTH;
+
+		GenerateTimeRangeBeatLines(timeEnd, timeEnd + deltaTime, InChart, 48, true);
+		GenerateTimeRangeBeatLines(timeEnd, timeEnd + deltaTime, InChart, 5, true);
 	}
 }
 

@@ -172,7 +172,7 @@ Time TimefieldRenderModule::GetWindowTimePointEnd(const Time InTime, const float
 
 Column TimefieldRenderModule::GetColumnFromScreenPoint(const int InScreenPointX) 
 {
-	int inputX = InScreenPointX - _TimefieldMetrics.ColumnSize / 2;
+	int inputX = InScreenPointX - _TimefieldMetrics.ColumnSize;
 	
 	const int leftBorder = _WindowMetrics.MiddlePoint - _TimefieldMetrics.NoteFieldWidthHalf;
 	const int rightBorder = _WindowMetrics.MiddlePoint + _TimefieldMetrics.NoteFieldWidthHalf;

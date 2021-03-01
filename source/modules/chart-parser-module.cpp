@@ -165,7 +165,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 				std::stringstream timePointStream(line);
 
-				Time timePoint;
+				double timePoint;
 				double beatLength;
 				int meter, sampleSet, sampleIndex, volume, uninherited, effects;
 

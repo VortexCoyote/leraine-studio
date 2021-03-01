@@ -25,15 +25,21 @@ public:
 
 	double GetTimeSeconds();
 	Time GetTimeMilliSeconds();
-	
 	Time GetSongLengthMilliSeconds();
+	
+	[[nodiscard]] WaveFormData* GenerateAndGetWaveformData(const std::string& InPath);
 
 private:
+
+	const WaveFormData& SampleWaveFormData(const Time InTimePoint);
+
+	WaveFormData* _ReadableWaveFormData = nullptr;
 
 	double _CurrentTime = 0;
 	float _Speed = 1.f;
 	bool _Paused = true;
 
+	float* _WaveFormData = nullptr;
 	DWORD _SongByteLength;
 
 	//relevant BASS variables

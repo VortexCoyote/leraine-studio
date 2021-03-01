@@ -29,4 +29,7 @@ private:
 
 	bool _IsAreaSelecting = false;
 	bool _IsPreviewingPaste = false;
+
+	Column _MostRightColumn = 0;
+	Column _MostLeftColumn = 0;
 };

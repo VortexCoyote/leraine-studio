@@ -8,3 +8,4 @@
 #include "../structures/timefield-render-graph.h"
 #include "../structures/window-metrics.h"
 #include "../structures/timefield-metrics.h"
+#include "../structures/waveform-data.h"

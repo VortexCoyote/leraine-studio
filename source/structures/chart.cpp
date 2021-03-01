@@ -35,7 +35,8 @@ void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes)
 	Time timePointMin = InNotes.front().second.TimePoint;
 	Time timePointMax = InNotes.back().second.TimePoint;
 
-	RegisterTimeSliceHistoryRanged(timePointMin, timePointMax);
+	// - TIMESLICE_LENGTH and + TIMESLICE_LENGTH accounts for potential resnaps (AAAAAA) 
+	RegisterTimeSliceHistoryRanged(timePointMin - TIMESLICE_LENGTH, timePointMax + TIMESLICE_LENGTH);
 
 	for(const auto& [column, note] : InNotes)
 	{
@@ -211,8 +212,11 @@ TimeSlice& Chart::FindOrAddTimeSlice(const Time InTime)
 	return TimeSlices[index];
 }
 
-void Chart::RegisterTimeSliceHistoryIfNotAdded(const Time InTime) 
+void Chart::PushTimeSliceHistoryIfNotAdded(const Time InTime) 
 {
+	if(TimeSliceHistory.size() == 0)
+		return;
+
 	auto& collection = TimeSliceHistory.top();
 
 	for(auto& timeSlice : collection)

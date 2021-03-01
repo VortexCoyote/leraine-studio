@@ -1,5 +1,7 @@
 #include "audio-module.h"
 
+#include <algorithm>
+
 bool AudioModule::Tick(const float& InDeltaTime)
 {
 	BASS_Update(_StreamHandle);
@@ -121,4 +123,49 @@ Time AudioModule::GetTimeMilliSeconds()
 Time AudioModule::GetSongLengthMilliSeconds() 
 {
 	return BASS_ChannelBytes2Seconds(_StreamHandle, BASS_ChannelGetLength(_StreamHandle, BASS_POS_BYTE)) * 1000;
+}
+
+WaveFormData* AudioModule::GenerateAndGetWaveformData(const std::string& InPath) 
+{
+	HSTREAM decoder = BASS_StreamCreateFile(FALSE, InPath.c_str(), 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_DECODE);
+
+	if (_WaveFormData != nullptr)
+	{
+		delete[] _WaveFormData;
+		_WaveFormData = nullptr;
+	}
+
+	if (_ReadableWaveFormData != nullptr)
+	{
+		delete[] _ReadableWaveFormData;
+		_ReadableWaveFormData = nullptr;
+	}
+
+	_SongByteLength = BASS_ChannelGetLength(decoder, BASS_POS_BYTE);
+	_WaveFormData = (float*)std::malloc(_SongByteLength); 
+	_SongByteLength = BASS_ChannelGetData(decoder, _WaveFormData, _SongByteLength);
+
+	_ReadableWaveFormData = new WaveFormData[GetSongLengthMilliSeconds()]();
+
+	for(Time time = 0; time < GetSongLengthMilliSeconds(); ++time)
+	{
+		double timeSeconds = double(time) / 1000.0;
+		QWORD index = BASS_ChannelSeconds2Bytes(_StreamHandle, std::max(0.0, timeSeconds)) / 2;
+
+		if(index < _SongByteLength / sizeof(int))
+		{
+			float right = _WaveFormData[index];
+			float left = _WaveFormData[index + 1];
+
+			_ReadableWaveFormData[time].Right = right;
+			_ReadableWaveFormData[time].Left = left;
+		}
+	}
+
+	return _ReadableWaveFormData;
+}
+
+const WaveFormData& AudioModule::SampleWaveFormData(const Time InTimePoint) 
+{
+	return _ReadableWaveFormData[std::max(0, std::min(GetSongLengthMilliSeconds(), InTimePoint))];
 }

@@ -12,8 +12,14 @@ Program::~Program()
 
 void Program::Init()
 {
-    _RenderWindow = new sf::RenderWindow(sf::VideoMode(1024, 768), "Leraine Studio", sf::Style::Default);
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+
+    _RenderWindow = new sf::RenderWindow(sf::VideoMode(1024, 768), "Leraine Studio", sf::Style::Default, settings);
     _RenderWindow->setFramerateLimit(0);
+    _RenderWindow->setVerticalSyncEnabled(true);
+    _RenderWindow->setActive(true);
+    
 
     ModuleManager::Init();
     
@@ -75,7 +81,7 @@ void Program::Render()
 	ModuleManager::RenderBack(_RenderWindow);
     InnerRender(_RenderWindow);
 	ModuleManager::RenderFront(_RenderWindow);
-	
+
     _RenderWindow->display();
 }
 

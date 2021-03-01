@@ -12,7 +12,7 @@ namespace
 
 	TimefieldRenderGraph ChartRenderGraph;
 	TimefieldRenderGraph PreviewRenderGraph;
-
+	
 	Chart* SelectedChart = nullptr;
 
 	float ZoomLevel = 1.0f;
@@ -31,6 +31,7 @@ namespace
 #include "../modules/edit-module.h"
 #include "../modules/background-module.h"
 #include "../modules/minimap-module.h"
+#include "../modules/waveform-module.h"
 
 void Program::RegisterModules()
 {
@@ -42,6 +43,7 @@ void Program::RegisterModules()
 	ModuleManager::Register<MiniMapModule>();
 	ModuleManager::Register<ChartParserModule>();
 	ModuleManager::Register<AudioModule>();
+	ModuleManager::Register<WaveFormModule>();
 	ModuleManager::Register<BeatModule>();
 	ModuleManager::Register<EditModule>();
 }
@@ -82,16 +84,18 @@ void Program::InnerRender(sf::RenderTarget* const InOutRenderTarget)
 	if (!SelectedChart)
 		return;
 
+	MOD(WaveFormModule).RenderWaveForm(InOutRenderTarget, WindowTimeBegin, WindowTimeEnd, MOD(TimefieldRenderModule).GetTimefieldMetrics().LeftSidePosition + MOD(TimefieldRenderModule).GetTimefieldMetrics().FieldWidthHalf, ZoomLevel);
+
 	MOD(BeatModule).IterateThroughBeatlines([this, &InOutRenderTarget](const BeatLine& InBeatLine)
 	{
 		MOD(TimefieldRenderModule).RenderBeatLine(InOutRenderTarget, InBeatLine.TimePoint, InBeatLine.BeatSnap, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	});
 
 	MOD(TimefieldRenderModule).RenderReceptors(InOutRenderTarget, CurrentSnap);
-	
+
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget ,ChartRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, PreviewRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel, false);
-	
+
 	MOD(MiniMapModule).Render(InOutRenderTarget);
 
 	if(MOD(MiniMapModule).ShouldPreview()) // :D ???
@@ -126,13 +130,14 @@ void Program::MenuBar()
 					MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
 					MOD(TimefieldRenderModule).SetKeyAmount(SelectedChart->KeyAmount);
 					MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
-				
+					MOD(WaveFormModule).GenerateWaveForm(MOD(AudioModule).GenerateAndGetWaveformData(SelectedChart->AudioPath), MOD(AudioModule).GetSongLengthMilliSeconds());
+
 					SelectedChart->RegisterOnModifiedCallback([this](TimeSlice& InTimeSlice)
 					{
 						//TODO: replicate the timeslice method to optimize when "re-generating"
 						//MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 
-						MOD(BeatModule).AssignNotesToSnapsInTimeSlice(SelectedChart, InTimeSlice, true);
+						MOD(BeatModule).AssignNotesToSnapsInTimeSlice(SelectedChart, InTimeSlice);
 					});
 				});
 			}
