@@ -221,7 +221,7 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
     return true;
 }
 
-void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph)
+void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd)
 {
     if(_IsPreviewingPaste)
     {

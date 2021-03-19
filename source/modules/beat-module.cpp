@@ -10,7 +10,9 @@ bool BeatModule::StartUp()
 	_LegalSnaps.insert(4);
 	_LegalSnaps.insert(5);
 	_LegalSnaps.insert(6);
+	_LegalSnaps.insert(7);
 	_LegalSnaps.insert(8);
+	_LegalSnaps.insert(9);
 	_LegalSnaps.insert(12);
 	_LegalSnaps.insert(16);
 	_LegalSnaps.insert(24);
@@ -36,6 +38,8 @@ void BeatModule::AssignNotesToSnapsInTimeSlice(Chart* const InChart, TimeSlice& 
 {
 	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 48);
 	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 5, true);
+	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 7, true);
+	GenerateTimeRangeBeatLines(InOutTimeSlice.TimePoint, InOutTimeSlice.TimePoint + TIMESLICE_LENGTH, InChart, 9, true);
 
 	std::sort(_OnFieldBeatLines.begin(), _OnFieldBeatLines.end(), [](const auto& lhs, const auto& rhs) { return lhs.TimePoint < rhs.TimePoint; });
 
@@ -60,8 +64,10 @@ void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time I
 	const auto& bpmPoints = InChart->GetBpmPointsRelatedToTimeRange(InTimeBegin, InTimeEnd);
 
 	size_t index = 0;
-	for (const auto& bpmPoint : bpmPoints)
+	for (const auto& bpmPointPtr : bpmPoints)
 	{
+		const BpmPoint& bpmPoint = *bpmPointPtr;
+
 		Time timeBegin = InTimeBegin;
 		Time timeEnd = InTimeEnd;
 
@@ -69,7 +75,7 @@ void BeatModule::GenerateTimeRangeBeatLines(const Time InTimeBegin, const Time I
 			timeBegin = bpmPoint.TimePoint;
 
 		if (index + 1 <= bpmPoints.size() - 1)
-			timeEnd = bpmPoints[index + 1].TimePoint;
+			timeEnd = bpmPoints[index + 1]->TimePoint;
 
 		const double timeBetweenSnaps = bpmPoint.BeatLength / double(InBeatDivision);
 		double firstPosition = double(bpmPoint.TimePoint) + ceil(double(timeBegin - bpmPoint.TimePoint) / timeBetweenSnaps) * timeBetweenSnaps;

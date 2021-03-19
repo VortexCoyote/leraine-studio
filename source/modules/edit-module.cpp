@@ -35,9 +35,9 @@ bool EditModule::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 	return _EditModes[_SelectedEditMode]->OnMouseLeftButtonClicked(InIsShiftDown);
 }
 
-void EditModule::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph)
+void EditModule::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd)
 {
-	_EditModes[_SelectedEditMode]->SubmitToRenderGraph(InOutTimefieldRenderGraph);
+	_EditModes[_SelectedEditMode]->SubmitToRenderGraph(InOutTimefieldRenderGraph, InTimeBegin, InTimeEnd);
 }
 
 void EditModule::SetChart(Chart* const InOutChart)

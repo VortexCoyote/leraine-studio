@@ -11,7 +11,7 @@ public:
 
 	bool OnMouseRightButtonClicked(const bool InIsShiftDown) override;
 
-	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph) override;
+	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd) override;
 	
 private:
 

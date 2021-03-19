@@ -6,6 +6,7 @@
 
 #include "../editing/note-edit-mode.h"
 #include "../editing/select-edit-mode.h"
+#include "../editing/bpm-edit-mode.h"
 
 /*
 * special edit-mode actions cannot be directly called by the program, but must be interfaced through the edit module.
@@ -30,7 +31,7 @@ public: //edit-mode overrides
 	bool OnCopy() override;
 	bool OnPaste() override;
 
-	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph) override;
+	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd) override;
 
 public:
 
@@ -44,9 +45,15 @@ public:
 		_SelectedEditMode = _EditModes.GetIndex<T>();
 	}
 
+	template<class T>
+	bool IsEditModeActive()
+	{
+		return (_SelectedEditMode == _EditModes.GetIndex<T>());
+	}
+
 private:
 
 	size_t _SelectedEditMode = 0;
 
-	EditModeCollection<SelectEditMode, NoteEditMode> _EditModes;
+	EditModeCollection<SelectEditMode, NoteEditMode, BpmEditMode> _EditModes;
 };

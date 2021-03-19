@@ -75,7 +75,7 @@ void Skin::RenderNote(const int InColumn, const int InPositionY, sf::RenderTarge
 	if (!_HasOverlay)
 		return;
 
-	NoteSprite.setColor(sf::Color(255, 255, 255, 255));
+	NoteSprite.setColor(sf::Color(255, 255, 255, InAlpha));
 
 	NoteSprite.setTexture(NoteOverlayTextures[InColumn]);
 	NoteSprite.setScale((float)_TimefieldMetrics.ColumnSize / (float)NoteTextures[InColumn].getSize().x,

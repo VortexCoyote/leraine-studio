@@ -44,7 +44,7 @@ bool NoteEditMode::OnMouseLeftButtonReleased()
     return false;
 }
 
-void NoteEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph)
+void NoteEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd)
 {
     if(_IsPlacingHold)
         if(_AnchoredHoldCursor.TimePoint < static_Cursor.TimePoint)

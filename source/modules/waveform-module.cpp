@@ -7,6 +7,7 @@ bool WaveFormModule::StartUp()
 
 void WaveFormModule::GenerateWaveForm(WaveFormData* const InWaveFormData, const Time InSongLengthMilliSeconds) 
 {
+    _WaveFormData = InWaveFormData;
     _WaveFormSlices.clear();
 
     for(Time time = 0; time < InSongLengthMilliSeconds; time += _SliceLength)
@@ -25,8 +26,8 @@ void WaveFormModule::GenerateWaveForm(WaveFormData* const InWaveFormData, const 
             float left = InWaveFormData[waveFormTime].Left;// * 128.f;
             float right = InWaveFormData[waveFormTime].Right;// * 128.f;
 
-            float totalLengthFront = pow((abs(left) + abs(right)) / 2.f, 1.5f) * 256.f;
-            float totalLengthBack = (abs(left) + abs(right)) * 196.f;
+            float totalLengthFront = pow((abs(left) + abs(right)) / 2.f, 1.5f) * 128.f;
+            float totalLengthBack = (abs(left) + abs(right)) * 128.f;
 
             sf::RectangleShape lineBack(sf::Vector2f(totalLengthBack, 1));
             lineBack.setFillColor(backColor);
@@ -61,4 +62,33 @@ void WaveFormModule::RenderWaveForm(sf::RenderTarget* const InOutRenderTarget, c
 
         InOutRenderTarget->draw(_WaveFormSliceSprite);
     }
+}
+
+void WaveFormModule::RenderWaveFormRealtime(sf::RenderTarget* const InOutRenderTarget, const Time InTimeBegin, const Time InTimeEnd, const int InScreenX, const float InZoomLevel) 
+{
+    const float windowHeight = float(InOutRenderTarget->getView().getSize().y);
+    const float scale = windowHeight / float(InTimeEnd - InTimeBegin);
+    const int pointAmount = InTimeEnd - InTimeBegin;
+
+    sf::VertexArray waveFormPoints(sf::TriangleStrip, pointAmount * 2);
+
+    for(int i = 0; i < pointAmount; i += 1)
+    {
+        WaveFormData waveFormData = _WaveFormData[InTimeEnd - i];
+
+        float y = floor(float(i) * scale);
+
+        int pointIndex = i * 2;
+
+        waveFormPoints[pointIndex].position.x = InScreenX - abs(waveFormData.Left * 128);
+        waveFormPoints[pointIndex].position.y = y;
+
+        waveFormPoints[pointIndex + 1].position.x = InScreenX + abs(waveFormData.Right * 128);
+        waveFormPoints[pointIndex + 1].position.y = y;
+
+        waveFormPoints[pointIndex].color = sf::Color(255, 255, 255, 255);
+        waveFormPoints[pointIndex + 1].color = sf::Color(255, 255, 255, 255);
+    }
+
+    InOutRenderTarget->draw(waveFormPoints);
 }

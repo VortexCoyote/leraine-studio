@@ -15,6 +15,7 @@ public:
 
     void GenerateWaveForm(WaveFormData* const InWaveFormData, const Time InSongLengthMilliSeconds);
     void RenderWaveForm(sf::RenderTarget* const InOutRenderTarget, const Time InTimeBegin, const Time InTimeEnd, const int InScreenX, const float InZoomLevel);
+    void RenderWaveFormRealtime(sf::RenderTarget* const InOutRenderTarget, const Time InTimeBegin, const Time InTimeEnd, const int InScreenX, const float InZoomLevel);
 
 private:
 
@@ -23,4 +24,6 @@ private:
 
     sf::Sprite _WaveFormSliceSprite;
     std::map<Time, sf::RenderTexture> _WaveFormSlices;
+
+    WaveFormData* _WaveFormData = nullptr;
 };

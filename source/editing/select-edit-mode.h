@@ -17,7 +17,7 @@ public:
 	bool OnPaste() override;
 
 	void OnReset() override;
-	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph) override;
+	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd) override;
 
 private:
 

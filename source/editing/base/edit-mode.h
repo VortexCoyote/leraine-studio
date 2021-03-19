@@ -5,6 +5,7 @@
 
 #include "../../global/global-types.h"
 #include "../../global/global-functions.h"
+#include "../edit-flags.h"
 
 class EditMode
 {
@@ -22,7 +23,7 @@ public:
 	virtual bool OnPaste();
 
 	virtual void OnReset();
-	virtual void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph);
+	virtual void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd);
 	virtual void Tick();
 
 public:
@@ -30,6 +31,8 @@ public:
 	static void SetChart(Chart* const InOutChart);
 	static void SetCursorData(const Cursor& InCursor);
 
+	static EditFlags static_Flags;
+	
 protected:
 
 	static Chart* static_Chart;

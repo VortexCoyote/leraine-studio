@@ -2,6 +2,7 @@
 
 Chart* EditMode::static_Chart = nullptr;
 Cursor EditMode::static_Cursor;
+EditFlags EditMode::static_Flags;
 
 void EditMode::SetChart(Chart* const InOutChart)
 {
@@ -53,7 +54,7 @@ void EditMode::OnReset()
 
 }
 
-void EditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph)
+void EditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd)
 {
 	
 }

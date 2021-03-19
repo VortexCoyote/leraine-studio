@@ -43,6 +43,11 @@ struct BpmPoint
 
 	double BeatLength;
 	double Bpm;
+
+	bool operator==(const BpmPoint& InOther)
+	{
+		return (TimePoint == InOther.TimePoint);
+	}
 };
 struct ScrollVelocityMultiplier
 {
@@ -86,10 +91,11 @@ public: //accessors
 	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes);
 
 	bool RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHoldChecks = false);
+	bool RemoveBpmPoint(BpmPoint& InBpmPoint);
 
 	Note& InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin = -1, const Time InTimeEnd = -1, const int InBeatSnap = -1);
 	void InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn,  const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
-	void InjectBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
+	BpmPoint* InjectBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
 	bool IsAPotentialNoteDuplicate(const Time InTime, const Column InColumn);
 	TimeSlice& FindOrAddTimeSlice(const Time InTime);
@@ -102,7 +108,9 @@ public: //accessors
 
 	void IterateTimeSlicesInTimeRange(const Time InTimeBegin, const Time InTimeEnd, std::function<void(TimeSlice&)> InWork);
 	void IterateNotesInTimeRange(const Time InTimeBegin, const Time InTimeEnd, std::function<void(Note&, const Column)> InWork);
-	const std::vector<BpmPoint>& GetBpmPointsRelatedToTimeRange(const Time InTimeBegin, const Time InTimeEnd);
+	std::vector<BpmPoint*>& GetBpmPointsRelatedToTimeRange(const Time InTimeBegin, const Time InTimeEnd);
+	BpmPoint* GetPreviousBpmPointFromTimePoint(const Time InTime);
+	BpmPoint* GetNextBpmPointFromTimePoint(const Time InTime);
 
 	void DebugPrint();
 	void RegisterOnModifiedCallback(std::function<void(TimeSlice&)> InCallback);
@@ -114,7 +122,7 @@ public: //data ownership
 
 	std::stack<std::vector<TimeSlice>> TimeSliceHistory;
 
-	std::vector<BpmPoint> CachedBpmPoints;
+	std::vector<BpmPoint*> CachedBpmPoints;
 
 private:
 

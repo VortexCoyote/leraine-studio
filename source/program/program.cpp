@@ -66,17 +66,23 @@ void Program::InnerTick()
 	WindowTimeBegin = MOD(TimefieldRenderModule).GetWindowTimePointBegin(MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	WindowTimeEnd   = MOD(TimefieldRenderModule).GetWindowTimePointEnd(MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 
-	InputActions();
+	if(!ImGui::IsAnyItemActive())
+		InputActions();
 
 	MOD(TimefieldRenderModule).UpdateMetrics(_WindowMetrics);
 	MOD(BeatModule).GenerateTimeRangeBeatLines(WindowTimeBegin, WindowTimeEnd, SelectedChart, CurrentSnap);
 
 	SelectedChart->IterateNotesInTimeRange(WindowTimeBegin - TIMESLICE_LENGTH, WindowTimeEnd, [this](Note& InNote, const Column InColumn)
 	{
-		ChartRenderGraph.SubmitNoteRenderCommand(InNote, InColumn);
+		sf::Int8 alpha = 255;
+
+		if(MOD(EditModule).IsEditModeActive<BpmEditMode>())
+			alpha = 128;
+
+		ChartRenderGraph.SubmitNoteRenderCommand(InNote, InColumn, alpha);
 	});
 
-	MOD(EditModule).SubmitToRenderGraph(PreviewRenderGraph);
+	MOD(EditModule).SubmitToRenderGraph(PreviewRenderGraph, WindowTimeBegin, WindowTimeEnd);
 }
 
 void Program::InnerRender(sf::RenderTarget* const InOutRenderTarget)
@@ -93,7 +99,7 @@ void Program::InnerRender(sf::RenderTarget* const InOutRenderTarget)
 
 	MOD(TimefieldRenderModule).RenderReceptors(InOutRenderTarget, CurrentSnap);
 
-	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget ,ChartRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
+	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, ChartRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, PreviewRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel, false);
 
 	MOD(MiniMapModule).Render(InOutRenderTarget);
@@ -150,6 +156,15 @@ void Program::MenuBar()
 			ImGui::EndMenu();
 		}
 
+		if(ImGui::BeginMenu("Options"))
+		{
+			ImGui::Separator();
+
+			ImGui::Checkbox("Use Auto Timing", &EditMode::static_Flags.UseAutoTiming);
+
+			ImGui::EndMenu();
+		}
+
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -157,8 +172,6 @@ void Program::MenuBar()
 
 void Program::InputActions() 
 {
-	//TODO: set up input action priorities (maybe make some sort of dependency graph module?)
-	
 	if (MOD(InputModule).IsTogglingPause())
 		MOD(AudioModule).TogglePause();
 
@@ -170,6 +183,9 @@ void Program::InputActions()
 
 	if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Num2))
 		MOD(EditModule).SetEditMode<NoteEditMode>();
+
+	if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Num3))
+		MOD(EditModule).SetEditMode<BpmEditMode>();
 
 	if (MOD(InputModule).IsCtrlKeyDown())
 	{
