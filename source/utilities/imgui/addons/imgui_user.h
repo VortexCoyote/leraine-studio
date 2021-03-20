@@ -123,14 +123,14 @@ inline void operator delete(void*, ImImplPlacementNewDummy, void*) {}
 #else //__EMSCRIPTEN__
 #   undef YES_IMGUIEMSCRIPTENPERSISTENTFOLDER
 #endif //__EMSCRIPTEN__
-
+/*
 #ifndef NO_IMGUISTRING
 #include "./imguistring/imguistring.h"
 #endif //NO_IMGUISTRING
 #ifndef NO_IMGUITABWINDOW
 #include "./imguitabwindow/imguitabwindow.h"
 #endif //NO_IMGUITABWINDOW
-
+*/
 #ifdef YES_IMGUISOLOUD_ALL
 #   undef YES_IMGUISOLOUD
 #   define YES_IMGUISOLOUD
@@ -171,7 +171,7 @@ inline void operator delete(void*, ImImplPlacementNewDummy, void*) {}
 #   endif //
 # 	include "./imguibindings/imguibindings.h"
 #endif //IMGUI_USE_AUTO_BINDING
-
+/*
 #ifndef NO_IMGUILISTVIEW
 #include "./imguilistview/imguilistview.h"
 #endif //NO_IMGUILISTVIEW
@@ -184,7 +184,7 @@ inline void operator delete(void*, ImImplPlacementNewDummy, void*) {}
 #ifndef NO_IMGUIDOCK
 #include "./imguidock/imguidock.h"
 #endif //NO_IMGUIDOCK
-
+*/
 #ifdef YES_IMGUIADDONS_ALL
 #	ifndef NO_IMGUIPDFVIEWER
 #		undef YES_IMGUIPDFVIEWER

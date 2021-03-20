@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ../binaries)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ../binaries)
 
+set(CMAKE_CXX_FLAGS "-fpermissive -std=c++0x")
+set(GCC_COVERAGE_COMPILE_FLAGS "lm")
+
 #build routine
 include_directories($ENV{VCPKG_ROOT}/installed/x64-windows/include include)
 link_directories($ENV{VCPKG_ROOT}/installed/x64-windows/lib libraries)
@@ -34,5 +37,4 @@ target_link_libraries($ENV{PROJECT_NAME} PRIVATE
     sfml-system
     bass
     bass_fx
-    zlib
 )
