@@ -4,6 +4,19 @@
 #include <sstream>
 #include <algorithm>
 
+#include <cmath>
+
+namespace 
+{
+	auto getLine = [](std::ifstream& InIfstream, std::string& OutLine) -> auto&
+		{
+			auto& result = std::getline(InIfstream, OutLine); 
+			OutLine.erase(remove(OutLine.begin(), OutLine.end(), '\r'), OutLine.end()); 
+			
+			return result; 
+		}; 
+};
+
 #define PARSE_COMMA_VALUE(stringstream, target) stringstream >> target; if (stringstream.peek() == ',') stringstream.ignore()
 
 Chart* ChartParserModule::ParseAndGenerateChartSet(std::string InPath)
@@ -21,14 +34,14 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 	std::filesystem::path path = InPath;
 	std::string parentPath = path.parent_path().string();
-
-	while (std::getline(InIfstream, line))
+	
+	while (getLine(InIfstream, line))
 	{
 		if (line == "[General]")
 		{
 			std::string metadataLine;
 
-			while (std::getline(InIfstream, metadataLine))
+			while (getLine(InIfstream, metadataLine))
 			{
 				if (metadataLine.empty())
 					break;
@@ -49,7 +62,9 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 				if (meta == "AudioFilename")
 				{
-					std::string songPath = parentPath + "\\" + value;
+					std::string songPath = parentPath + "/" + value;
+					songPath.erase(remove(songPath.begin(), songPath.end(), '\r'), songPath.end()); 
+
 					chart->AudioPath = songPath;
 					//chartData->audioFileName = value;
 				}
@@ -60,7 +75,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 		{
 			std::string metadataLine;
 
-			while (std::getline(InIfstream, metadataLine))
+			while (getLine(InIfstream, metadataLine))
 			{
 				if (metadataLine.empty())
 					break;
@@ -96,7 +111,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 		{
 			std::string difficultyLine;
 
-			while (std::getline(InIfstream, difficultyLine))
+			while (getLine(InIfstream, difficultyLine))
 			{
 				std::string type;
 				std::string value;
@@ -126,7 +141,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 		{
 			std::string timePointLine;
 
-			while (std::getline(InIfstream, timePointLine))
+			while (getLine(InIfstream, timePointLine))
 			{
 				if (timePointLine == "")
 					continue;
@@ -197,7 +212,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 		if (line == "[HitObjects]")
 		{
 			std::string noteLine;
-			while (std::getline(InIfstream, noteLine))
+			while (getLine(InIfstream, noteLine))
 			{
 				if (noteLine == "")
 					continue;
@@ -212,7 +227,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 				PARSE_COMMA_VALUE(noteStream, hitSound);
 				PARSE_COMMA_VALUE(noteStream, timePointEnd);
 
-				int parsedColumn = std::clamp(floor(float(column) * (float(chart->KeyAmount) / 512.f)), 0.f, float(chart->KeyAmount) - 1.f);
+				int parsedColumn = std::clamp(float(floor(float(column) * (float(chart->KeyAmount) / 512.f))), 0.f, float(chart->KeyAmount) - 1.f);
 
 				if (noteType == 128)
 				{
