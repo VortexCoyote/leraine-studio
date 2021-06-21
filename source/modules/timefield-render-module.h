@@ -6,14 +6,13 @@
 
 class TimefieldRenderModule : public Module
 {
-public:
+public: //module overrides
 
 	bool StartUp() override;
 	bool Tick(const float& InDeltaTime) override;
 
 	bool RenderBack(sf::RenderTarget* const InOutRenderTarget) override;
 	bool RenderFront(sf::RenderTarget* const InOutRenderTarget) override;
-
 
 public: //rendering
 
@@ -25,7 +24,7 @@ public: //rendering
 
 public: //data gathering
 
-	int GetScreenTimePoint(const Time InTimePoint, const Time InTime, const float InZoomLevel);
+	int GetScreenPointFromTime(const Time InTimePoint, const Time InTime, const float InZoomLevel);
 	Time GetTimeFromScreenPoint(const int InScreenPointY, const Time InTime, const float InZoomLevel, const bool InNoteTimePivot = false);
 	Column GetColumnFromScreenPoint(const int InScreenPointX);
 

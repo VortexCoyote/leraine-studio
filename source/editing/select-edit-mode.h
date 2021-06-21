@@ -6,6 +6,9 @@
 #include <unordered_map>
 #include <utility>
 
+/*
+* this edit-mode is one giant edgecase 
+*/
 class SelectEditMode : public EditMode
 {
 public:
@@ -17,9 +20,12 @@ public:
 	bool OnPaste() override;
 
 	void OnReset() override;
+	void Tick() override;
 	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd) override;
 
 private:
+
+	int GetDelteColumn();
 
 	std::unordered_map<Column, std::unordered_set<Note*>> _SelectedNotes;
 	std::vector<std::pair<Column, Note>> _PastePreviewNotes;
@@ -29,7 +35,12 @@ private:
 
 	bool _IsAreaSelecting = false;
 	bool _IsPreviewingPaste = false;
+	bool _IsMovingNote = false;
 
 	Column _MostRightColumn = 0;
 	Column _MostLeftColumn = 0;
+
+	Note* _DraggingNote = nullptr;
+	Note* _HoveredNote = nullptr;
+	Column _HoveredNoteColumn = 0;
 };

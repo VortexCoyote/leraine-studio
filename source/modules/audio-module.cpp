@@ -154,8 +154,8 @@ WaveFormData* AudioModule::GenerateAndGetWaveformData(const std::string& InPath)
 
 		if(index < _SongByteLength / sizeof(int))
 		{
-			float right = _WaveFormData[index];
-			float left = _WaveFormData[index + 1];
+			float right = _WaveFormData[index + 1];
+			float left = _WaveFormData[index];
 
 			_ReadableWaveFormData[time].Right = right;
 			_ReadableWaveFormData[time].Left = left;

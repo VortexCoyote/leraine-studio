@@ -45,7 +45,7 @@ void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRe
 		const Note& note = InNoteRenderCommand.RenderNote;
 		const Column column = InNoteRenderCommand.NoteColumn;
 
-		const int y = GetScreenTimePoint(note.TimePoint, InTime, InZoomLevel) + _TimefieldMetrics.NoteScreenPivot;
+		const int y = GetScreenPointFromTime(note.TimePoint, InTime, InZoomLevel) + _TimefieldMetrics.NoteScreenPivot;
 
 		//hold pass
 		switch (note.Type)
@@ -54,8 +54,8 @@ void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRe
 		case Note::EType::HoldIntermediate:
 		case Note::EType::HoldEnd:
 			{
-				int endY = GetScreenTimePoint(note.TimePointEnd, InTime, InZoomLevel) - _TimefieldMetrics.ColumnSize / 2;
-				int height = GetScreenTimePoint(note.TimePointBegin, InTime, InZoomLevel) - endY;
+				int endY = GetScreenPointFromTime(note.TimePointEnd, InTime, InZoomLevel) - _TimefieldMetrics.ColumnSize / 2;
+				int height = GetScreenPointFromTime(note.TimePointBegin, InTime, InZoomLevel) - endY;
 
 				_Skin.RenderHoldBody(column, endY + _TimefieldMetrics.NoteScreenPivot, height, &_HoldRenderLayer, InNoteRenderCommand.Alpha);
 			}
@@ -92,7 +92,7 @@ void TimefieldRenderModule::RenderTimefieldGraph(sf::RenderTarget* const InOutRe
 
 	InOutTimefieldRenderGraph.Render([this, &InOutRenderTarget, &InTime, &InZoomLevel](const TimefieldRenderCommand& InRenderCommand)
 	{
-		InRenderCommand.RenderWork(InOutRenderTarget, _TimefieldMetrics, _TimefieldMetrics.FirstColumnPosition + InRenderCommand.ColumnPoint * _TimefieldMetrics.ColumnSize, GetScreenTimePoint(InRenderCommand.TimePoint, InTime, InZoomLevel));
+		InRenderCommand.RenderWork(InOutRenderTarget, _TimefieldMetrics, _TimefieldMetrics.FirstColumnPosition + InRenderCommand.ColumnPoint * _TimefieldMetrics.ColumnSize, GetScreenPointFromTime(InRenderCommand.TimePoint, InTime, InZoomLevel));
 	});
 }
 
@@ -123,7 +123,7 @@ sf::RenderTexture* const TimefieldRenderModule::GetRenderedTimefieldGraphSegment
 void TimefieldRenderModule::RenderBeatLine(sf::RenderTarget* const InOutRenderTarget, const Time InBeatTimePoint, const int InBeatSnap, const Time InTime, const float InZoomLevel) 
 {
 	sf::RectangleShape line(sf::Vector2f(_TimefieldMetrics.FieldWidth, 1));
-	line.setPosition(_TimefieldMetrics.LeftSidePosition, GetScreenTimePoint(InBeatTimePoint, InTime, InZoomLevel));
+	line.setPosition(_TimefieldMetrics.LeftSidePosition, GetScreenPointFromTime(InBeatTimePoint, InTime, InZoomLevel));
 	
 	line.setFillColor(_Skin.SnapColorTable[InBeatSnap]);
 
@@ -136,11 +136,11 @@ void TimefieldRenderModule::RenderReceptors(sf::RenderTarget* const InOutRenderT
 }
 
 
-int TimefieldRenderModule::GetScreenTimePoint(const Time InTimePoint, const Time InTime, const float InZoomLevel)
+int TimefieldRenderModule::GetScreenPointFromTime(const Time InTimePoint, const Time InTime, const float InZoomLevel)
 {
 	int timePoint = InTimePoint - InTime;
 
-	timePoint = float(timePoint) * InZoomLevel;
+	timePoint = float(timePoint) * InZoomLevel + 0.5f;
 	timePoint += _TimefieldMetrics.HitLine;
 
 	timePoint = _WindowMetrics.Height - timePoint;
@@ -153,7 +153,7 @@ Time TimefieldRenderModule::GetTimeFromScreenPoint(const int InScreenPointY, con
 	int screenPoint = _WindowMetrics.Height - InScreenPointY + ((int)InNoteTimePivot * _TimefieldMetrics.NoteScreenPivot);
 
 	screenPoint -= _TimefieldMetrics.HitLine;
-	screenPoint = float(screenPoint) / InZoomLevel;
+	screenPoint = float(screenPoint) / InZoomLevel - 0.5f;
 
 	const int timePoint = screenPoint + InTime;
 

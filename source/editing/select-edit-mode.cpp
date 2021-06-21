@@ -3,27 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <sstream>
 
-bool SelectEditMode::OnMouseLeftButtonReleased()
-{
-    _IsAreaSelecting = false;
+#include "imgui.h"
 
-    if(!(static_Cursor.TimefieldSide != _AnchoredCursor.TimefieldSide || static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle && _AnchoredCursor.TimefieldSide == Cursor::FieldPosition::Middle))
-        return false;
-
-    const Time timeBegin = std::min(_AnchoredCursor.UnsnappedTimePoint, static_Cursor.UnsnappedTimePoint);
-    const Time timeEnd   = std::max(_AnchoredCursor.UnsnappedTimePoint, static_Cursor.UnsnappedTimePoint);
-
-    const Column columnMin = std::min(_AnchoredCursor.Column, static_Cursor.Column);
-    const Column columnMax = std::max(_AnchoredCursor.Column, static_Cursor.Column);
-
-    static_Chart->IterateNotesInTimeRange(timeBegin, timeEnd, [this, &timeBegin, &timeEnd, &columnMin, &columnMax](Note& InOutNote, const Column& InColumn)
-    {
-        if((InOutNote.Type == Note::EType::Common || InOutNote.Type == Note::EType::HoldBegin) && (InColumn >= columnMin && InColumn <= columnMax))
-            _SelectedNotes[InColumn].insert(&InOutNote);
-    });
-
-    return true;
-}
 
 bool SelectEditMode::OnCopy() 
 {
@@ -185,38 +166,82 @@ void SelectEditMode::OnReset()
     _PastePreviewNotes.clear();
 }
 
+void SelectEditMode::Tick() 
+{
+    if(_IsMovingNote)
+        return;
+
+    if(!static_Cursor.HoveredNotes.empty() && static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle && !_IsAreaSelecting)
+    {
+        _HoveredNoteColumn = static_Cursor.Column;
+        _HoveredNote = static_Chart->FindNote(static_Cursor.HoveredNotes.back()->TimePoint, _HoveredNoteColumn);
+    }
+    else
+        _HoveredNote = nullptr;
+}
+
 bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
     _AnchoredCursor = static_Cursor;
+    _SelectedNotes.clear();  
+
+    if(_HoveredNote != nullptr)
+    {
+        _DraggingNote = _HoveredNote;
+        return _IsMovingNote = true;
+    }
+
     _IsAreaSelecting = true;
 
-    _SelectedNotes.clear();
-
-    if(_IsPreviewingPaste)
+    if(!_IsPreviewingPaste)
+        return true;
+    
+    for(auto& [column, note] : _PastePreviewNotes)
     {
-        int deltaColumn = int(static_Cursor.Column) - int(_MostLeftColumn);
-        int keyAmount = static_Chart->KeyAmount - 1;
+        Column newColumn = column + GetDelteColumn();
 
-        if(int(_MostRightColumn) + deltaColumn > keyAmount)
-            deltaColumn = deltaColumn - (int(_MostRightColumn) + deltaColumn - keyAmount);
+        note.TimePoint = static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint;
+        note.TimePointBegin = static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint;
+        note.TimePointEnd = static_Cursor.TimePoint + note.TimePointEnd - _LowestPasteTimePoint;
 
-        if(int(_MostLeftColumn) + deltaColumn < 0)
-            deltaColumn = deltaColumn - (int(_MostLeftColumn) + deltaColumn);
-
-        for(auto& [column, note] : _PastePreviewNotes)
-        {
-            Column newColumn = column + deltaColumn;
-
-            note.TimePoint = static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint;
-            note.TimePointBegin = static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint;
-            note.TimePointEnd = static_Cursor.TimePoint + note.TimePointEnd - _LowestPasteTimePoint;
-
-            column = newColumn;
-        }
-
-        static_Chart->BulkPlaceNotes(_PastePreviewNotes);
-        _IsPreviewingPaste = false;
+        column = newColumn;
     }
+
+    static_Chart->BulkPlaceNotes(_PastePreviewNotes);
+    _IsPreviewingPaste = false;
+
+    return true;
+}
+
+bool SelectEditMode::OnMouseLeftButtonReleased()
+{
+    if(_IsMovingNote)
+    {
+        _HoveredNote = static_Chart->MoveNote(_HoveredNote->TimePoint, static_Cursor.TimePoint, _HoveredNoteColumn, static_Cursor.Column, static_Cursor.BeatSnap);
+        _HoveredNoteColumn = static_Cursor.Column;
+
+        return _IsMovingNote = false;
+    } 
+
+    if(!(static_Cursor.TimefieldSide != _AnchoredCursor.TimefieldSide || static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle && _AnchoredCursor.TimefieldSide == Cursor::FieldPosition::Middle))
+        return _IsAreaSelecting = false;
+
+    if(!_IsAreaSelecting)
+        return false;
+
+    _IsAreaSelecting = false;
+    
+    const Time timeBegin = std::min(_AnchoredCursor.UnsnappedTimePoint, static_Cursor.UnsnappedTimePoint);
+    const Time timeEnd   = std::max(_AnchoredCursor.UnsnappedTimePoint, static_Cursor.UnsnappedTimePoint);
+
+    const Column columnMin = std::min(_AnchoredCursor.Column, static_Cursor.Column);
+    const Column columnMax = std::max(_AnchoredCursor.Column, static_Cursor.Column);
+
+    static_Chart->IterateNotesInTimeRange(timeBegin, timeEnd, [this, &timeBegin, &timeEnd, &columnMin, &columnMax](Note& InOutNote, const Column& InColumn)
+    {
+        if((InOutNote.Type == Note::EType::Common || InOutNote.Type == Note::EType::HoldBegin) && (InColumn >= columnMin && InColumn <= columnMax))
+            _SelectedNotes[InColumn].insert(&InOutNote);
+    });
 
     return true;
 }
@@ -225,18 +250,9 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
 {
     if(_IsPreviewingPaste)
     {
-        int deltaColumn = int(static_Cursor.Column) - int(_MostLeftColumn);
-        int keyAmount = static_Chart->KeyAmount - 1;
-
-        if(int(_MostRightColumn) + deltaColumn > keyAmount)
-            deltaColumn = deltaColumn - (int(_MostRightColumn) + deltaColumn - keyAmount);
-
-        if(int(_MostLeftColumn) + deltaColumn < 0)
-            deltaColumn = deltaColumn - (int(_MostLeftColumn) + deltaColumn);
-
-        for(const auto [column, note] : _PastePreviewNotes)
+        for(auto& [column, note] : _PastePreviewNotes)
         {
-            Column newColumn = column + deltaColumn;
+            Column newColumn = column + GetDelteColumn();
 
             switch(note.Type)
             {
@@ -274,6 +290,51 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
         }
     }
 
+    if(_HoveredNote || _IsMovingNote)
+    {
+        Column column = _HoveredNoteColumn;
+        Time timePoint = _HoveredNote->TimePoint;
+
+        if(_IsMovingNote)
+        {
+            column = static_Cursor.Column;
+            timePoint = static_Cursor.TimePoint;
+
+            switch (_DraggingNote->Type)
+            {
+            case Note::EType::HoldBegin:
+                InOutTimefieldRenderGraph.SubmitHoldNoteRenderCommand(column, timePoint, _DraggingNote->TimePointEnd, -1, -1, 128);
+                break;
+
+            case Note::EType::HoldEnd:
+                InOutTimefieldRenderGraph.SubmitHoldNoteRenderCommand(column, _DraggingNote->TimePointBegin, timePoint, -1, -1, 128);
+                break;
+            
+            default:
+                InOutTimefieldRenderGraph.SubmitCommonNoteRenderCommand(column, timePoint, -1, 128);
+                break;
+            }
+
+        }
+        else
+        {
+            InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(column, timePoint,
+            [](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
+            {
+                sf::RectangleShape rectangle;
+
+                rectangle.setPosition(InScreenX, InScreenY - InTimefieldMetrics.NoteScreenPivot);
+                rectangle.setSize(sf::Vector2f(InTimefieldMetrics.ColumnSize, InTimefieldMetrics.ColumnSize));
+
+                rectangle.setFillColor(sf::Color(64, 255, 64, 64));
+                rectangle.setOutlineColor(sf::Color(64, 255, 64, 255));
+                rectangle.setOutlineThickness(1.0f);
+
+                InRenderTarget->draw(rectangle);
+            }); 
+        }
+    }
+
     if(!_IsAreaSelecting)
         return;
 
@@ -291,4 +352,18 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
 
         InRenderTarget->draw(rectangle);
     });
+}
+
+int SelectEditMode::GetDelteColumn() 
+{
+    int deltaColumn = int(static_Cursor.Column) - int(_MostLeftColumn);
+    int keyAmount = static_Chart->KeyAmount - 1;
+
+    if(int(_MostRightColumn) + deltaColumn > keyAmount)
+        deltaColumn = deltaColumn - (int(_MostRightColumn) + deltaColumn - keyAmount);
+
+    if(int(_MostLeftColumn) + deltaColumn < 0)
+        deltaColumn = deltaColumn - (int(_MostLeftColumn) + deltaColumn);
+
+    return deltaColumn;
 }

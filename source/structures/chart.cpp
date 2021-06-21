@@ -53,7 +53,7 @@ void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes)
 	}
 }
 
-bool Chart::RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHoldChecks)
+bool Chart::RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks, const bool InSkipHistoryRegistering)
 {
 	auto& timeSlice = FindOrAddTimeSlice(InTime);
 	auto& noteCollection = timeSlice.Notes[InColumn];
@@ -69,7 +69,8 @@ bool Chart::RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHo
 		Time holdTimeBegin = noteIt->TimePointBegin;
 		Time holdTimedEnd = noteIt->TimePointEnd;
 
-		RegisterTimeSliceHistoryRanged(holdTimeBegin, holdTimedEnd);
+		if(!InSkipHistoryRegistering)
+			RegisterTimeSliceHistoryRanged(holdTimeBegin, holdTimedEnd);
 
 		//removes all intermidiate notes
 		for(Time time = FindOrAddTimeSlice(holdTimeBegin).TimePoint + TIMESLICE_LENGTH; 
@@ -84,7 +85,7 @@ bool Chart::RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHo
 	}
 	else
 	{	
-		if(!InIgnoreHoldChecks)
+		if(!InIgnoreHoldChecks && !InSkipHistoryRegistering)
 			RegisterTimeSliceHistory(InTime);
 		
 		noteCollection.erase(noteIt);	
@@ -120,17 +121,18 @@ Note& Chart::InjectNote(const Time InTime, const Column InColumn, const Note::ET
 	note.TimePointEnd = InTimeEnd;
 
 	timeSlice.Notes[InColumn].push_back(note);
+	Note& injectedNoteRef = timeSlice.Notes[InColumn].back();
 
 	std::sort(timeSlice.Notes[InColumn].begin(), timeSlice.Notes[InColumn].end(), [](const auto& lhs, const auto& rhs) { return (lhs.TimePoint < rhs.TimePoint); });
 
 	_OnModified(timeSlice);
 
-	return note;
+	return injectedNoteRef;
 }
 
-void Chart::InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin, const int InBeatSnapEnd)
+Note& Chart::InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin, const int InBeatSnapEnd)
 {
-	InjectNote(InTimeBegin, InColumn, Note::EType::HoldBegin, InTimeBegin, InTimeEnd, InBeatSnapBegin);
+	Note& noteToReturn = InjectNote(InTimeBegin, InColumn, Note::EType::HoldBegin, InTimeBegin, InTimeEnd, InBeatSnapBegin);
 
 	Time startTime = FindOrAddTimeSlice(InTimeBegin).TimePoint + TIMESLICE_LENGTH;
 	Time endTime = FindOrAddTimeSlice(InTimeEnd).TimePoint - TIMESLICE_LENGTH;
@@ -141,6 +143,8 @@ void Chart::InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Colum
 	}
 
 	InjectNote(InTimeEnd, InColumn, Note::EType::HoldEnd, InTimeBegin, InTimeEnd, InBeatSnapEnd);
+
+	return noteToReturn;
 }
 
 BpmPoint* Chart::InjectBpmPoint(const Time InTime, const double InBpm, const double InBeatLength)
@@ -161,6 +165,75 @@ BpmPoint* Chart::InjectBpmPoint(const Time InTime, const double InBpm, const dou
 	TimeSlicesWithBpmPoints[timeSlice.Index] = &timeSlice;
 
 	return bpmPointPtr;
+}
+
+Note* Chart::MoveNote(const Time InTimeFrom, const Time InTimeTo, const Column InColumnFrom, const Column InColumnTo, const int InNewBeatSnap) 
+{
+	//have I mentioned that I really dislike handling edge-cases?
+	Note noteToRemove = *FindNote(InTimeFrom, InColumnFrom);
+
+	switch (noteToRemove.Type)
+	{
+	case Note::EType::Common:
+		{
+			auto& timeSliceFrom = FindOrAddTimeSlice(InTimeFrom);
+			auto& timeSliceTo = FindOrAddTimeSlice(InTimeTo);
+
+			if(timeSliceFrom.Index == timeSliceTo.Index)
+				RegisterTimeSliceHistory(InTimeFrom);
+			else
+				RegisterTimeSliceHistoryRanged(InTimeFrom, InTimeTo);
+
+			RemoveNote(InTimeFrom, InColumnFrom, false, true);
+			return &(InjectNote(InTimeTo, InColumnTo, Note::EType::Common, -1, -1, InNewBeatSnap));
+		}
+		break;
+
+	case Note::EType::HoldBegin:
+		{
+			if(InTimeTo < noteToRemove.TimePointBegin)
+				RegisterTimeSliceHistoryRanged(InTimeTo - TIMESLICE_LENGTH, noteToRemove.TimePointEnd);
+			else
+				RegisterTimeSliceHistoryRanged(noteToRemove.TimePointBegin - TIMESLICE_LENGTH, noteToRemove.TimePointEnd);
+
+			RemoveNote(InTimeFrom, InColumnFrom, false, true);
+
+			return &(InjectHold(InTimeTo, noteToRemove.TimePointEnd, InColumnTo, InNewBeatSnap));
+		}
+		break;
+	case Note::EType::HoldEnd:
+		{
+			if(InTimeTo > noteToRemove.TimePointBegin)
+				RegisterTimeSliceHistoryRanged(noteToRemove.TimePointBegin, InTimeTo + TIMESLICE_LENGTH);
+			else
+				RegisterTimeSliceHistoryRanged(noteToRemove.TimePointBegin, noteToRemove.TimePointEnd + TIMESLICE_LENGTH);
+
+			int beatSnap = FindNote(noteToRemove.TimePointBegin, InColumnFrom)->BeatSnap;
+
+			RemoveNote(InTimeFrom, InColumnFrom, false, true);
+
+			return &(InjectHold(noteToRemove.TimePointBegin, InTimeTo, InColumnTo, beatSnap));
+		}
+		break;
+
+	default:
+		return nullptr;
+		break;
+	}
+
+}
+
+Note* Chart::FindNote(const Time InTime, const Column InColumn) 
+{
+	auto& timeSlice = FindOrAddTimeSlice(InTime);
+	auto& noteCollection = timeSlice.Notes[InColumn];
+
+	auto noteIt = std::find_if(noteCollection.begin(), noteCollection.end(), [InTime](const Note& InNote) { return InNote.TimePoint == InTime; });
+
+	if(noteIt == noteCollection.end())
+		return nullptr;
+
+	return noteIt._Ptr;
 }
 
 void Chart::DebugPrint()
@@ -276,6 +349,18 @@ bool Chart::Undo()
 
 void Chart::IterateTimeSlicesInTimeRange(const Time InTimeBegin, const Time InTimeEnd, std::function<void(TimeSlice&)> InWork)
 {
+	if(InTimeBegin > InTimeEnd)
+	{
+		for (TimeSlice* timeSlice = &FindOrAddTimeSlice(InTimeBegin);
+			timeSlice->TimePoint > InTimeEnd - TIMESLICE_LENGTH;
+			timeSlice = &FindOrAddTimeSlice(timeSlice->TimePoint - TIMESLICE_LENGTH))
+		{
+			InWork(*timeSlice);
+		}
+
+		return;
+	}
+
 	for (TimeSlice* timeSlice = &FindOrAddTimeSlice(InTimeBegin);
 		timeSlice->TimePoint <= InTimeEnd;
 		timeSlice = &FindOrAddTimeSlice(timeSlice->TimePoint + TIMESLICE_LENGTH))

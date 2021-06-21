@@ -90,13 +90,15 @@ public: //accessors
 
 	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes);
 
-	bool RemoveNote(const Time InTime, const Column InColumn, bool InIgnoreHoldChecks = false);
+	bool RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks = false, const bool InSkipHistoryRegistering = false);
 	bool RemoveBpmPoint(BpmPoint& InBpmPoint);
 
 	Note& InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin = -1, const Time InTimeEnd = -1, const int InBeatSnap = -1);
-	void InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn,  const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
+	Note& InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn,  const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
 	BpmPoint* InjectBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
+	Note* MoveNote(const Time InTimeFrom, const Time InTimeTo, const Column InColumnFrom, const Column InColumnTo, const int InNewBeatSnap);
+	Note* FindNote(const Time InTime, const Column InColumn);
 	bool IsAPotentialNoteDuplicate(const Time InTime, const Column InColumn);
 	TimeSlice& FindOrAddTimeSlice(const Time InTime);
 	

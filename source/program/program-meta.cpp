@@ -13,14 +13,12 @@ Program::~Program()
 void Program::Init()
 {
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    //settings.antialiasingLevel = 8;
 
-    _RenderWindow = new sf::RenderWindow(sf::VideoMode(1024, 768), "Leraine Studio", sf::Style::Default, settings);
+    _RenderWindow = new sf::RenderWindow(sf::VideoMode(1024, 768), "Leraine Studio", sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close, settings);
     _RenderWindow->setFramerateLimit(0);
-    _RenderWindow->setVerticalSyncEnabled(true);
     _RenderWindow->setActive(true);
     
-
     ModuleManager::Init();
     
     RegisterModules();
@@ -50,9 +48,13 @@ bool Program::HandleEvents()
         if (event.type == sf::Event::Closed)
         {
             _RenderWindow->close();
-            return false;
+            _ShouldExitProgram = true;
         }
     }
+
+    if(_ShouldExitProgram)
+        return false;
+
     return true;
 }
 

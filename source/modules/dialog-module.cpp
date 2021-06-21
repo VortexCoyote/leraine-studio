@@ -8,6 +8,9 @@ bool DialogModule::Tick(const float& InDeltaTime)
 	if(!_RenderWindow)
 		return false;
 
+	if(_IsOpen)
+		ImGui::GetIO().WantCaptureMouse = true;
+
 	ImGuiWindowFlags flags = ImGuiWindowFlags_None;
 
 	flags |= ImGuiWindowFlags_NoResize;
@@ -58,7 +61,7 @@ bool DialogModule::Tick(const float& InDeltaTime)
 	default:
 		break;
 	}
-	
+
 	if (chosenPath.size() != 0)
 	{
 		_SelectedItemAction(chosenPath);

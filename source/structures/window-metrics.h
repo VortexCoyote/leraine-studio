@@ -7,4 +7,4 @@ struct WindowMetrics
 
 	int MiddlePoint;
 	int MenuBarHeight = 23;
-};
+}; 

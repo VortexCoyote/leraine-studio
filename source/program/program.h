@@ -35,8 +35,9 @@ public: //meta program sequences
 	void ShutDown();
 
 private: //meta data ownership
-
+	
 	sf::Clock _DeltaClock;
 	sf::RenderWindow* _RenderWindow;
 	WindowMetrics _WindowMetrics;
+	bool _ShouldExitProgram = false;
 };
