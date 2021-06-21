@@ -2,5 +2,4 @@ binaries/*.ini
 binaries/*.exe
 binaries/*.ilk
 binaries/*.pdb
-binaries/*.dll
 cmake/
