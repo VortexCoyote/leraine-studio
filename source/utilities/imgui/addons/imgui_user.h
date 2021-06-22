@@ -124,13 +124,6 @@ inline void operator delete(void*, ImImplPlacementNewDummy, void*) {}
 #   undef YES_IMGUIEMSCRIPTENPERSISTENTFOLDER
 #endif //__EMSCRIPTEN__
 
-#ifndef NO_IMGUISTRING
-#include "./imguistring/imguistring.h"
-#endif //NO_IMGUISTRING
-#ifndef NO_IMGUITABWINDOW
-#include "./imguitabwindow/imguitabwindow.h"
-#endif //NO_IMGUITABWINDOW
-
 #ifdef YES_IMGUISOLOUD_ALL
 #   undef YES_IMGUISOLOUD
 #   define YES_IMGUISOLOUD
