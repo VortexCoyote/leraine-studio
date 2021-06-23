@@ -217,6 +217,26 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
 {
     if(_IsMovingNote)
     {
+        if (_DraggingNote->Type == Note::EType::HoldEnd && _DraggingNote->TimePointBegin >= static_Cursor.TimePoint)
+        {
+            // TODO : Make the one-undo implementation
+            Time TimePointBegin = _DraggingNote->TimePointBegin;
+            static_Chart->RemoveNote(_DraggingNote->TimePointBegin, static_Cursor.Column);
+            static_Chart->PlaceNote(TimePointBegin, static_Cursor.Column, static_Cursor.BeatSnap);
+
+            return _IsMovingNote = false;
+        }
+
+        if (_DraggingNote->Type == Note::EType::HoldBegin && _DraggingNote->TimePointEnd <= static_Cursor.TimePoint)
+        {
+            // TODO : Make the one-undo implementation
+            Time TimePointEnd = _DraggingNote->TimePointEnd;
+            static_Chart->RemoveNote(_DraggingNote->TimePointEnd, static_Cursor.Column);
+            static_Chart->PlaceNote(TimePointEnd, static_Cursor.Column, static_Cursor.BeatSnap);
+
+            return _IsMovingNote = false;
+        }
+
         _HoveredNote = static_Chart->MoveNote(_HoveredNote->TimePoint, static_Cursor.TimePoint, _HoveredNoteColumn, static_Cursor.Column, static_Cursor.BeatSnap);
         _HoveredNoteColumn = static_Cursor.Column;
 
