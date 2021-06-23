@@ -221,8 +221,8 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
         {
             // TODO : Make the one-undo implementation
             Time TimePointBegin = _DraggingNote->TimePointBegin;
-            static_Chart->RemoveNote(_DraggingNote->TimePointBegin, static_Cursor.Column);
-            static_Chart->PlaceNote(TimePointBegin, static_Cursor.Column, static_Cursor.BeatSnap);
+            static_Chart->RemoveNote(_DraggingNote->TimePointBegin, _AnchoredCursor.Column);
+            static_Chart->PlaceNote(static_Cursor.TimePoint, static_Cursor.Column, static_Cursor.BeatSnap);
 
             return _IsMovingNote = false;
         }
@@ -231,8 +231,8 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
         {
             // TODO : Make the one-undo implementation
             Time TimePointEnd = _DraggingNote->TimePointEnd;
-            static_Chart->RemoveNote(_DraggingNote->TimePointEnd, static_Cursor.Column);
-            static_Chart->PlaceNote(TimePointEnd, static_Cursor.Column, static_Cursor.BeatSnap);
+            static_Chart->RemoveNote(_DraggingNote->TimePointEnd, _AnchoredCursor.Column);
+            static_Chart->PlaceNote(static_Cursor.TimePoint, static_Cursor.Column, static_Cursor.BeatSnap);
 
             return _IsMovingNote = false;
         }
