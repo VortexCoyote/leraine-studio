@@ -253,11 +253,11 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 {	
 	std::string backgroundFileName;
 	for (std::string::reverse_iterator rit = InChart->BackgroundPath.rbegin(); rit != InChart->BackgroundPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
-		backgroundFileName.insert(BackgroundFileName.begin(), *rit);
+		backgroundFileName.insert(backgroundFileName.begin(), *rit);
 
 	std::string audioFileName;
 	for (std::string::reverse_iterator rit = InChart->AudioPath.rbegin(); rit != InChart->AudioPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
-		sudioFileName.insert(AudioFileName.begin(), *rit);
+		audioFileName.insert(audioFileName.begin(), *rit);
 	
 	std::stringstream ChartStream;
 
