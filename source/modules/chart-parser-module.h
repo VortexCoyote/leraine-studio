@@ -8,7 +8,7 @@ class ChartParserModule : public Module
 {
 public:
 	void SetCurrentChartPath(const std::string InPath);
-	Chart* ParseAndGenerateChartSet(std::string _CurrentChartPath);
+	Chart* ParseAndGenerateChartSet(std::string InPath);
 	void ExportChartSet(Chart* InChart, const Time InSongLength);
 
 private:

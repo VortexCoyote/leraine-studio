@@ -251,20 +251,20 @@ void ChartParserModule::ExportChartSet(Chart* InChart, const Time InSongLength)
 
 void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLength, std::ofstream& InOfStream)
 {	
-	std::string BackgroundFileName;
+	std::string backgroundFileName;
 	for (std::string::reverse_iterator rit = InChart->BackgroundPath.rbegin(); rit != InChart->BackgroundPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
-		BackgroundFileName.insert(BackgroundFileName.begin(), *rit);
+		backgroundFileName.insert(BackgroundFileName.begin(), *rit);
 
-	std::string AudioFileName;
+	std::string audioFileName;
 	for (std::string::reverse_iterator rit = InChart->AudioPath.rbegin(); rit != InChart->AudioPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
-		AudioFileName.insert(AudioFileName.begin(), *rit);
+		sudioFileName.insert(AudioFileName.begin(), *rit);
 	
 	std::stringstream ChartStream;
 
 	ChartStream << "osu file format v14" << "\n"
 						  << "\n"
 						  << "[General]" << "\n"
-						  << "AudioFilename: " << AudioFileName << "\n"
+						  << "AudioFilename: " << audioFileName << "\n"
 						  << "AudioLeadIn: 0" << "\n"
 						  << "PreviewTime: 0" << "\n"
 						  << "Countdown: 0" << "\n"
@@ -304,8 +304,8 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 						  << "[Events]" << "\n"
 							<< "//Background and Video events" << "\n";
 
-	if (BackgroundFileName != "")
-		ChartStream << "0,0,\"" << BackgroundFileName << "\",0,0" << "\n";
+	if (backgroundFileName != "")
+		ChartStream << "0,0,\"" << backgroundFileName << "\",0,0" << "\n";
 
 	ChartStream << "//Break Periods" << "\n"
 							<< "//Storyboard Layer 0 (Background)" << "\n"
