@@ -259,9 +259,9 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 	for (std::string::reverse_iterator rit = InChart->AudioPath.rbegin(); rit != InChart->AudioPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
 		audioFileName.insert(audioFileName.begin(), *rit);
 	
-	std::stringstream ChartStream;
+	std::stringstream chartStream;
 
-	ChartStream << "osu file format v14" << "\n"
+	chartStream << "osu file format v14" << "\n"
 						  << "\n"
 						  << "[General]" << "\n"
 						  << "AudioFilename: " << audioFileName << "\n"
@@ -305,9 +305,9 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 							<< "//Background and Video events" << "\n";
 
 	if (backgroundFileName != "")
-		ChartStream << "0,0,\"" << backgroundFileName << "\",0,0" << "\n";
+		chartStream << "0,0,\"" << backgroundFileName << "\",0,0" << "\n";
 
-	ChartStream << "//Break Periods" << "\n"
+	chartStream << "//Break Periods" << "\n"
 							<< "//Storyboard Layer 0 (Background)" << "\n"
 							<< "//Storyboard Layer 1 (Fail)" << "\n"
 							<< "//Storyboard Layer 2 (Pass)" << "\n"
@@ -319,27 +319,27 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 
 	for (auto BpmPoint : InChart->GetBpmPointsRelatedToTimeRange(0, InSongLength))
 	{
-		ChartStream << BpmPoint->TimePoint << "," << BpmPoint->BeatLength << "," << "4" << ",0,0,10,1,0\n";
+		chartStream << BpmPoint->TimePoint << "," << BpmPoint->BeatLength << "," << "4" << ",0,0,10,1,0\n";
 	}
 	// leaving the "4" there since we will want to set custom snap divisor
 	
-	ChartStream << "\n"
+	chartStream << "\n"
 							<< "\n"
 							<< "[HitObjects]" << "\n";
 
 	int keyAmount = InChart->KeyAmount;
-	InChart->IterateNotesInTimeRange(0, InSongLength, [InSongLength, keyAmount, &ChartStream](const Note InOutNote, const Column InColumn)
+	InChart->IterateNotesInTimeRange(0, InSongLength, [InSongLength, keyAmount, &chartStream](const Note InOutNote, const Column InColumn)
 	{
 		int column = float(float((InColumn + 1)) * 512.f) / float(keyAmount) - (512.f / float(keyAmount) / 2.f);
 
 		switch (InOutNote.Type)
 		{
 		case Note::EType::Common:
-			ChartStream << column << ",192," << InOutNote.TimePoint << ",1,0,0:0:0:0:\n";
+			chartStream << column << ",192," << InOutNote.TimePoint << ",1,0,0:0:0:0:\n";
 			break;
 		
 		case Note::EType::HoldBegin:
-			ChartStream << column << ",192," << InOutNote.TimePoint << ",128,0," << InOutNote.TimePointEnd << ":0:0:0:0:\n";
+			chartStream << column << ",192," << InOutNote.TimePoint << ",128,0," << InOutNote.TimePointEnd << ":0:0:0:0:\n";
 			break;
 
 		default:
@@ -348,7 +348,7 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 	});
 
 	InOfStream.clear();
-	InOfStream << ChartStream.str();
+	InOfStream << chartStream.str();
 	InOfStream.close();
 }
 void ChartParserModule::ExportChartStepmaniaImpl(Chart* InChart, const Time InSongLength, std::ofstream& InOfStream)
