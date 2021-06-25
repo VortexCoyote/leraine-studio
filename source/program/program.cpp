@@ -196,7 +196,7 @@ void Program::MenuBar()
 
 			if (ImGui::MenuItem("Save", "CTRL+S"))
 			{
-				//scream
+				MOD(ChartParserModule).ExportChartSet(SelectedChart, MOD(AudioModule).GetSongLengthMilliSeconds());
 			}
 
 			ImGui::Separator();
