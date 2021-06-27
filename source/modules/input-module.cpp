@@ -8,24 +8,24 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 		return false;
 	}
 
-	if (InEvent.type == sf::Event::MouseWheelMoved)
+	if (InEvent.type == sf::Event::MouseWheelScrolled)
 	{
-		_MouseWheelDelta = InEvent.mouseWheel.delta;
+		_MouseWheelDelta = InEvent.mouseWheelScroll.delta;
 	}
 
-	if (InEvent.type == sf::Event::MouseButtonPressed)
+	else if (InEvent.type == sf::Event::MouseButtonPressed)
 	{
 		_MousePressedStates[InEvent.mouseButton.button] = true;
 		_MouseReleasedStates[InEvent.mouseButton.button] = false;
 	}
 
-	if (InEvent.type == sf::Event::MouseButtonReleased)
+	else if (InEvent.type == sf::Event::MouseButtonReleased)
 	{
 		_MousePressedStates[InEvent.mouseButton.button] = false;
 		_MouseReleasedStates[InEvent.mouseButton.button] = true;
 	}
 
-	if (InEvent.type == sf::Event::KeyPressed)
+	else if (InEvent.type == sf::Event::KeyPressed)
 	{
 		_KeyboardPressedStates[InEvent.key.code] = true;
 
@@ -34,7 +34,7 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 		_AltKey = InEvent.key.alt;
 	}
 
-	if (InEvent.type == sf::Event::KeyReleased)
+	else if (InEvent.type == sf::Event::KeyReleased)
 	{
 		_KeyboardPressedStates[InEvent.key.code] = false;
 
@@ -43,7 +43,7 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 		_AltKey = InEvent.key.alt;
 	}
 
-	if (InEvent.type == sf::Event::GainedFocus)
+	else if (InEvent.type == sf::Event::GainedFocus)
 		_GainedFocusLastFrame = true;
 
 	return true;
