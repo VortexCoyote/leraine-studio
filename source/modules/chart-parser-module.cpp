@@ -11,6 +11,49 @@ void ChartParserModule::SetCurrentChartPath(const std::string InPath)
 	_CurrentChartPath = InPath;
 }
 
+std::string ChartParserModule::CreateNewChart(const NewChartData& InNewChartData) 
+{
+	Chart dummyChart;
+
+	std::filesystem::path audioPath = InNewChartData.AudioPath;
+	std::filesystem::path chartFolderPath = InNewChartData.ChartPath;
+
+	audioPath.make_preferred();
+	chartFolderPath.make_preferred();
+
+	std::string chartFileName = "";
+	chartFileName += InNewChartData.Artist;
+	chartFileName += " - ";
+	chartFileName += InNewChartData.SongTitle;
+	chartFileName += " (";
+	chartFileName += InNewChartData.Charter;
+	chartFileName += ") ";
+	chartFileName += "[";
+	chartFileName += InNewChartData.DifficultyName;
+	chartFileName += "].osu";
+
+	std::filesystem::path chartFilePath = chartFolderPath / chartFileName;
+	std::filesystem::path targetPath = chartFolderPath / audioPath.filename();
+
+	std::filesystem::copy_file(audioPath, targetPath);
+
+	SetCurrentChartPath(chartFilePath.string());
+
+	dummyChart.Artist = InNewChartData.Artist;
+	dummyChart.SongTitle = InNewChartData.SongTitle;
+	dummyChart.Charter = InNewChartData.Charter;
+	dummyChart.DifficultyName = InNewChartData.DifficultyName;
+	dummyChart.AudioPath = targetPath.string();
+	dummyChart.BackgroundPath = "";
+	dummyChart.HP = InNewChartData.HP;
+	dummyChart.OD = InNewChartData.OD;
+	dummyChart.KeyAmount = InNewChartData.KeyAmount;
+
+	ExportChartSet(&dummyChart);
+
+	return chartFilePath.string();
+}
+
 Chart* ChartParserModule::ParseAndGenerateChartSet(std::string InPath)
 {
 	_CurrentChartPath = InPath;
@@ -122,6 +165,12 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 				if (type == "CircleSize")
 					chart->KeyAmount = int(std::stof(value));
+
+				if(type == "HPDrainRate")
+					chart->HP = std::stof(value);
+
+				if(type == "OverallDifficulty")
+					chart->OD = std::stof(value);
 
 				if (difficultyLine.empty())
 					break;
@@ -242,14 +291,14 @@ Chart* ChartParserModule::ParseChartStepmaniaImpl(std::ifstream& InIfstream, std
 	return nullptr;
 }
 
-void ChartParserModule::ExportChartSet(Chart* InChart, const Time InSongLength)
+void ChartParserModule::ExportChartSet(Chart* InChart)
 {
 	std::ofstream chartFile(_CurrentChartPath);
 
-	ExportChartOsuImpl(InChart, InSongLength, chartFile);
+	ExportChartOsuImpl(InChart, chartFile);
 }
 
-void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLength, std::ofstream& InOfStream)
+void ChartParserModule::ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfStream)
 {	
 	std::string backgroundFileName;
 	for (std::string::reverse_iterator rit = InChart->BackgroundPath.rbegin(); rit != InChart->BackgroundPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
@@ -294,9 +343,9 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 						  << "BeatmapSetID:-1" << "\n"
 						  << "\n"
 						  << "[Difficulty]" << "\n"
-						  << "HPDrainRate:8" << "\n"
+						  << "HPDrainRate:" << InChart->HP << "\n"
 						  << "CircleSize:" << InChart->KeyAmount << "\n"
-						  << "OverallDifficulty:8" << "\n"
+						  << "OverallDifficulty:" << InChart->OD << "\n"
 						  << "ApproachRate:9" << "\n"
 						  << "SliderMultiplier:1.4" << "\n"
 						  << "SliderTickRate:1" << "\n"
@@ -317,10 +366,12 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 							<< "\n"
 							<< "[TimingPoints]" << "\n";
 
-	for (auto BpmPoint : InChart->GetBpmPointsRelatedToTimeRange(0, InSongLength))
+
+	InChart->IterateAllBpmPoints([&chartStream](BpmPoint& InBpmPoint)
 	{
-		chartStream << BpmPoint->TimePoint << "," << BpmPoint->BeatLength << "," << "4" << ",0,0,10,1,0\n";
-	}
+		chartStream << InBpmPoint.TimePoint << "," << InBpmPoint.BeatLength << "," << "4" << ",0,0,10,1,0\n";
+	});
+
 	// leaving the "4" there since we will want to set custom snap divisor
 	
 	chartStream << "\n"
@@ -328,7 +379,7 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 							<< "[HitObjects]" << "\n";
 
 	int keyAmount = InChart->KeyAmount;
-	InChart->IterateNotesInTimeRange(0, InSongLength, [InSongLength, keyAmount, &chartStream](const Note InOutNote, const Column InColumn)
+	InChart->IterateAllNotes([keyAmount, &chartStream](const Note InOutNote, const Column InColumn)
 	{
 		int column = float(float((InColumn + 1)) * 512.f) / float(keyAmount) - (512.f / float(keyAmount) / 2.f);
 
@@ -351,7 +402,7 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, const Time InSongLeng
 	InOfStream << chartStream.str();
 	InOfStream.close();
 }
-void ChartParserModule::ExportChartStepmaniaImpl(Chart* InChart, const Time InSongLength, std::ofstream& InOfStream)
+void ChartParserModule::ExportChartStepmaniaImpl(Chart* InChart, std::ofstream& InOfStream)
 {
 	return;
 }

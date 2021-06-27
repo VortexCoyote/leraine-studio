@@ -62,6 +62,12 @@ bool DialogModule::Tick(const float& InDeltaTime)
 		break;
 	}
 
+	if(dialog.hasUserJustCancelledDialog() && _ShouldCallActionWhenClosing)
+	{
+		_SelectedItemAction("");
+		_ShouldCallActionWhenClosing = false;
+	}
+
 	if (chosenPath.size() != 0)
 	{
 		_SelectedItemAction(chosenPath);
@@ -71,6 +77,8 @@ bool DialogModule::Tick(const float& InDeltaTime)
 	if (dialog.hasUserJustCancelledDialog())
 		_IsOpen = false;
 	
+
+
 	ImGui::End();
 
 	if (_ShouldOpenDialog)
@@ -86,7 +94,7 @@ bool DialogModule::RenderBack(sf::RenderTarget* const InOutRenderTarget)
 	return true;
 }
 
-void DialogModule::OpenFolderDialog(std::function<void(const std::string&)> InSelectedFolderAction)
+void DialogModule::OpenFolderDialog(std::function<void(const std::string&)> InSelectedFolderAction, const bool InShouldCallActionWhenClosing)
 {
 	_ShouldOpenDialog = true;
 	_IsOpen = true;
@@ -95,10 +103,11 @@ void DialogModule::OpenFolderDialog(std::function<void(const std::string&)> InSe
 	_DialogType = EDialogType::Folder;
 }
 
-void DialogModule::OpenFileDialog(const std::string& InFileExtension, std::function<void(const std::string&)> InSelectedFileAction)
+void DialogModule::OpenFileDialog(const std::string& InFileExtension, std::function<void(const std::string&)> InSelectedFileAction, const bool InShouldCallActionWhenClosing)
 {
 	_ShouldOpenDialog = true;
 	_IsOpen = true;
+	_ShouldCallActionWhenClosing = InShouldCallActionWhenClosing;
 	_SelectedItemAction = InSelectedFileAction;
 
 	_FileExtension = InFileExtension;

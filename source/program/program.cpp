@@ -2,6 +2,9 @@
 
 #include "imgui.h"
 #include "../utilities/imgui/addons/imgui_user.h"
+#include "../utilities/imgui/std/imgui-stdlib.h"
+
+#include "../structures/newchart-data.h"
 
 namespace
 {
@@ -19,6 +22,9 @@ namespace
 	float ZoomLevel = 1.0f;
 	int CurrentSnap = 2;
 	
+	NewChartData SetUpChartData = NewChartData();
+	bool IsSettingUpNewChart = false;
+
 	bool DebugShowTimeSliceBoundaries = false;
 }
 
@@ -155,48 +161,22 @@ void Program::MenuBar()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New File", "CTRL+N"))
-			{
-				MOD(PopupModule).OpenPopup("New File", [this](bool& OutOpen)
-				{
-					if(ImGui::Button("Close"))
-						OutOpen = false;
-					
-					if(ImGui::Button("Choose Audio File"))
-						MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string &InPath) 
-						{
-							
-						});
-				});
-			}
+			if (ImGui::MenuItem("New Chart", "CTRL+N"))
+				IsSettingUpNewChart = true;
 
 			ImGui::Separator();
 
 			if (ImGui::MenuItem("Open", "CTRL+O"))
 			{
-				MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string &InPath) {
-					SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
-
-					MOD(BeatModule).AssignNotesToSnapsInChart(SelectedChart);
-					MOD(AudioModule).LoadAudio(SelectedChart->AudioPath);
-					MOD(EditModule).SetChart(SelectedChart);
-					MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
-					MOD(TimefieldRenderModule).SetKeyAmount(SelectedChart->KeyAmount);
-					MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
-					MOD(WaveFormModule).SetWaveFormData(MOD(AudioModule).GenerateAndGetWaveformData(SelectedChart->AudioPath), MOD(AudioModule).GetSongLengthMilliSeconds());
-
-					SelectedChart->RegisterOnModifiedCallback([this](TimeSlice &InTimeSlice) {
-						//TODO: replicate the timeslice method to optimize when "re-generating"
-						//MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
-
-						MOD(BeatModule).AssignNotesToSnapsInTimeSlice(SelectedChart, InTimeSlice);
-					});
+				MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string &InPath) 
+				{
+					OpenChart(InPath);
 				});
 			}
 
 			if (ImGui::MenuItem("Save", "CTRL+S"))
 			{
-				MOD(ChartParserModule).ExportChartSet(SelectedChart, MOD(AudioModule).GetSongLengthMilliSeconds());
+				MOD(ChartParserModule).ExportChartSet(SelectedChart);
 			}
 
 			ImGui::Separator();
@@ -262,6 +242,72 @@ void Program::MenuBar()
 
 
 		ImGui::EndMainMenuBar();
+	}
+
+	if(IsSettingUpNewChart)
+	{
+		MOD(PopupModule).OpenPopup("New Chart", [this](bool& OutOpen)
+		{
+			ImGui::Text("Meta Data");
+			ImGui::InputText("Artist", &SetUpChartData.Artist);
+			ImGui::InputText("Song Title", &SetUpChartData.SongTitle);
+			ImGui::InputText("Charter", &SetUpChartData.Charter);
+			ImGui::InputText("Difficulty Name", &SetUpChartData.DifficultyName);
+
+			ImGui::NewLine();
+
+			ImGui::Text("Difficulty");
+			ImGui::SliderInt("Key Amount", &SetUpChartData.KeyAmount, 4, 10);
+			ImGui::DragFloat("OD", &SetUpChartData.OD, 0.1f, 1.0f, 10.0f);
+			ImGui::DragFloat("HP", &SetUpChartData.HP, 0.1f, 1.0f, 10.0f);
+
+			ImGui::NewLine();
+
+			std::string audioButtonName =  SetUpChartData.AudioPath == "" ? "Pick an audio file" : SetUpChartData.AudioPath;
+			std::string chartButtonName =  SetUpChartData.ChartPath == "" ? "Pick a chart folder path" : SetUpChartData.ChartPath;
+			
+			ImGui::Text("Relevant Paths");
+			
+			if(ImGui::Button(audioButtonName.c_str()))
+			{
+				IsSettingUpNewChart = OutOpen = false;
+
+				MOD(DialogModule).OpenFileDialog(".mp3", [this](const std::string &InPath) 
+				{
+					SetUpChartData.AudioPath = InPath;
+					IsSettingUpNewChart = true;
+				}, true);
+			}
+
+			if(ImGui::Button(chartButtonName.c_str()))
+			{
+				IsSettingUpNewChart = OutOpen = false;
+
+				MOD(DialogModule).OpenFolderDialog([this](const std::string &InPath) 
+				{
+					SetUpChartData.ChartPath = InPath;
+					IsSettingUpNewChart = true;
+				}, true);
+			}
+
+			ImGui::NewLine();
+
+			if(ImGui::Button("Save"))
+			{
+				OpenChart(MOD(ChartParserModule).CreateNewChart(SetUpChartData));
+
+				IsSettingUpNewChart = OutOpen = false;
+				SetUpChartData = NewChartData();
+			}
+
+			ImGui::SameLine();
+			
+			if(ImGui::Button("Close"))
+			{
+				IsSettingUpNewChart = OutOpen = false;
+				SetUpChartData = NewChartData();
+			}
+		});
 	}
 }
 
@@ -359,6 +405,27 @@ void Program::InputActions()
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 		return void(MOD(EditModule).OnMouseRightButtonClicked(MOD(InputModule).IsShiftKeyDown()));
+}
+
+void Program::OpenChart(const std::string InPath) 
+{
+	SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
+
+	MOD(BeatModule).AssignNotesToSnapsInChart(SelectedChart);
+	MOD(AudioModule).LoadAudio(SelectedChart->AudioPath);
+	MOD(EditModule).SetChart(SelectedChart);
+	MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
+	MOD(TimefieldRenderModule).SetKeyAmount(SelectedChart->KeyAmount);
+	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
+	MOD(WaveFormModule).SetWaveFormData(MOD(AudioModule).GenerateAndGetWaveformData(SelectedChart->AudioPath), MOD(AudioModule).GetSongLengthMilliSeconds());
+
+	SelectedChart->RegisterOnModifiedCallback([this](TimeSlice &InTimeSlice) 
+	{
+		//TODO: replicate the timeslice method to optimize when "re-generating"
+		//MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
+
+		MOD(BeatModule).AssignNotesToSnapsInTimeSlice(SelectedChart, InTimeSlice);
+	});
 }
 
 void Program::ApplyDeltaToZoom(const float InDelta)

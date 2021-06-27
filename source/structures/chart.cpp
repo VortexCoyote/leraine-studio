@@ -386,6 +386,31 @@ void Chart::IterateNotesInTimeRange(const Time InTimeBegin, const Time InTimeEnd
 	}
 }
 
+void Chart::IterateAllNotes(std::function<void(Note&, const Column)> InWork) 
+{
+	for (auto& [ID, timeSlice] : TimeSlices)
+	{
+		for (auto& [column, notes] : timeSlice.Notes)
+		{
+			for (auto& note : notes)
+			{
+				InWork(note, column);
+			}
+		}
+	}
+}
+
+void Chart::IterateAllBpmPoints(std::function<void(BpmPoint&)> InWork) 
+{
+	for (auto& [ID, timeSlice] : TimeSlices)
+	{
+		for (auto& bpmPoint: timeSlice.BpmPoints)
+		{
+			InWork(bpmPoint);
+		}
+	}
+}
+
 std::vector<BpmPoint*>& Chart::GetBpmPointsRelatedToTimeRange(const Time InTimeBegin, const Time InTimeEnd)
 {
 	//TODO: make this good please (I seriously can't believe this works)

@@ -83,6 +83,9 @@ public: //meta
 
 	int KeyAmount;
 
+	float HP;
+	float OD;
+
 public: //accessors
 
 	bool PlaceNote(const Time InTime, const Column InColumn, const int InBeatSnap = -1);
@@ -110,6 +113,10 @@ public: //accessors
 
 	void IterateTimeSlicesInTimeRange(const Time InTimeBegin, const Time InTimeEnd, std::function<void(TimeSlice&)> InWork);
 	void IterateNotesInTimeRange(const Time InTimeBegin, const Time InTimeEnd, std::function<void(Note&, const Column)> InWork);
+
+	void IterateAllNotes(std::function<void(Note&, const Column)> InWork);
+	void IterateAllBpmPoints(std::function<void(BpmPoint&)> InWork);
+
 	std::vector<BpmPoint*>& GetBpmPointsRelatedToTimeRange(const Time InTimeBegin, const Time InTimeEnd);
 	BpmPoint* GetPreviousBpmPointFromTimePoint(const Time InTime);
 	BpmPoint* GetNextBpmPointFromTimePoint(const Time InTime);

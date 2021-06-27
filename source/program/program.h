@@ -18,6 +18,7 @@ public: //abstractions
 	void InputActions();
 	void ApplyDeltaToZoom(const float InDelta);
 	void UpdateCursor();
+	void OpenChart(const std::string InPath);
 
 public: //meta program sequences
 

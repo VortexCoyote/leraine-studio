@@ -18,8 +18,8 @@ public:
 
 public:
 
-	void OpenFolderDialog(std::function<void(const std::string&)> InSelectedFolderAction);
-	void OpenFileDialog(const std::string& InFileExtension, std::function<void(const std::string&)> InSelectedFileAction);
+	void OpenFolderDialog(std::function<void(const std::string&)> InSelectedFolderAction, const bool InShouldCallActionWhenClosing = false);
+	void OpenFileDialog(const std::string& InFileExtension, std::function<void(const std::string&)> InSelectedFileAction, const bool InShouldCallActionWhenClosing = false);
 
 	bool IsDialogOpen();
 
@@ -27,6 +27,7 @@ private:
 
 	bool _IsOpen = false;
 	bool _ShouldOpenDialog = false;
+	bool _ShouldCallActionWhenClosing = false;
 
 	std::string _FileExtension = "";
 

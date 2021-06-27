@@ -23,6 +23,12 @@ bool BeatModule::StartUp()
 
 void BeatModule::AssignNotesToSnapsInChart(Chart* const InChart)
 {
+	if(!InChart)
+		return;
+
+	if(InChart->TimeSlices.empty())
+		return;
+
 	Time timeBegin = 0;
 	Time timeEnd = InChart->TimeSlices.rbegin()->second.TimePoint + TIMESLICE_LENGTH;
 
