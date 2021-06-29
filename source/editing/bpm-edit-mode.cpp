@@ -10,6 +10,10 @@ bool BpmEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
     if(_HoveredBpmPoint != nullptr)
     {
         _MovableBpmPoint = _HoveredBpmPoint;
+        _MovableBpmPointInitialValue = *_MovableBpmPoint;
+
+        static_Chart->RegisterTimeSliceHistory(_MovableBpmPoint->TimePoint);
+
         _PreviousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(_MovableBpmPoint->TimePoint);
         _NextBpmPoint = static_Chart->GetNextBpmPointFromTimePoint(_MovableBpmPoint->TimePoint);
 
@@ -29,6 +33,8 @@ bool BpmEditMode::OnMouseLeftButtonReleased()
 {
     if(_MovableBpmPoint != nullptr)
     {
+        static_Chart->RevaluateBpmPoint(_MovableBpmPointInitialValue, *_MovableBpmPoint);
+
         _MovableBpmPoint = nullptr;
         return false;
     }
@@ -38,24 +44,29 @@ bool BpmEditMode::OnMouseLeftButtonReleased()
 
 bool BpmEditMode::OnMouseRightButtonClicked(const bool InIsShiftDown) 
 {
-    if(_HoveredBpmPoint != nullptr)
+    if(_HoveredBpmPoint && !_MovableBpmPoint)
     {
-        if(BpmPoint* previousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(_HoveredBpmPoint->TimePoint))
+        if(static_Flags.UseAutoTiming)
         {
-            if(BpmPoint* nextBpmPoint = static_Chart->GetNextBpmPointFromTimePoint(_HoveredBpmPoint->TimePoint))
+            if(BpmPoint* previousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(_HoveredBpmPoint->TimePoint))
             {
-                Time deltaTime = abs((previousBpmPoint->TimePoint) - nextBpmPoint->TimePoint);
+                if(BpmPoint* nextBpmPoint = static_Chart->GetNextBpmPointFromTimePoint(_HoveredBpmPoint->TimePoint))
+                {
+                    Time deltaTime = abs((previousBpmPoint->TimePoint) - nextBpmPoint->TimePoint);
 	
-                double beatLength = double(deltaTime);
-                double newBpm = 60000.0 / beatLength;
+                    double beatLength = double(deltaTime);
+                    double newBpm = 60000.0 / beatLength;
     
-                previousBpmPoint->BeatLength = beatLength;
-                previousBpmPoint->Bpm = newBpm;
+                    previousBpmPoint->BeatLength = beatLength;
+                    previousBpmPoint->Bpm = newBpm;
+                }
             }
         }
 
         static_Chart->RemoveBpmPoint(*_HoveredBpmPoint);
         _HoveredBpmPoint = nullptr;
+
+        _VisibleBpmPoints->clear();
     }
 
     return false;
@@ -63,6 +74,29 @@ bool BpmEditMode::OnMouseRightButtonClicked(const bool InIsShiftDown)
 
 void BpmEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd) 
 {
+    if(_PinnedBpmPoint)
+    {
+        InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(0, _PinnedBpmPoint->TimePoint, 
+        [this](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
+        {
+            float posY = InRenderTarget->getView().getSize().y / 2.f;
+            float posX = InTimefieldMetrics.LeftSidePosition + InTimefieldMetrics.FieldWidth + 64.f;
+
+            sf::VertexArray line(sf::Lines, 2);
+            line[0].position.x = InTimefieldMetrics.LeftSidePosition + InTimefieldMetrics.FieldWidth;
+            line[0].position.y = InScreenY;
+            line[0].color = sf::Color(255, 255, 255, 255);
+
+            line[1].position.x = posX;
+            line[1].position.y = posY;
+            line[1].color = sf::Color(255, 255, 255, 255);
+
+            InRenderTarget->draw(line);
+
+            DisplayBpmNode(*_PinnedBpmPoint, posX , posY, true);
+        });
+    }
+
     //a bit hacky but if it works and is isolated it works for now I guess
 	_VisibleBpmPoints = &(static_Chart->GetBpmPointsRelatedToTimeRange(InTimeBegin, InTimeEnd));
 
@@ -71,22 +105,25 @@ void BpmEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRender
         InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(0, bpmPointPtr->TimePoint, 
         [this, bpmPointPtr](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
         {
-            sf::RectangleShape rectangle;
+            sf::RectangleShape bpmLine;
         
             if(_HoveredBpmPoint == bpmPointPtr)
             {
-                rectangle.setPosition(InTimefieldMetrics.LeftSidePosition, InScreenY - 8);
-                rectangle.setSize(sf::Vector2f(InTimefieldMetrics.FieldWidth, 16));
-                rectangle.setFillColor(sf::Color(128, 255, 128, 255));
+                bpmLine.setPosition(InTimefieldMetrics.LeftSidePosition, InScreenY - 8);
+                bpmLine.setSize(sf::Vector2f(InTimefieldMetrics.FieldWidth, 16));
+                bpmLine.setFillColor(sf::Color(128, 255, 128, 255));
             }
             else
             {
-                rectangle.setPosition(InTimefieldMetrics.LeftSidePosition, InScreenY - 2);
-                rectangle.setSize(sf::Vector2f(InTimefieldMetrics.FieldWidth, 4));
-                rectangle.setFillColor(sf::Color(255, 255, 255, 255));
+                bpmLine.setPosition(InTimefieldMetrics.LeftSidePosition, InScreenY - 2);
+                bpmLine.setSize(sf::Vector2f(InTimefieldMetrics.FieldWidth, 4));
+                bpmLine.setFillColor(sf::Color(255, 255, 255, 255));
             }
 
-            InRenderTarget->draw(rectangle);
+            InRenderTarget->draw(bpmLine);
+
+            if(bpmPointPtr == _PinnedBpmPoint)
+                return;
 
             sf::RectangleShape indicator;
             indicator.setPosition(InTimefieldMetrics.LeftSidePosition + InTimefieldMetrics.FieldWidth, InScreenY);
@@ -119,9 +156,12 @@ void BpmEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRender
 
 void BpmEditMode::Tick() 
 {
-    if(_MovableBpmPoint != nullptr)
+    if(_MovableBpmPoint)
     {
         _MovableBpmPoint->TimePoint = static_Cursor.UnsnappedTimePoint;
+
+        if(!static_Flags.UseAutoTiming)
+            return;
 
         if(_PreviousBpmPoint)
         {
@@ -150,7 +190,7 @@ void BpmEditMode::Tick()
 
     for (auto& bpmPointPtr : *_VisibleBpmPoints)
 	{
-        if(abs(static_Cursor.UnsnappedTimePoint - bpmPointPtr->TimePoint) < 20)
+        if(abs(static_Cursor.UnsnappedTimePoint - bpmPointPtr->TimePoint) < 20 && static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle)
             return void(_HoveredBpmPoint = bpmPointPtr);
     }
 
@@ -180,10 +220,10 @@ void BpmEditMode::PlaceAutoTimePoint()
         double beatLength = double(deltaTime);
         double newBpm = 60000.0 / beatLength;
     
-        static_Chart->InjectBpmPoint(cursorTime, newBpm, beatLength);
+        static_Chart->PlaceBpmPoint(cursorTime, newBpm, beatLength);
     }
     else   
-        static_Chart->InjectBpmPoint(cursorTime, 120.0, 60000.0 / 120.0);
+        static_Chart->PlaceBpmPoint(cursorTime, 120.0, 60000.0 / 120.0);
 }
 
 void BpmEditMode::PlaceTimePoint() 
@@ -191,13 +231,13 @@ void BpmEditMode::PlaceTimePoint()
     BpmPoint* previousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(static_Cursor.UnsnappedTimePoint);
 
     if(previousBpmPoint)
-        static_Chart->InjectBpmPoint(static_Cursor.UnsnappedTimePoint, previousBpmPoint->Bpm, previousBpmPoint->BeatLength);
+        static_Chart->PlaceBpmPoint(static_Cursor.UnsnappedTimePoint, previousBpmPoint->Bpm, previousBpmPoint->BeatLength);
     else
-        static_Chart->InjectBpmPoint(static_Cursor.UnsnappedTimePoint, 120.0, 60000.0 / 120.0);
+        static_Chart->PlaceBpmPoint(static_Cursor.UnsnappedTimePoint, 120.0, 60000.0 / 120.0);
 }
 
 
-void BpmEditMode::DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, const int InScreenY) 
+void BpmEditMode::DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, const int InScreenY, const bool InIsPinned) 
 {
     ImGuiWindowFlags windowFlags = 0;
 	windowFlags |= ImGuiWindowFlags_NoTitleBar;
@@ -209,12 +249,24 @@ void BpmEditMode::DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, cons
 
 	bool open = true;
 
-	ImGui::SetNextWindowPos({ float(InScreenX + 8), float(InScreenY) });
-	ImGui::Begin(std::to_string((int)&InBpmPoint).c_str(), &open, windowFlags);
-    
-    bool lol = false;
+	ImGui::SetNextWindowPos({ float(InScreenX), float(InScreenY) });
+	ImGui::Begin(std::to_string((int)&InBpmPoint).c_str(), &open, windowFlags);    
 
-	ImGui::Checkbox("", &lol);
+    if(InIsPinned)
+    {
+        if(ImGui::Button("Unpin"))
+        {
+            _PinnedBpmPoint = nullptr;
+        }
+    }
+    else
+    {
+	    if(ImGui::Button("Pin"))
+        {
+            _PinnedBpmPoint = &InBpmPoint;
+        }        
+    }
+
 	ImGui::SameLine();
 
 	ImGui::Text("BPM");

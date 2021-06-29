@@ -30,6 +30,14 @@ bool Chart::PlaceHold(const Time InTimeBegin, const Time InTimeEnd, const Column
 	return true;
 }
 
+bool Chart::PlaceBpmPoint(const Time InTime, const double InBpm, const double InBeatLength) 
+{
+	RegisterTimeSliceHistory(InTime);
+	InjectBpmPoint(InTime, InBpm, InBeatLength);
+
+	return true;
+}
+
 void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes) 
 {
 	Time timePointMin = InNotes.front().second.TimePoint;
@@ -96,14 +104,19 @@ bool Chart::RemoveNote(const Time InTime, const Column InColumn, const bool InIg
 	return true;
 }
 
-bool Chart::RemoveBpmPoint(BpmPoint& InBpmPoint) 
+bool Chart::RemoveBpmPoint(BpmPoint& InBpmPoint, const bool InSkipHistoryRegistering ) 
 {
 	auto& timeSlice = FindOrAddTimeSlice(InBpmPoint.TimePoint);
 	auto& bpmCollection = timeSlice.BpmPoints;
 
+	if(!InSkipHistoryRegistering)
+		RegisterTimeSliceHistory(InBpmPoint.TimePoint);
+
 	bpmCollection.erase(std::remove(bpmCollection.begin(), bpmCollection.end(), InBpmPoint), bpmCollection.end());
 
 	CachedBpmPoints.clear();
+
+	_BpmPointCounter--;
 
 	return true;
 }
@@ -162,7 +175,7 @@ BpmPoint* Chart::InjectBpmPoint(const Time InTime, const double InBpm, const dou
 
 	std::sort(timeSlice.BpmPoints.begin(), timeSlice.BpmPoints.end(), [](const auto& lhs, const auto& rhs) { return lhs.TimePoint < rhs.TimePoint; });
 
-	TimeSlicesWithBpmPoints[timeSlice.Index] = &timeSlice;
+	_BpmPointCounter++;
 
 	return bpmPointPtr;
 }
@@ -317,6 +330,28 @@ void Chart::PushTimeSliceHistoryIfNotAdded(const Time InTime)
 	collection.push_back(FindOrAddTimeSlice(InTime));
 }
 
+void Chart::RevaluateBpmPoint(BpmPoint& InFormerBpmPoint, BpmPoint& InMovedBpmPoint) 
+{
+	auto& formerTimeSlice = FindOrAddTimeSlice(InFormerBpmPoint.TimePoint);
+	auto& newTimeSlice = FindOrAddTimeSlice(InMovedBpmPoint.TimePoint);
+
+	auto& formerBpmCollection = formerTimeSlice.BpmPoints;
+
+	if(formerTimeSlice.Index != newTimeSlice.Index)
+	{
+		BpmPoint bpmPointToAdd = InMovedBpmPoint;
+
+		formerBpmCollection.erase(std::remove(formerBpmCollection.begin(), formerBpmCollection.end(), InMovedBpmPoint), formerBpmCollection.end());
+		CachedBpmPoints.clear();
+
+		TimeSliceHistory.top().push_back(newTimeSlice);
+		
+		InjectBpmPoint(bpmPointToAdd.TimePoint, bpmPointToAdd.Bpm, bpmPointToAdd.BeatLength);
+		
+		_BpmPointCounter--;
+	}
+}
+
 void Chart::RegisterTimeSliceHistory(const Time InTime) 
 {
 	TimeSliceHistory.push({FindOrAddTimeSlice(InTime)});
@@ -413,13 +448,24 @@ void Chart::IterateAllBpmPoints(std::function<void(BpmPoint&)> InWork)
 
 std::vector<BpmPoint*>& Chart::GetBpmPointsRelatedToTimeRange(const Time InTimeBegin, const Time InTimeEnd)
 {
-	//TODO: make this good please (I seriously can't believe this works)
 	CachedBpmPoints.clear();
 
-	if (TimeSlicesWithBpmPoints.empty())
+	if(!_BpmPointCounter)
 		return CachedBpmPoints;
 
-	IterateTimeSlicesInTimeRange(InTimeBegin, InTimeEnd, [this](TimeSlice& InTimeSlice)
+	Time newTimeBegin = InTimeBegin - TIMESLICE_LENGTH;
+
+	for(Time time = newTimeBegin; time >= -10000; time -= TIMESLICE_LENGTH)
+	{
+		auto& timeSlice = FindOrAddTimeSlice(time);
+		if(!timeSlice.BpmPoints.empty())
+		{
+			newTimeBegin = time;
+			break;
+		}
+	}
+
+	IterateTimeSlicesInTimeRange(newTimeBegin, InTimeEnd, [this](TimeSlice& InTimeSlice)
 	{
 		if (InTimeSlice.BpmPoints.empty())
 			return;
@@ -428,25 +474,8 @@ std::vector<BpmPoint*>& Chart::GetBpmPointsRelatedToTimeRange(const Time InTimeB
 			CachedBpmPoints.push_back(&bpmPoint);
 	});
 
-	//this is actually retarded
-	int index = FindOrAddTimeSlice(InTimeBegin).Index;
-	
-	TimeSlicesWithBpmPoints[index];
-	auto it = TimeSlicesWithBpmPoints.find(index);
-	if (it != TimeSlicesWithBpmPoints.begin())
-	{
-		if (--it != TimeSlicesWithBpmPoints.end())
-			CachedBpmPoints.push_back(&((*it).second->BpmPoints.back()));
-	}
-
-	if (FindOrAddTimeSlice(InTimeBegin).BpmPoints.empty())
-		TimeSlicesWithBpmPoints.erase(index);
-
-	if (CachedBpmPoints.empty() && !TimeSlicesWithBpmPoints.empty())
-		if(!(TimeSlicesWithBpmPoints.begin()->second->BpmPoints.empty()))
-			CachedBpmPoints.push_back(&(TimeSlicesWithBpmPoints.begin()->second->BpmPoints[0]));
-
-	std::sort(CachedBpmPoints.begin(), CachedBpmPoints.end(), [](const auto& lhs, const auto& rhs) { return lhs->TimePoint < rhs->TimePoint; });
+	if(CachedBpmPoints.empty())
+		return GetBpmPointsRelatedToTimeRange(InTimeBegin, InTimeEnd + TIMESLICE_LENGTH);
 
 	return CachedBpmPoints;
 }
@@ -473,28 +502,25 @@ BpmPoint* Chart::GetPreviousBpmPointFromTimePoint(const Time InTime)
 
 BpmPoint* Chart::GetNextBpmPointFromTimePoint(const Time InTime) 
 {
-	if(TimeSlicesWithBpmPoints.empty())
+	if(!_BpmPointCounter)
 		return nullptr;
 
-	BpmPoint* foundBpmPoint = nullptr;
+	auto& relevantTimeSlice = FindOrAddTimeSlice(InTime);
 
-	IterateTimeSlicesInTimeRange(InTime - TIMESLICE_LENGTH, (--TimeSlicesWithBpmPoints.end())->second->TimePoint + TIMESLICE_LENGTH, [this, InTime, &foundBpmPoint](TimeSlice& InTimeSlice)
+	auto timeSliceIt = TimeSlices.find(relevantTimeSlice.Index);
+
+	while (timeSliceIt != TimeSlices.end())
 	{
-		if(foundBpmPoint != nullptr)
-			return;
+		auto& currentTimeSlice = *timeSliceIt;
 
-		if (InTimeSlice.BpmPoints.empty())
-			return;
-
-		for (auto& bpmPoint : InTimeSlice.BpmPoints)
+		for(auto& bpmPoint : currentTimeSlice.second.BpmPoints)
 			if(bpmPoint.TimePoint > InTime)
-			{
-				foundBpmPoint = &bpmPoint;
-				return;
-			}
-	});
+				return &bpmPoint;
 
-	return foundBpmPoint;
+		timeSliceIt++;
+	}
+
+	return nullptr;
 }
 
 Chart::Chart() 

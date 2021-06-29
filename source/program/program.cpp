@@ -217,9 +217,9 @@ void Program::MenuBar()
 
 		if (ImGui::BeginMenu("Options"))
 		{
-			ImGui::Checkbox("Use Pitched Rate", &EditMode::static_Flags.UseAutoTiming);
+			//ImGui::Checkbox("Use Pitched Rate", &EditMode::static_Flags.UseAutoTiming);
 
-			ImGui::Checkbox("Show Column Lines", &EditMode::static_Flags.UseAutoTiming);
+			//ImGui::Checkbox("Show Column Lines", &EditMode::static_Flags.UseAutoTiming);
 
 			ImGui::Checkbox("Use Auto Timing", &EditMode::static_Flags.UseAutoTiming);
 

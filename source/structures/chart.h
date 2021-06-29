@@ -90,11 +90,12 @@ public: //accessors
 
 	bool PlaceNote(const Time InTime, const Column InColumn, const int InBeatSnap = -1);
 	bool PlaceHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
+	bool PlaceBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
 	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes);
 
 	bool RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks = false, const bool InSkipHistoryRegistering = false);
-	bool RemoveBpmPoint(BpmPoint& InBpmPoint);
+	bool RemoveBpmPoint(BpmPoint& InBpmPoint, const bool InSkipHistoryRegistering = false);
 
 	Note& InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin = -1, const Time InTimeEnd = -1, const int InBeatSnap = -1);
 	Note& InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn,  const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
@@ -105,6 +106,7 @@ public: //accessors
 	bool IsAPotentialNoteDuplicate(const Time InTime, const Column InColumn);
 	TimeSlice& FindOrAddTimeSlice(const Time InTime);
 	
+	void RevaluateBpmPoint(BpmPoint& InFormerBpmPoint, BpmPoint& InMovedBpmPoint);
 	void PushTimeSliceHistoryIfNotAdded(const Time InTime);
 	void RegisterTimeSliceHistory(const Time InTime);
 	void RegisterTimeSliceHistoryRanged(const Time InTimeBegin, const Time InTimeEnd);
@@ -127,7 +129,6 @@ public: //accessors
 public: //data ownership
 
 	std::map<int, TimeSlice> TimeSlices;
-	std::map<int, TimeSlice*> TimeSlicesWithBpmPoints;
 
 	std::stack<std::vector<TimeSlice>> TimeSliceHistory;
 
@@ -136,4 +137,7 @@ public: //data ownership
 private:
 
 	std::function<void(TimeSlice&)> _OnModified;	
+
+	int _BpmPointCounter = 0;
+	bool _HasNegativePlacedBpmPoint = false;
 };

@@ -19,12 +19,16 @@ private:
 	void PlaceAutoTimePoint();
 	void PlaceTimePoint();
 
-	void DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, const int InScreenY);
+	void DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, const int InScreenY, const bool InIsPinned = false);
 
 	std::vector<BpmPoint*>* _VisibleBpmPoints = nullptr;
 	BpmPoint* _HoveredBpmPoint = nullptr;
 	BpmPoint* _MovableBpmPoint = nullptr;
+
+	BpmPoint _MovableBpmPointInitialValue;
 	
 	BpmPoint* _PreviousBpmPoint = nullptr;
 	BpmPoint* _NextBpmPoint = nullptr;
+
+	BpmPoint* _PinnedBpmPoint = nullptr;
 };
