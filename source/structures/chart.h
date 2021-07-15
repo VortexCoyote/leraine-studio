@@ -72,11 +72,20 @@ public: //meta
 
 	Chart();
 
+	std::string ArtistUnicode;
 	std::string Artist;
+	
+	std::string SongtitleUnicode;
 	std::string SongTitle;
 
 	std::string Charter;
 	std::string DifficultyName;
+
+	std::string Source;
+	std::string Tags;
+
+	std::string BeatmapID;
+	std::string BeatmapSetID;
 
 	std::string AudioPath;
 	std::string BackgroundPath;
@@ -85,6 +94,8 @@ public: //meta
 
 	float HP;
 	float OD;
+
+	std::vector<std::string> InheritedPointVector;
 
 public: //accessors
 
