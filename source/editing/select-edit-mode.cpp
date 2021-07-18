@@ -11,7 +11,7 @@ bool SelectEditMode::OnCopy()
 {
     std::string clipboard =  "LeraineStudio:";
 
-    for(const auto [column, noteCollection] : _SelectedNotes)
+    for(const auto [column, noteCollection] : _SelectedNotes.Notes)
     {
         for(auto selectedNote : noteCollection)
         {
@@ -158,7 +158,7 @@ bool SelectEditMode::OnPaste()
 
 bool SelectEditMode::OnMirror() 
 {
-    static_Chart->MirrorNotes(&_SelectedNotes);
+    static_Chart->MirrorNotes(_SelectedNotes);
 
     return true;
 }
@@ -170,7 +170,7 @@ void SelectEditMode::OnReset()
     _IsPreviewingPaste = false;
     _IsAreaSelecting = false;
 
-    _SelectedNotes.clear();
+    _SelectedNotes.Clear();
     _PastePreviewNotes.clear();
 }
 
@@ -191,7 +191,7 @@ void SelectEditMode::Tick()
 bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
     _AnchoredCursor = static_Cursor;
-    _SelectedNotes.clear();  
+    _SelectedNotes.Clear();  
 
     if(_HoveredNote != nullptr)
     {
@@ -268,7 +268,7 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
     static_Chart->IterateNotesInTimeRange(timeBegin, timeEnd, [this, &timeBegin, &timeEnd, &columnMin, &columnMax](Note& InOutNote, const Column& InColumn)
     {
         if((InOutNote.Type == Note::EType::Common || InOutNote.Type == Note::EType::HoldBegin) && (InColumn >= columnMin && InColumn <= columnMax))
-            _SelectedNotes[InColumn].insert(&InOutNote);
+            _SelectedNotes.PushNote(InColumn, &InOutNote);
     });
 
     return true;
@@ -297,7 +297,7 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
         return;
     }
 
-    for(const auto& [column, noteCollection] : _SelectedNotes)
+    for(const auto& [column, noteCollection] : _SelectedNotes.Notes)
     {
         for(auto& selectedNote : noteCollection)
         {

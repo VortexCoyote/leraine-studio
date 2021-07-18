@@ -30,7 +30,7 @@ private:
 
 	int GetDelteColumn();
 
-	std::unordered_map<Column, std::unordered_set<Note*>> _SelectedNotes;
+	NoteReferenceCollection _SelectedNotes;
 	std::vector<std::pair<Column, Note>> _PastePreviewNotes;
 
 	Time _LowestPasteTimePoint = INT_MAX;

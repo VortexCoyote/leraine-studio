@@ -4,6 +4,37 @@
 #include <algorithm>
 #include <set>
 #include <unordered_set>
+#include <limits>
+
+void NoteReferenceCollection::PushNote(Column InColumn, Note* InNote) 
+{
+	Notes[InColumn].insert(InNote);
+
+	switch (InNote->Type)
+	{
+	case Note::EType::Common:
+		TrySetMinMaxTime(InNote->TimePoint);
+		break;
+
+	case Note::EType::HoldBegin:
+		TrySetMinMaxTime(InNote->TimePointEnd);
+		break;
+	}
+}
+
+void NoteReferenceCollection::Clear() 
+{
+	Notes.clear();
+
+	MinTimePoint = std::numeric_limits<int>::max();
+	MaxTimePoint = std::numeric_limits<int>::min();
+}
+
+void NoteReferenceCollection::TrySetMinMaxTime(Time InTime) 
+{
+	MinTimePoint = std::min(MinTimePoint, InTime);
+	MaxTimePoint = std::max(MaxTimePoint, InTime);
+}
 
 bool Chart::PlaceNote(const Time InTime, const Column InColumn, const int InBeatSnap)
 {
@@ -39,13 +70,14 @@ bool Chart::PlaceBpmPoint(const Time InTime, const double InBpm, const double In
 	return true;
 }
 
-void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes)
+void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes, const bool InSkipHistoryRegistering)
 {
 	Time timePointMin = InNotes.front().second.TimePoint;
 	Time timePointMax = InNotes.back().second.TimePoint;
 
 	// - TIMESLICE_LENGTH and + TIMESLICE_LENGTH accounts for potential resnaps (AAAAAA)
-	RegisterTimeSliceHistoryRanged(timePointMin - TIMESLICE_LENGTH, timePointMax + TIMESLICE_LENGTH);
+	if(!InSkipHistoryRegistering)
+		RegisterTimeSliceHistoryRanged(timePointMin - TIMESLICE_LENGTH, timePointMax + TIMESLICE_LENGTH);
 
 	for (const auto &[column, note] : InNotes)
 	{
@@ -62,12 +94,14 @@ void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes)
 	}
 }
 
-void Chart::MirrorNotes(std::unordered_map<Column, std::unordered_set<Note *>> *InNotes)
+void Chart::MirrorNotes(NoteReferenceCollection& InNotes)
 {
 	std::unordered_map<Column, std::unordered_set<Note*>> newNoteSet;
 	std::vector<std::pair<Column, Note>> bulkOfNotes;
 
-	for (auto& [column, notes] : *InNotes)
+	RegisterTimeSliceHistoryRanged(InNotes.MinTimePoint, InNotes.MaxTimePoint);
+
+	for (auto& [column, notes] : InNotes.Notes)
 	{
 		Column newColumn = (KeyAmount - 1) - column;
 
@@ -83,12 +117,13 @@ void Chart::MirrorNotes(std::unordered_map<Column, std::unordered_set<Note *>> *
 		}
 	}
 
-	BulkPlaceNotes(bulkOfNotes);
+	BulkPlaceNotes(bulkOfNotes, true);
 
 	for(auto& [column, note] : bulkOfNotes)
 		newNoteSet[column].insert(FindNote(note.TimePoint, column));
 
-	*InNotes = newNoteSet;
+
+	InNotes.Clear();
 }
 
 bool Chart::RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks, const bool InSkipHistoryRegistering)
@@ -556,3 +591,4 @@ Chart::Chart()
 {
 	_OnModified = [](TimeSlice &InOutTimeSlice) {};
 }
+

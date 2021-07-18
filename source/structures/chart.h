@@ -38,6 +38,7 @@ struct Note
 	Time TimePointBegin = 0;
 	Time TimePointEnd = 0;
 };
+
 struct BpmPoint
 {
 	Time TimePoint;
@@ -50,11 +51,13 @@ struct BpmPoint
 		return (TimePoint == InOther.TimePoint);
 	}
 };
+
 struct ScrollVelocityMultiplier
 {
 	Time TimePoint;
 	double Multiplier;
 };
+
 struct TimeSlice
 {
 	Time TimePoint;
@@ -65,6 +68,19 @@ struct TimeSlice
 
 	std::vector<BpmPoint> BpmPoints;
 	std::vector<ScrollVelocityMultiplier> SvMultipliers;
+};
+
+struct NoteReferenceCollection
+{
+	void PushNote(Column InColumn, Note* InNote);
+	void Clear();
+
+	void TrySetMinMaxTime(Time InTime);
+
+	std::unordered_map<Column, std::unordered_set<Note *>> Notes;
+
+	Time MinTimePoint;
+	Time MaxTimePoint;
 };
 
 struct Chart
@@ -104,8 +120,8 @@ public: //accessors
 	bool PlaceHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
 	bool PlaceBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
-	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes);
-	void MirrorNotes(std::unordered_map<Column, std::unordered_set<Note *>> *InNotes);
+	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes, const bool InSkipHistoryRegistering = false);
+	void MirrorNotes(NoteReferenceCollection& InNotes);
 
 	bool RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks = false, const bool InSkipHistoryRegistering = false);
 	bool RemoveBpmPoint(BpmPoint& InBpmPoint, const bool InSkipHistoryRegistering = false);
