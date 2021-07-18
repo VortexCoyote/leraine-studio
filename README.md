@@ -1,7 +1,7 @@
 # leraine-studio
 A cross-platform open-source VSRG chart editor
 
-
+![screenshot](https://i.imgur.com/WmF2Gny.png "screenshot")
 # Compilation
 
 This project uses [cmake tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) for [vscode](https://code.visualstudio.com/) and [vcpkg](https://github.com/microsoft/vcpkg).
