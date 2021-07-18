@@ -30,6 +30,11 @@ bool EditModule::OnPaste()
 	return _EditModes[_SelectedEditMode]->OnPaste();
 }
 
+bool EditModule::OnMirror() 
+{
+	return _EditModes[_SelectedEditMode]->OnMirror();
+}
+
 bool EditModule::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
 	return _EditModes[_SelectedEditMode]->OnMouseLeftButtonClicked(InIsShiftDown);

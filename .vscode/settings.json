@@ -2,7 +2,7 @@
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cmake.configureEnvironment": 
     {
-        "VCPKG_ROOT": "C:/dev/vcpkg",
+        "VCPKG_ROOT": "/home/x3tr0v/Development/vcpkg",
         "PROJECT_NAME": "leraine-studio"
     },
     "cmake.configureSettings": 
@@ -77,6 +77,22 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "queue": "cpp",
-        "unordered_set": "cpp"
+        "unordered_set": "cpp",
+        "array": "cpp",
+        "bit": "cpp",
+        "charconv": "cpp",
+        "clocale": "cpp",
+        "format": "cpp",
+        "forward_list": "cpp",
+        "optional": "cpp",
+        "*.tcc": "cpp",
+        "codecvt": "cpp",
+        "cstdarg": "cpp",
+        "cwctype": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "string_view": "cpp",
+        "ranges": "cpp"
     }
 }

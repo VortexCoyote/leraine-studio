@@ -1,6 +1,7 @@
 #include "select-edit-mode.h"
 
 #include <SFML/Graphics.hpp>
+#include <climits>
 #include <sstream>
 
 #include "imgui.h"
@@ -155,6 +156,13 @@ bool SelectEditMode::OnPaste()
     return true;
 }
 
+bool SelectEditMode::OnMirror() 
+{
+    static_Chart->MirrorNotes(&_SelectedNotes);
+
+    return true;
+}
+
 void SelectEditMode::OnReset() 
 {
     _PastePreviewNotes.reserve(100);
@@ -289,9 +297,9 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
         return;
     }
 
-    for(const auto [column, noteCollection] : _SelectedNotes)
+    for(const auto& [column, noteCollection] : _SelectedNotes)
     {
-        for(auto selectedNote : noteCollection)
+        for(auto& selectedNote : noteCollection)
         {
             InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(column, selectedNote->TimePoint,
             [](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)

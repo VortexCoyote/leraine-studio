@@ -49,6 +49,11 @@ bool EditMode::OnPaste()
 	return false;
 }
 
+bool EditMode::OnMirror() 
+{
+	return false;
+}
+
 void EditMode::OnReset() 
 {
 

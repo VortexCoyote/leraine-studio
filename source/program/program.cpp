@@ -176,7 +176,8 @@ void Program::MenuBar()
 
 			if (ImGui::MenuItem("Save", "CTRL+S"))
 			{
-				MOD(ChartParserModule).ExportChartSet(SelectedChart);
+				if(SelectedChart)
+					MOD(ChartParserModule).ExportChartSet(SelectedChart);
 			}
 
 			ImGui::Separator();
@@ -341,6 +342,9 @@ void Program::InputActions()
 
 		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::V))
 			return void(MOD(EditModule).OnPaste());
+
+		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::H))
+			return void(MOD(EditModule).OnMirror());
 	}
 
 	if (MOD(InputModule).IsAltKeyDown())

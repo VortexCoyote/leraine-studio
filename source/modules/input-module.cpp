@@ -29,18 +29,28 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 	{
 		_KeyboardPressedStates[InEvent.key.code] = true;
 
-		_CtrlKey = InEvent.key.control;
-		_ShiftKey = InEvent.key.shift;
-		_AltKey = InEvent.key.alt;
+		if(InEvent.key.code == sf::Keyboard::LAlt)
+			_AltKey = true;
+
+		if(InEvent.key.code == sf::Keyboard::LControl)
+			_CtrlKey = true;
+
+		if(InEvent.key.code == sf::Keyboard::LShift)
+			_ShiftKey = true;
 	}
 
 	else if (InEvent.type == sf::Event::KeyReleased)
 	{
 		_KeyboardPressedStates[InEvent.key.code] = false;
 
-		_CtrlKey = InEvent.key.control;
-		_ShiftKey = InEvent.key.shift;
-		_AltKey = InEvent.key.alt;
+		if(InEvent.key.code == sf::Keyboard::LAlt)
+			_AltKey = false;
+
+		if(InEvent.key.code == sf::Keyboard::LControl)
+			_CtrlKey = false;
+
+		if(InEvent.key.code == sf::Keyboard::LShift)
+			_ShiftKey = false;
 	}
 
 	else if (InEvent.type == sf::Event::GainedFocus)

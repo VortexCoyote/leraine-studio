@@ -4,7 +4,10 @@
 #include <sstream>
 #include <algorithm>
 
+#include <math.h>
+
 #define PARSE_COMMA_VALUE(stringstream, target) stringstream >> target; if (stringstream.peek() == ',') stringstream.ignore()
+#define REMOVE_POTENTIAL_NEWLINE(str) if(str.find('\r') != std::string::npos) str.resize(str.size() - 1)
 
 void ChartParserModule::SetCurrentChartPath(const std::string InPath)
 {
@@ -73,12 +76,16 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 	while (std::getline(InIfstream, line))
 	{
+		REMOVE_POTENTIAL_NEWLINE(line);
+
 		if (line == "[General]")
 		{
 			std::string metadataLine;
 
 			while (std::getline(InIfstream, metadataLine))
 			{
+				REMOVE_POTENTIAL_NEWLINE(metadataLine);
+
 				if (metadataLine.empty())
 					break;
 
@@ -98,9 +105,12 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 				if (meta == "AudioFilename")
 				{
-					std::string songPath = parentPath + "\\" + value;
-					chart->AudioPath = songPath;
-					//chartData->audioFileName = value;
+					REMOVE_POTENTIAL_NEWLINE(value);
+
+					std::filesystem::path resultedParentPath = parentPath;
+					std::filesystem::path songPath = resultedParentPath / value;
+
+					chart->AudioPath = songPath.string();
 				}
 			}
 		}
@@ -111,6 +121,8 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 			while (std::getline(InIfstream, metadataLine))
 			{
+				REMOVE_POTENTIAL_NEWLINE(metadataLine);
+
 				if (metadataLine.empty())
 					break;
 
@@ -165,6 +177,8 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 			while (std::getline(InIfstream, difficultyLine))
 			{
+				REMOVE_POTENTIAL_NEWLINE(difficultyLine);
+
 				std::string type;
 				std::string value;
 
@@ -201,6 +215,8 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 
 			while (std::getline(InIfstream, timePointLine))
 			{
+				REMOVE_POTENTIAL_NEWLINE(timePointLine);
+
 				if (timePointLine == "")
 					continue;
 
@@ -222,7 +238,12 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 					background += timePointLine[charIndex];
 				while (timePointLine[++charIndex] != '"');
 
-				chart->BackgroundPath = parentPath + "\\" + background;
+				REMOVE_POTENTIAL_NEWLINE(background);
+
+				std::filesystem::path resultedParentPath = parentPath;
+				std::filesystem::path backgroundPath = resultedParentPath / background;
+
+				chart->BackgroundPath = backgroundPath.string();
 				
 				break;
 			}
@@ -254,8 +275,9 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 				//BPMData* bpmData = new BPMData();
 				//bpmData->BPMSaved = bpm;
 
-				if (beatLength < 0){
-					chart->InheritedPointVector.push_back(timePointLine);
+				if (beatLength < 0)
+				{
+					chart->InheritedTimingPoints.push_back(timePointLine);
 					continue;
 				}
 
@@ -275,6 +297,8 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 			std::string noteLine;
 			while (std::getline(InIfstream, noteLine))
 			{
+				REMOVE_POTENTIAL_NEWLINE(noteLine);
+
 				if (noteLine == "")
 					continue;
 
@@ -386,9 +410,8 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfSt
 							<< "\n"
 							<< "[TimingPoints]" << "\n";
 
-	for (std::string inheritedPoint : InChart->InheritedPointVector){
+	for (std::string inheritedPoint : InChart->InheritedTimingPoints)
 		chartStream << inheritedPoint;
-	}
 	
 	InChart->IterateAllBpmPoints([&chartStream](BpmPoint& InBpmPoint)
 	{

@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <utility>
+#include <climits>
 
 /*
 * this edit-mode is one giant edgecase 
@@ -18,6 +19,8 @@ public:
 
 	bool OnCopy() override;
 	bool OnPaste() override;
+	bool OnMirror() override;
+
 
 	void OnReset() override;
 	void Tick() override;

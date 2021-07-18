@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <fstream>
+#include <filesystem>
 
 #include <SFML/Graphics.hpp>
 
@@ -25,32 +26,36 @@ void Skin::LoadResources(const int InKeyAmount)
 
 	SnapColorTable[-1] = sf::Color(75, 75, 75, 255);
 
-	std::string path = "data\\skin\\";
+	std::filesystem::path path = "data/skin/";
 	path += std::to_string(InKeyAmount);
-	path += "k\\"; 
+	path += "k/"; 
+
+	path.make_preferred();
 
 	for (int key = 0; key < InKeyAmount; key++)
 	{
-		std::string subPath = path;
-		subPath += "column_";
-		subPath += std::to_string(key + 1);
-		subPath += ".png";
+		std::filesystem::path subPath = path;
+		subPath /= "column_" + std::to_string(key + 1) + ".png";
 
-		NoteTextures[key].loadFromFile(subPath);
+		subPath.make_preferred();
+
+		NoteTextures[key].loadFromFile(subPath.string());
 
 		subPath = path;
-		subPath += "column_";
-		subPath += std::to_string(key + 1);
-		subPath += "_overlay.png";
+		subPath /= "column_" + std::to_string(key + 1) + "_overlay.png";
+
+		subPath.make_preferred();
 
 		if (_HasOverlay = !!std::ifstream(subPath))
 			NoteOverlayTextures[key].loadFromFile(subPath);
 	}
 	
-	HoldBodyTexture.loadFromFile(path + "holdbody.png");
-	HoldBodyCapTexture.loadFromFile(path + "holdcap.png");
+	HoldBodyTexture.loadFromFile(path / "holdbody.png");
+	HoldBodyCapTexture.loadFromFile(path / "holdcap.png");
 
-	HitlineTexture.loadFromFile("data\\skin\\hitline.png");
+	std::filesystem::path hitlinePath = "data/skin/hitline.png";
+
+	HitlineTexture.loadFromFile(hitlinePath);
 	HitlineSprite.setTexture(HitlineTexture);
 	
 	HoldBodySprite.setTexture(HoldBodyTexture);

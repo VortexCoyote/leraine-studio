@@ -1,5 +1,7 @@
 #include "beat-module.h"
 
+#include <math.h>
+
 bool BeatModule::StartUp()
 {
 	_OnFieldBeatLines.reserve(10000);

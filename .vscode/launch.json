@@ -11,6 +11,17 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "internalConsole",
+        },
+        {
+            "name": "(Linux) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/binaries",
+            "environment": [],
+            "externalConsole": false,
         }
     ]
 }

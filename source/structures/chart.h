@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <functional>
+#include <unordered_set>
 
 /*
 * these types should not have any dependencies on any systems or modules.
@@ -95,7 +96,7 @@ public: //meta
 	float HP;
 	float OD;
 
-	std::vector<std::string> InheritedPointVector;
+	std::vector<std::string> InheritedTimingPoints;
 
 public: //accessors
 
@@ -104,6 +105,7 @@ public: //accessors
 	bool PlaceBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
 	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes);
+	void MirrorNotes(std::unordered_map<Column, std::unordered_set<Note *>> *InNotes);
 
 	bool RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks = false, const bool InSkipHistoryRegistering = false);
 	bool RemoveBpmPoint(BpmPoint& InBpmPoint, const bool InSkipHistoryRegistering = false);
