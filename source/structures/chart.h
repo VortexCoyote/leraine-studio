@@ -81,6 +81,8 @@ struct NoteReferenceCollection
 
 	Time MinTimePoint;
 	Time MaxTimePoint;
+
+	bool HasNotes = false;
 };
 
 struct Chart
@@ -120,15 +122,15 @@ public: //accessors
 	bool PlaceHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
 	bool PlaceBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
-	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes, const bool InSkipHistoryRegistering = false);
+	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes, const bool InSkipHistoryRegistering = false, const bool InSkipOnModified = false);
 	void MirrorNotes(NoteReferenceCollection& InNotes);
 
-	bool RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks = false, const bool InSkipHistoryRegistering = false);
+	bool RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks = false, const bool InSkipHistoryRegistering = false, const bool InSkipOnModified = false);
 	bool RemoveBpmPoint(BpmPoint& InBpmPoint, const bool InSkipHistoryRegistering = false);
 	bool BulkRemoveNotes(NoteReferenceCollection& InNotes, const bool InSkipHistoryRegistering = false);
 
-	Note& InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin = -1, const Time InTimeEnd = -1, const int InBeatSnap = -1);
-	Note& InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn,  const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1);
+	Note& InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin = -1, const Time InTimeEnd = -1, const int InBeatSnap = -1, const bool InSkipOnModified = false);
+	Note& InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn,  const int InBeatSnapBegin = -1, const int InBeatSnapEnd = -1, const bool InSkipOnModified = false);
 	BpmPoint* InjectBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
 	Note* MoveNote(const Time InTimeFrom, const Time InTimeTo, const Column InColumnFrom, const Column InColumnTo, const int InNewBeatSnap);
@@ -136,6 +138,8 @@ public: //accessors
 	bool IsAPotentialNoteDuplicate(const Time InTime, const Column InColumn);
 	TimeSlice& FindOrAddTimeSlice(const Time InTime);
 	
+	void FillNoteCollectionWithAllNotes(NoteReferenceCollection& OutNotes);
+
 	void RevaluateBpmPoint(BpmPoint& InFormerBpmPoint, BpmPoint& InMovedBpmPoint);
 	void PushTimeSliceHistoryIfNotAdded(const Time InTime);
 	void RegisterTimeSliceHistory(const Time InTime);

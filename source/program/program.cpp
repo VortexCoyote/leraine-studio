@@ -348,6 +348,9 @@ void Program::InputActions()
 
 		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::H))
 			return void(MOD(EditModule).OnMirror());
+
+		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::A))
+			return void(MOD(EditModule).OnSelectAll());
 	}
 
 	if (MOD(InputModule).IsAltKeyDown())

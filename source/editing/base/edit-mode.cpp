@@ -59,6 +59,11 @@ bool EditMode::OnDelete()
 	return false;
 }
 
+bool EditMode::OnSelectAll() 
+{
+	return false;
+}
+
 void EditMode::OnReset() 
 {
 

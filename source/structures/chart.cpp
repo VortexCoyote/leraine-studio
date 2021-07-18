@@ -8,6 +8,8 @@
 
 void NoteReferenceCollection::PushNote(Column InColumn, Note* InNote) 
 {
+	HasNotes = true;
+
 	Notes[InColumn].insert(InNote);
 
 	switch (InNote->Type)
@@ -24,6 +26,8 @@ void NoteReferenceCollection::PushNote(Column InColumn, Note* InNote)
 
 void NoteReferenceCollection::Clear() 
 {
+	HasNotes = false;
+
 	Notes.clear();
 
 	MinTimePoint = std::numeric_limits<int>::max();
@@ -70,7 +74,7 @@ bool Chart::PlaceBpmPoint(const Time InTime, const double InBpm, const double In
 	return true;
 }
 
-void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes, const bool InSkipHistoryRegistering)
+void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes, const bool InSkipHistoryRegistering, const bool InSkipOnModified)
 {
 	Time timePointMin = InNotes.front().second.TimePoint;
 	Time timePointMax = InNotes.back().second.TimePoint;
@@ -84,11 +88,11 @@ void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes, 
 		switch (note.Type)
 		{
 		case Note::EType::Common:
-			InjectNote(note.TimePoint, column, note.Type);
+			InjectNote(note.TimePoint, column, note.Type, -1, -1, -1, InSkipOnModified);
 			break;
 
 		case Note::EType::HoldBegin:
-			InjectHold(note.TimePointBegin, note.TimePointEnd, column);
+			InjectHold(note.TimePointBegin, note.TimePointEnd, column, -1, -1, InSkipOnModified);
 			break;
 		}
 	}
@@ -96,7 +100,6 @@ void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes, 
 
 void Chart::MirrorNotes(NoteReferenceCollection& InNotes)
 {
-	std::unordered_map<Column, std::unordered_set<Note*>> newNoteSet;
 	std::vector<std::pair<Column, Note>> bulkOfNotes;
 
 	RegisterTimeSliceHistoryRanged(InNotes.MinTimePoint, InNotes.MaxTimePoint);
@@ -113,20 +116,21 @@ void Chart::MirrorNotes(NoteReferenceCollection& InNotes)
 		for (auto &note : copiedNotes)
 		{
 			bulkOfNotes.push_back({newColumn, note});
-			RemoveNote(note.TimePoint, column, false, true);
+			RemoveNote(note.TimePoint, column, false, true, true);
 		}
 	}
 
-	BulkPlaceNotes(bulkOfNotes, true);
+	BulkPlaceNotes(bulkOfNotes, true, true);
 
-	for(auto& [column, note] : bulkOfNotes)
-		newNoteSet[column].insert(FindNote(note.TimePoint, column));
-
+	IterateTimeSlicesInTimeRange(InNotes.MinTimePoint, InNotes.MaxTimePoint, [this](TimeSlice& InTimeSlice)
+	{
+		_OnModified(InTimeSlice);
+	});
 
 	InNotes.Clear();
 }
 
-bool Chart::RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks, const bool InSkipHistoryRegistering)
+bool Chart::RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks, const bool InSkipHistoryRegistering, const bool InSkipOnModified)
 {
 	auto &timeSlice = FindOrAddTimeSlice(InTime);
 	auto &noteCollection = timeSlice.Notes[InColumn];
@@ -165,7 +169,8 @@ bool Chart::RemoveNote(const Time InTime, const Column InColumn, const bool InIg
 		noteCollection.erase(noteIt);
 	}
 
-	_OnModified(timeSlice);
+	if(!InSkipOnModified)
+		_OnModified(timeSlice);
 
 	return true;
 }
@@ -202,15 +207,20 @@ bool Chart::BulkRemoveNotes(NoteReferenceCollection& InNotes, const bool InSkipH
 			copiedNotes.push_back(*note);
 
 		for (auto &note : copiedNotes)
-			RemoveNote(note.TimePoint, column, false, true);
+			RemoveNote(note.TimePoint, column, false, true, true);
 	}
+
+	IterateTimeSlicesInTimeRange(InNotes.MinTimePoint, InNotes.MaxTimePoint, [this](TimeSlice& InTimeSlice)
+	{
+		_OnModified(InTimeSlice);
+	});
 
 	InNotes.Clear();
 
 	return true;
 }
 
-Note &Chart::InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin, const Time InTimeEnd, const int InBeatSnap)
+Note &Chart::InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin, const Time InTimeEnd, const int InBeatSnap, const bool InSkipOnModified)
 {
 	auto &timeSlice = FindOrAddTimeSlice(InTime);
 
@@ -228,12 +238,13 @@ Note &Chart::InjectNote(const Time InTime, const Column InColumn, const Note::ET
 	std::sort(timeSlice.Notes[InColumn].begin(), timeSlice.Notes[InColumn].end(), [](const auto &lhs, const auto &rhs)
 			  { return (lhs.TimePoint < rhs.TimePoint); });
 
-	_OnModified(timeSlice);
+	if(!InSkipOnModified)
+		_OnModified(timeSlice);
 
 	return injectedNoteRef;
 }
 
-Note &Chart::InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin, const int InBeatSnapEnd)
+Note &Chart::InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Column InColumn, const int InBeatSnapBegin, const int InBeatSnapEnd, const bool InSkipOnModified)
 {
 	Note &noteToReturn = InjectNote(InTimeBegin, InColumn, Note::EType::HoldBegin, InTimeBegin, InTimeEnd, InBeatSnapBegin);
 
@@ -245,7 +256,8 @@ Note &Chart::InjectHold(const Time InTimeBegin, const Time InTimeEnd, const Colu
 		InjectNote(time, InColumn, Note::EType::HoldIntermediate, InTimeBegin, InTimeEnd);
 	}
 
-	InjectNote(InTimeEnd, InColumn, Note::EType::HoldEnd, InTimeBegin, InTimeEnd, InBeatSnapEnd);
+	if(!InSkipOnModified)
+		InjectNote(InTimeEnd, InColumn, Note::EType::HoldEnd, InTimeBegin, InTimeEnd, InBeatSnapEnd);
 
 	return noteToReturn;
 }
@@ -401,6 +413,16 @@ TimeSlice &Chart::FindOrAddTimeSlice(const Time InTime)
 	}
 
 	return TimeSlices[index];
+}
+
+void Chart::FillNoteCollectionWithAllNotes(NoteReferenceCollection& OutNotes) 
+{
+	OutNotes.Clear();
+
+	IterateAllNotes([&OutNotes](Note& InNote, Column InColumn)
+	{
+		OutNotes.PushNote(InColumn, &InNote);
+	});
 }
 
 void Chart::PushTimeSliceHistoryIfNotAdded(const Time InTime)

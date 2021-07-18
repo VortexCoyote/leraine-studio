@@ -40,6 +40,11 @@ bool EditModule::OnDelete()
 	return _EditModes[_SelectedEditMode]->OnDelete();
 }
 
+bool EditModule::OnSelectAll() 
+{
+	return _EditModes[_SelectedEditMode]->OnSelectAll();
+}
+
 bool EditModule::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
 	return _EditModes[_SelectedEditMode]->OnMouseLeftButtonClicked(InIsShiftDown);

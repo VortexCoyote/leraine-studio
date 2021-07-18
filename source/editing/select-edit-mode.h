@@ -21,6 +21,7 @@ public:
 	bool OnPaste() override;
 	bool OnMirror() override;
 	bool OnDelete() override;
+	bool OnSelectAll() override;
 
 	void OnReset() override;
 	void Tick() override;

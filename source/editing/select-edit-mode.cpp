@@ -158,14 +158,23 @@ bool SelectEditMode::OnPaste()
 
 bool SelectEditMode::OnMirror() 
 {
-    static_Chart->MirrorNotes(_SelectedNotes);
+    if(_SelectedNotes.HasNotes)
+        static_Chart->MirrorNotes(_SelectedNotes);
 
     return true;
 }
 
 bool SelectEditMode::OnDelete() 
 {
-    static_Chart->BulkRemoveNotes(_SelectedNotes);
+    if(_SelectedNotes.HasNotes)
+        static_Chart->BulkRemoveNotes(_SelectedNotes);
+
+    return true;
+}
+
+bool SelectEditMode::OnSelectAll() 
+{
+    static_Chart->FillNoteCollectionWithAllNotes(_SelectedNotes);
 
     return true;
 }
@@ -308,6 +317,9 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
     {
         for(auto& selectedNote : noteCollection)
         {
+            if(selectedNote->TimePoint < InTimeBegin - TIMESLICE_LENGTH || selectedNote->TimePoint > InTimeEnd + TIMESLICE_LENGTH)
+                continue;
+
             InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(column, selectedNote->TimePoint,
             [](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
             {
