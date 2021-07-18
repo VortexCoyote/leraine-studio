@@ -15,6 +15,8 @@ public:
 
 	bool IsTogglingPause();
 
+	bool IsDeleting();
+
 	bool WasKeyPressed(const sf::Keyboard::Key InKey);
 	
 	bool WasMouseButtonPressed(const sf::Mouse::Button InButton);

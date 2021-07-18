@@ -163,6 +163,13 @@ bool SelectEditMode::OnMirror()
     return true;
 }
 
+bool SelectEditMode::OnDelete() 
+{
+    static_Chart->BulkRemoveNotes(_SelectedNotes);
+
+    return true;
+}
+
 void SelectEditMode::OnReset() 
 {
     _PastePreviewNotes.reserve(100);

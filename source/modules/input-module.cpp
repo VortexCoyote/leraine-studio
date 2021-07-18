@@ -74,6 +74,11 @@ bool InputModule::IsTogglingPause()
 	return WasKeyPressed(sf::Keyboard::Space);
 }
 
+bool InputModule::IsDeleting() 
+{
+	return WasKeyPressed(sf::Keyboard::Delete);
+}
+
 bool InputModule::WasKeyPressed(const sf::Keyboard::Key InKey)
 {
 	bool pressed = _KeyboardPressedStates[InKey];

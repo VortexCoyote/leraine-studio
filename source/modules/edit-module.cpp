@@ -35,6 +35,11 @@ bool EditModule::OnMirror()
 	return _EditModes[_SelectedEditMode]->OnMirror();
 }
 
+bool EditModule::OnDelete() 
+{
+	return _EditModes[_SelectedEditMode]->OnDelete();
+}
+
 bool EditModule::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
 	return _EditModes[_SelectedEditMode]->OnMouseLeftButtonClicked(InIsShiftDown);

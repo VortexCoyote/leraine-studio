@@ -187,6 +187,29 @@ bool Chart::RemoveBpmPoint(BpmPoint &InBpmPoint, const bool InSkipHistoryRegiste
 	return true;
 }
 
+bool Chart::BulkRemoveNotes(NoteReferenceCollection& InNotes, const bool InSkipHistoryRegistering) 
+{
+	if (!InSkipHistoryRegistering)
+		RegisterTimeSliceHistoryRanged(InNotes.MinTimePoint, InNotes.MaxTimePoint);
+
+	for (auto& [column, notes] : InNotes.Notes)
+	{
+		Column newColumn = (KeyAmount - 1) - column;
+
+		//this is neccesary since removing an element form a vector will change the contents of a pointer pointing to that element
+		std::vector<Note> copiedNotes;
+		for (auto &note : notes)
+			copiedNotes.push_back(*note);
+
+		for (auto &note : copiedNotes)
+			RemoveNote(note.TimePoint, column, false, true);
+	}
+
+	InNotes.Clear();
+
+	return true;
+}
+
 Note &Chart::InjectNote(const Time InTime, const Column InColumn, const Note::EType InNoteType, const Time InTimeBegin, const Time InTimeEnd, const int InBeatSnap)
 {
 	auto &timeSlice = FindOrAddTimeSlice(InTime);

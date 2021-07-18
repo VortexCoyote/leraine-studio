@@ -31,6 +31,7 @@ public: //edit-mode overrides
 	bool OnCopy() override;
 	bool OnPaste() override;
 	bool OnMirror() override;
+	bool OnDelete() override;
 
 	void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd) override;
 

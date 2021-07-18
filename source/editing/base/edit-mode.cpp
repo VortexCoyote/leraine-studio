@@ -54,6 +54,11 @@ bool EditMode::OnMirror()
 	return false;
 }
 
+bool EditMode::OnDelete() 
+{
+	return false;
+}
+
 void EditMode::OnReset() 
 {
 

@@ -22,6 +22,7 @@ public:
 	virtual bool OnCopy();
 	virtual bool OnPaste();
 	virtual bool OnMirror();
+	virtual bool OnDelete();
 
 	virtual void OnReset();
 	virtual void SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd);

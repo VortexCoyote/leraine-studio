@@ -20,7 +20,7 @@ public:
 	bool OnCopy() override;
 	bool OnPaste() override;
 	bool OnMirror() override;
-
+	bool OnDelete() override;
 
 	void OnReset() override;
 	void Tick() override;

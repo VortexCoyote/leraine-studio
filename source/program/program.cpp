@@ -329,6 +329,9 @@ void Program::InputActions()
 	if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Num3))
 		MOD(EditModule).SetEditMode<BpmEditMode>();
 
+	if(MOD(InputModule).IsDeleting())
+		MOD(EditModule).OnDelete();	
+
 	if (MOD(InputModule).IsCtrlKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
