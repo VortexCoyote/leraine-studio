@@ -130,14 +130,32 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 				if (meta == "Title")
 					chart->SongTitle = value;
 
+				if (meta == "TitleUnicode")
+					chart->SongtitleUnicode = value;
+
 				if (meta == "Artist")
 					chart->Artist = value;
+
+				if (meta == "ArtistUnicode")
+					chart->ArtistUnicode = value;
 
 				if (meta == "Version")
 					chart->DifficultyName = value;
 
 				if (meta == "Creator")
 					chart->Charter = value;
+
+				if (meta == "Source")
+					chart->Source = value;
+
+				if (meta == "Tags")
+					chart->Tags = value;
+
+				if (meta == "BeatmapID")
+					chart->BeatmapID = value;
+
+				if (meta == "BeatmapSetID")
+					chart->BeatmapSetID = value;
 			}
 		}
 
@@ -164,7 +182,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 					value += difficultyLine[pointer++];
 
 				if (type == "CircleSize")
-					chart->KeyAmount = int(std::stof(value));
+					chart->KeyAmount = int(std::stoi(value));
 
 				if(type == "HPDrainRate")
 					chart->HP = std::stof(value);
@@ -236,8 +254,10 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 				//BPMData* bpmData = new BPMData();
 				//bpmData->BPMSaved = bpm;
 
-				if (beatLength < 0)
+				if (beatLength < 0){
+					chart->InheritedPointVector.push_back(timePointLine);
 					continue;
+				}
 
 				double bpm = 60000.0 / beatLength;
 
@@ -332,15 +352,15 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfSt
 						  << "\n"
 						  << "[Metadata]" << "\n"
 						  << "Title:" << InChart->SongTitle << "\n"
-						  << "TitleUnicode:" << InChart->SongTitle << "\n"
+						  << "TitleUnicode:" << InChart->SongtitleUnicode << "\n"
 						  << "Artist:" << InChart->Artist << "\n"
-						  << "ArtistUnicode:" << InChart->Artist << "\n"
+						  << "ArtistUnicode:" << InChart->ArtistUnicode << "\n"
 						  << "Creator:" << InChart->Charter << "\n"
 						  << "Version:" << InChart->DifficultyName << "\n"
-						  << "Source:" << "\n"
-						  << "Tags:" << "\n"
-						  << "BeatmapID:-1" << "\n"
-						  << "BeatmapSetID:-1" << "\n"
+						  << "Source:" << InChart->Source << "\n"
+						  << "Tags:" << InChart->Tags <<  "\n"
+						  << "BeatmapID:" << InChart->BeatmapID << "\n"
+						  << "BeatmapSetID:" << InChart->BeatmapSetID << "\n"
 						  << "\n"
 						  << "[Difficulty]" << "\n"
 						  << "HPDrainRate:" << InChart->HP << "\n"
@@ -366,7 +386,10 @@ void ChartParserModule::ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfSt
 							<< "\n"
 							<< "[TimingPoints]" << "\n";
 
-
+	for (std::string inheritedPoint : InChart->InheritedPointVector){
+		chartStream << inheritedPoint;
+	}
+	
 	InChart->IterateAllBpmPoints([&chartStream](BpmPoint& InBpmPoint)
 	{
 		chartStream << InBpmPoint.TimePoint << "," << InBpmPoint.BeatLength << "," << "4" << ",0,0,10,1,0\n";
