@@ -4,6 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
+//TODO: refactor, remove all hardcoded values
 class MiniMapModule : public Module
 {
 public:
@@ -13,6 +14,7 @@ public:
 public:
 
     void Generate(Chart* const InChart, Skin& InSkin, const Time InSongLength);
+    void GeneratePortion(const TimeSlice& InTimeSlice, Skin& InSkin);
     TimefieldRenderGraph& GetPreviewRenderGraph(Chart* const InChart);
 
     bool IsHoveringTimeline(const int InScreenX, const int InScreenY, const int InHeight, const int InDistanceFromBorders, const Time InTime,  const Time InTimeScreenBegin, const Time InTimeScreenEnd, const Cursor& InCursor);

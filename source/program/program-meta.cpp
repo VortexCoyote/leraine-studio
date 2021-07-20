@@ -17,8 +17,9 @@ void Program::Init()
 
     _RenderWindow = new sf::RenderWindow(sf::VideoMode(1024, 768), "Leraine Studio", sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close, settings);
     _RenderWindow->setFramerateLimit(0);
+    _RenderWindow->setVerticalSyncEnabled(false);
     _RenderWindow->setActive(true);
-    
+
     ModuleManager::Init();
     
     RegisterModules();

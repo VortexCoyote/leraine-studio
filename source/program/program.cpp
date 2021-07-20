@@ -428,13 +428,13 @@ void Program::OpenChart(const std::string InPath)
 	MOD(TimefieldRenderModule).SetKeyAmount(SelectedChart->KeyAmount);
 	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 	MOD(WaveFormModule).SetWaveFormData(MOD(AudioModule).GenerateAndGetWaveformData(SelectedChart->AudioPath), MOD(AudioModule).GetSongLengthMilliSeconds());
+	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 
 	SelectedChart->RegisterOnModifiedCallback([this](TimeSlice &InTimeSlice) 
 	{
 		//TODO: replicate the timeslice method to optimize when "re-generating"
-		//MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
-
 		MOD(BeatModule).AssignNotesToSnapsInTimeSlice(SelectedChart, InTimeSlice);
+		MOD(MiniMapModule).GeneratePortion(InTimeSlice, MOD(TimefieldRenderModule).GetSkin());
 	});
 }
 

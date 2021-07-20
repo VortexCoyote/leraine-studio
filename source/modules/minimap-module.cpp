@@ -13,7 +13,7 @@ void MiniMapModule::Generate(Chart* const InChart, Skin& InSkin, const Time InSo
         _SongLength = InSongLength;
     }
     
-    _MiniMapRenderTexture.clear({0, 0, 0, 216});
+    _MiniMapRenderTexture.clear({0, 0, 0, 255});
 
     InChart->IterateNotesInTimeRange(0, InSongLength, [this, &InSkin, &InSongLength](Note& InOutNote, const Column InColumn)
     {
@@ -45,6 +45,48 @@ void MiniMapModule::Generate(Chart* const InChart, Skin& InSkin, const Time InSo
     _MiniMapSprite = sf::Sprite();
 
     _MiniMapSprite.setTexture(_MiniMapRenderTexture.getTexture());
+}
+
+void MiniMapModule::GeneratePortion(const TimeSlice& InTimeSlice, Skin& InSkin) 
+{
+    sf::RectangleShape backgroundRectangle;
+    backgroundRectangle.setSize(sf::Vector2f(_Width, int(float(TIMESLICE_LENGTH / _HeightScale) + 0.5f) + _NoteHeight));
+    backgroundRectangle.setFillColor({0, 0, 0, 255});
+
+    backgroundRectangle.setPosition(sf::Vector2f(0, (InTimeSlice.TimePoint) / _HeightScale));
+
+    _MiniMapRenderTexture.draw(backgroundRectangle);
+
+    for(const auto& [column, notes] : InTimeSlice.Notes)
+    {
+        for(const auto& note : notes)
+        {
+            if(note.Type == Note::EType::HoldEnd || note.Type == Note::EType::HoldBegin || note.Type == Note::EType::HoldIntermediate)
+            {
+                sf::RectangleShape rectangleHold;
+
+                rectangleHold.setSize(sf::Vector2f(_NoteWidth, (note.TimePointEnd - note.TimePointBegin + _NoteHeight) / _HeightScale));
+                rectangleHold.setFillColor({32, 255, 32, 255});
+
+                rectangleHold.setPosition(sf::Vector2f(_BorderPadding + _NoteWidth + (column * _NoteWidth + column), (note.TimePointBegin - _NoteHeight) / _HeightScale));
+
+                _MiniMapRenderTexture.draw(rectangleHold);
+            }
+
+            Time noteTime = note.Type == Note::EType::HoldBegin 
+                         || note.Type == Note::EType::HoldEnd 
+                         || note.Type == Note::EType::HoldIntermediate ? note.TimePointBegin : note.TimePoint;
+
+            sf::RectangleShape rectangle;
+
+            rectangle.setSize(sf::Vector2f(_NoteWidth, _NoteHeight));
+            rectangle.setFillColor(InSkin.SnapColorTable[note.BeatSnap]);
+
+            rectangle.setPosition(sf::Vector2f(_BorderPadding + _NoteWidth + (column * _NoteWidth + column), (noteTime - _NoteHeight) / _HeightScale));
+
+            _MiniMapRenderTexture.draw(rectangle);
+        }
+    }
 }
 
 TimefieldRenderGraph& MiniMapModule::GetPreviewRenderGraph(Chart* const InChart) 
