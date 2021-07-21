@@ -40,6 +40,7 @@ bool SelectEditMode::OnCopy()
         }
     }
 
+    PUSH_NOTIFICATION("Copied %d Notes", _SelectedNotes.NoteAmount);
     sf::Clipboard::setString(clipboard);
 
     return true;
@@ -50,7 +51,7 @@ bool SelectEditMode::OnPaste()
     //I hate parsing strings in c++ 
 
     _MostRightColumn = 0;
-    _MostLeftColumn = static_Chart->KeyAmount - 1;;
+    _MostLeftColumn = static_Chart->KeyAmount - 1;
 
     _PastePreviewNotes.clear();
     _LowestPasteTimePoint = INT_MAX;
@@ -238,6 +239,8 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
         column = newColumn;
     }
 
+    PUSH_NOTIFICATION("Placed %d Notes", _PastePreviewNotes.size());
+
     static_Chart->BulkPlaceNotes(_PastePreviewNotes);
     _IsPreviewingPaste = false;
 
@@ -294,7 +297,8 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
             _SelectedNotes.PushNote(InColumn, &InOutNote);
     });
 
-    PUSH_NOTIFICATION("Selected %d Notes", _SelectedNotes.NoteAmount);
+    if(_SelectedNotes.NoteAmount != 0)
+        PUSH_NOTIFICATION("Selected %d Notes", _SelectedNotes.NoteAmount);
 
     return true;
 }

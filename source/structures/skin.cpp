@@ -139,6 +139,20 @@ void Skin::RenderTimeFieldBackground(sf::RenderTarget* InOutRenderTarget)
 	rectangle.setFillColor(sf::Color(0, 0, 0, 255));
 
 	InOutRenderTarget->draw(rectangle);
+
+	if(ShowColumnLines)
+	{
+		for(int i = 0; i <= _TimefieldMetrics.KeyAmount; ++i)
+		{
+			sf::RectangleShape line;
+
+			line.setPosition(_TimefieldMetrics.FirstColumnPosition + i * _TimefieldMetrics.ColumnSize, 0);
+			line.setSize({ 1.0f, float(InOutRenderTarget->getView().getSize().y) });
+			line.setFillColor(sf::Color(255, 255, 255, 64));
+
+			InOutRenderTarget->draw(line);
+		}
+	}
 }
 
 void Skin::UpdateTimefieldMetrics(const TimefieldMetrics& InTimefieldMetrics) 

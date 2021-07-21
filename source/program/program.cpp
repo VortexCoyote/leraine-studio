@@ -26,6 +26,8 @@ namespace
 	bool IsSettingUpNewChart = false;
 
 	bool DebugShowTimeSliceBoundaries = false;
+
+	std::string TimeToGo = "0";
 }
 
 //module includes
@@ -69,6 +71,10 @@ void Program::InnerStartUp()
 void Program::InnerTick()
 {
 	 MenuBar();
+	 GlobalInputActions();
+
+	if(IsSettingUpNewChart)
+		SetUpNewChart();
 
 	if (!SelectedChart)
 		return;
@@ -183,42 +189,62 @@ void Program::MenuBar()
 					MOD(ChartParserModule).ExportChartSet(SelectedChart);
 			}
 
-			ImGui::Separator();
+			/*ImGui::Separator();
 
 			if (ImGui::MenuItem("Export", "CTRL+E"))
 			{
 				
-			}
+			}*/
 
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Edit"))
 		{
-			if (ImGui::MenuItem("Undo", "CTRL+Z"));
+			if ( ImGui::MenuItem("Undo", "CTRL+Z") && SelectedChart && SelectedChart->Undo())
+				PUSH_NOTIFICATION("Undo");
+				
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Copy", "CTRL+C") && SelectedChart)
+				MOD(EditModule).OnCopy();
+
+			if (ImGui::MenuItem("Paste", "CTRL+V") && SelectedChart)
+				MOD(EditModule).OnPaste();
+
+			if (ImGui::MenuItem("Delete", "DELETE") && SelectedChart)
+				MOD(EditModule).OnDelete();
 
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Copy", "CTRL+C"));
+			if (ImGui::MenuItem("Mirror", "CTRL+H") && SelectedChart)
+				MOD(EditModule).OnMirror();
 
-			if (ImGui::MenuItem("Paste", "CTRL+V"));
-
-			if (ImGui::MenuItem("Delete", "DELETE"));
-
-			ImGui::Separator();
-
-			if (ImGui::MenuItem("Mirror", "CTRL+H"));
-
-			if (ImGui::MenuItem("Goto Timepoint", "CTRL+T"));
+			if (ImGui::MenuItem("Go To Timepoint", "CTRL+T") && SelectedChart)
+				GoToTimePoint();
 				
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Options"))
 		{
-			//ImGui::Checkbox("Use Pitched Rate", &EditMode::static_Flags.UseAutoTiming);
+			std::string togglePitch = "Toggle Pitch (";
+			togglePitch += MOD(AudioModule).UsePitch ? "Pitched)" : "Stretched)";
 
-			//ImGui::Checkbox("Show Column Lines", &EditMode::static_Flags.UseAutoTiming);
+			if(ImGui::Button(togglePitch.c_str()))
+			{
+				MOD(AudioModule).ResetSpeed();
+				MOD(AudioModule).UsePitch = !MOD(AudioModule).UsePitch;
+			}
+
+			if(ImGui::Checkbox("Show Column Lines", &MOD(TimefieldRenderModule).GetSkin().ShowColumnLines))
+			{
+				if(!SelectedChart)
+				{
+					MOD(TimefieldRenderModule).GetSkin().ShowColumnLines = false;
+					PUSH_NOTIFICATION("Open a Chart First");
+				}
+			}
 
 			ImGui::Checkbox("Use Auto Timing", &EditMode::static_Flags.UseAutoTiming);
 
@@ -242,11 +268,12 @@ void Program::MenuBar()
 
 		ImGui::EndMainMenuBar();
 	}
+}
 
-	if(IsSettingUpNewChart)
+void Program::SetUpNewChart() 
+{
+	MOD(PopupModule).OpenPopup("New Chart", [this](bool& OutOpen)
 	{
-		MOD(PopupModule).OpenPopup("New Chart", [this](bool& OutOpen)
-		{
 			ImGui::Text("Meta Data");
 			ImGui::InputText("Artist", &SetUpChartData.Artist);
 			ImGui::InputText("Song Title", &SetUpChartData.SongTitle);
@@ -307,7 +334,26 @@ void Program::MenuBar()
 				SetUpChartData = NewChartData();
 			}
 		});
-	}
+}
+
+void Program::GoToTimePoint() 
+{
+	MOD(PopupModule).OpenPopup("Go To Timepoint", [this](bool& OutOpen)
+	{
+		ImGui::InputText("Timepoint (MS)", &TimeToGo);
+
+		if(ImGui::Button("Go") || MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Enter))
+		{
+			MOD(AudioModule).SetTimeMilliSeconds(std::stoi(TimeToGo));
+
+			OutOpen = false;
+		}
+
+		ImGui::SameLine();
+
+		if(ImGui::Button("Cancel") || MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Escape))
+			OutOpen = false;
+	});
 }
 
 void Program::InputActions()
@@ -344,9 +390,6 @@ void Program::InputActions()
 				PUSH_NOTIFICATION("Undo");
 		}
 
-		if (SelectedChart && MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::S))
-			MOD(ChartParserModule).ExportChartSet(SelectedChart);
-
 		if (MOD(InputModule).IsScrollingUp())
 			return ApplyDeltaToZoom(0.1f);
 
@@ -364,6 +407,9 @@ void Program::InputActions()
 
 		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::A))
 			return void(MOD(EditModule).OnSelectAll());
+
+		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::T))
+			GoToTimePoint();
 	}
 
 	if (MOD(InputModule).IsAltKeyDown())
@@ -428,6 +474,26 @@ void Program::InputActions()
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 		return void(MOD(EditModule).OnMouseRightButtonClicked(MOD(InputModule).IsShiftKeyDown()));
+}
+
+void Program::GlobalInputActions() 
+{
+	if (MOD(InputModule).IsCtrlKeyDown())
+	{
+		if (SelectedChart && MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::S))
+			MOD(ChartParserModule).ExportChartSet(SelectedChart);
+
+		if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::O))
+		{
+			MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string &InPath) 
+			{
+				OpenChart(InPath);
+			});
+		}
+
+		if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::N))
+			IsSettingUpNewChart = true;
+	}
 }
 
 void Program::OpenChart(const std::string InPath) 

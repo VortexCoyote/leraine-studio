@@ -29,6 +29,8 @@ public:
 	
 	[[nodiscard]] WaveFormData* GenerateAndGetWaveformData(const std::string& InPath);
 
+	bool UsePitch = true;
+
 private:
 
 	const WaveFormData& SampleWaveFormData(const Time InTimePoint);

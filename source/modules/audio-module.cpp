@@ -60,16 +60,15 @@ void AudioModule::ResetSpeed()
 	BASS_CHANNELINFO info;
 	BASS_ChannelGetInfo(_StreamHandle, &info);
 
-
-	//if (usePitch == true)
-	//{
+	if (UsePitch)
+	{
 		BASS_ChannelSetAttribute(_StreamHandle, BASS_ATTRIB_FREQ, float(info.freq) * _Speed);
 		BASS_ChannelSetAttribute(_StreamHandle, BASS_ATTRIB_TEMPO, 0);
-	//}
-	//else
-	//{
-	//	BASS_ChannelSetAttribute(myStreamHandle, BASS_ATTRIB_TEMPO, (mySpeed - 1.f) * 100.f);
-	//}
+	}
+	else
+	{
+		BASS_ChannelSetAttribute(_StreamHandle, BASS_ATTRIB_TEMPO, (_Speed - 1.f) * 100.f);
+	}
 }
 
 void AudioModule::SetTimeMilliSeconds(const Time InTime)
@@ -99,15 +98,15 @@ void AudioModule::ChangeSpeed(const float InDeltaSpeed)
 	BASS_CHANNELINFO info;
 	BASS_ChannelGetInfo(_StreamHandle, &info);
 
-	//if (usePitch == true)
-	//{
+	if (UsePitch)
+	{
 		BASS_ChannelSetAttribute(_StreamHandle, BASS_ATTRIB_FREQ, float(info.freq) * _Speed);
 		BASS_ChannelSetAttribute(_StreamHandle, BASS_ATTRIB_TEMPO, 0);
-	//}
-	//else
-	//{
-	//	BASS_ChannelSetAttribute(myStreamHandle, BASS_ATTRIB_TEMPO, (mySpeed - 1.f) * 100.f);
-	//}
+	}
+	else
+	{
+		BASS_ChannelSetAttribute(_StreamHandle, BASS_ATTRIB_TEMPO, (_Speed - 1.f) * 100.f);
+	}
 }
 
 double AudioModule::GetTimeSeconds()

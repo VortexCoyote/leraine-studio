@@ -14,8 +14,11 @@ public: //inner program sequences
 public: //abstractions
 
 	void MenuBar();
+	void SetUpNewChart();
+	void GoToTimePoint();
 	void ScrollShortcutRoutines();
 	void InputActions();
+	void GlobalInputActions();
 	void ApplyDeltaToZoom(const float InDelta);
 	void UpdateCursor();
 	void OpenChart(const std::string InPath);

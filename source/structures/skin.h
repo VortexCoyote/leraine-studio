@@ -37,6 +37,8 @@ struct Skin
 
 	std::map<int, sf::Color> SnapColorTable;
 
+	bool ShowColumnLines = false;
+
 public: //meta methods
 
 	void UpdateTimefieldMetrics(const TimefieldMetrics& InTimefieldMetrics);
