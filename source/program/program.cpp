@@ -41,6 +41,7 @@ namespace
 #include "../modules/minimap-module.h"
 #include "../modules/waveform-module.h"
 #include "../modules/popup-module.h"
+#include "../modules/notification-module.h"
 
 void Program::RegisterModules()
 {
@@ -51,6 +52,7 @@ void Program::RegisterModules()
 	ModuleManager::Register<PopupModule>();
 	ModuleManager::Register<InputModule>();
 	ModuleManager::Register<MiniMapModule>();
+	ModuleManager::Register<NotificationModule>();
 	ModuleManager::Register<ChartParserModule>();
 	ModuleManager::Register<AudioModule>();
 	ModuleManager::Register<WaveFormModule>();
@@ -61,6 +63,7 @@ void Program::RegisterModules()
 void Program::InnerStartUp()
 {
 	MOD(ImGuiModule).Init(_RenderWindow);
+	MOD(NotificationModule).SetStartY(_WindowMetrics.MenuBarHeight + 16);
 }
 
 void Program::InnerTick()
@@ -185,11 +188,6 @@ void Program::MenuBar()
 			if (ImGui::MenuItem("Export", "CTRL+E"))
 			{
 				
-			}
-
-			if (ImGui::MenuItem("Open in osu!", "F5"))
-			{
-
 			}
 
 			ImGui::EndMenu();
@@ -317,23 +315,38 @@ void Program::InputActions()
 	if (MOD(InputModule).IsTogglingPause())
 		MOD(AudioModule).TogglePause();
 
-	if (MOD(InputModule).IsCtrlKeyDown() && MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Z))
-		SelectedChart->Undo();
-
 	if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Num1))
+	{
 		MOD(EditModule).SetEditMode<SelectEditMode>();
+		PUSH_NOTIFICATION("Select Edit Mode");
+	}
 
 	if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Num2))
+	{
 		MOD(EditModule).SetEditMode<NoteEditMode>();
+		PUSH_NOTIFICATION("Note Edit Mode");
+	}
 
 	if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Num3))
+	{
 		MOD(EditModule).SetEditMode<BpmEditMode>();
+		PUSH_NOTIFICATION("Bpm Edit Mode");
+	}
 
 	if(MOD(InputModule).IsDeleting())
 		MOD(EditModule).OnDelete();	
 
 	if (MOD(InputModule).IsCtrlKeyDown())
 	{
+		if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Z))
+		{
+			if(SelectedChart->Undo())
+				PUSH_NOTIFICATION("Undo");
+		}
+
+		if (SelectedChart && MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::S))
+			MOD(ChartParserModule).ExportChartSet(SelectedChart);
+
 		if (MOD(InputModule).IsScrollingUp())
 			return ApplyDeltaToZoom(0.1f);
 
@@ -471,7 +484,7 @@ void Program::UpdateCursor()
 
 	EditCursor.TimePoint = snappedBeatLine.TimePoint;
 	EditCursor.UnsnappedTimePoint = MOD(TimefieldRenderModule).GetTimeFromScreenPoint(EditCursor.Y, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
-	EditCursor.Column = MOD(TimefieldRenderModule).GetColumnFromScreenPoint(EditCursor.X);
+	EditCursor.CursorColumn = MOD(TimefieldRenderModule).GetColumnFromScreenPoint(EditCursor.X);
 	EditCursor.BeatSnap = snappedBeatLine.BeatSnap;
 
 	if (EditCursor.X < timefieldMetrics.LeftSidePosition)
@@ -483,7 +496,7 @@ void Program::UpdateCursor()
 
 	EditCursor.HoveredNotes.clear();
 
-	MOD(TimefieldRenderModule).GetOverlappedOnScreenNotes(EditCursor.Column, EditCursor.Y, EditCursor.HoveredNotes);
+	MOD(TimefieldRenderModule).GetOverlappedOnScreenNotes(EditCursor.CursorColumn, EditCursor.Y, EditCursor.HoveredNotes);
 
 	std::sort(EditCursor.HoveredNotes.begin(), EditCursor.HoveredNotes.end(), [](const Note *lhs, const Note *rhs) { return lhs->TimePoint < rhs->TimePoint; });
 }

@@ -159,7 +159,10 @@ bool SelectEditMode::OnPaste()
 bool SelectEditMode::OnMirror() 
 {
     if(_SelectedNotes.HasNotes)
+    {
+        PUSH_NOTIFICATION("Mirrored %d Notes", _SelectedNotes.NoteAmount);
         static_Chart->MirrorNotes(_SelectedNotes);
+    }
 
     return true;
 }
@@ -167,7 +170,10 @@ bool SelectEditMode::OnMirror()
 bool SelectEditMode::OnDelete() 
 {
     if(_SelectedNotes.HasNotes)
+    {
+        PUSH_NOTIFICATION("Deleted %d Notes", _SelectedNotes.NoteAmount);
         static_Chart->BulkRemoveNotes(_SelectedNotes);
+    }
 
     return true;
 }
@@ -175,6 +181,7 @@ bool SelectEditMode::OnDelete()
 bool SelectEditMode::OnSelectAll() 
 {
     static_Chart->FillNoteCollectionWithAllNotes(_SelectedNotes);
+    PUSH_NOTIFICATION("Selected %d Notes", _SelectedNotes.NoteAmount);
 
     return true;
 }
@@ -197,7 +204,7 @@ void SelectEditMode::Tick()
 
     if(!static_Cursor.HoveredNotes.empty() && static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle && !_IsAreaSelecting)
     {
-        _HoveredNoteColumn = static_Cursor.Column;
+        _HoveredNoteColumn = static_Cursor.CursorColumn;
         _HoveredNote = static_Chart->FindNote(static_Cursor.HoveredNotes.back()->TimePoint, _HoveredNoteColumn);
     }
     else
@@ -245,8 +252,8 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
         {
             // TODO : Make the one-undo implementation
             Time TimePointBegin = _DraggingNote->TimePointBegin;
-            static_Chart->RemoveNote(_DraggingNote->TimePointBegin, static_Cursor.Column);
-            static_Chart->PlaceNote(TimePointBegin, static_Cursor.Column, static_Cursor.BeatSnap);
+            static_Chart->RemoveNote(_DraggingNote->TimePointBegin, static_Cursor.CursorColumn);
+            static_Chart->PlaceNote(TimePointBegin, static_Cursor.CursorColumn, static_Cursor.BeatSnap);
 
             return _IsMovingNote = false;
         }
@@ -255,14 +262,14 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
         {
             // TODO : Make the one-undo implementation
             Time TimePointEnd = _DraggingNote->TimePointEnd;
-            static_Chart->RemoveNote(_DraggingNote->TimePointEnd, static_Cursor.Column);
-            static_Chart->PlaceNote(TimePointEnd, static_Cursor.Column, static_Cursor.BeatSnap);
+            static_Chart->RemoveNote(_DraggingNote->TimePointEnd, static_Cursor.CursorColumn);
+            static_Chart->PlaceNote(TimePointEnd, static_Cursor.CursorColumn, static_Cursor.BeatSnap);
 
             return _IsMovingNote = false;
         }
 
-        _HoveredNote = static_Chart->MoveNote(_HoveredNote->TimePoint, static_Cursor.TimePoint, _HoveredNoteColumn, static_Cursor.Column, static_Cursor.BeatSnap);
-        _HoveredNoteColumn = static_Cursor.Column;
+        _HoveredNote = static_Chart->MoveNote(_HoveredNote->TimePoint, static_Cursor.TimePoint, _HoveredNoteColumn, static_Cursor.CursorColumn, static_Cursor.BeatSnap);
+        _HoveredNoteColumn = static_Cursor.CursorColumn;
 
         return _IsMovingNote = false;
     } 
@@ -278,14 +285,16 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
     const Time timeBegin = std::min(_AnchoredCursor.UnsnappedTimePoint, static_Cursor.UnsnappedTimePoint);
     const Time timeEnd   = std::max(_AnchoredCursor.UnsnappedTimePoint, static_Cursor.UnsnappedTimePoint);
 
-    const Column columnMin = std::min(_AnchoredCursor.Column, static_Cursor.Column);
-    const Column columnMax = std::max(_AnchoredCursor.Column, static_Cursor.Column);
+    const Column columnMin = std::min(_AnchoredCursor.CursorColumn, static_Cursor.CursorColumn);
+    const Column columnMax = std::max(_AnchoredCursor.CursorColumn, static_Cursor.CursorColumn);
 
     static_Chart->IterateNotesInTimeRange(timeBegin, timeEnd, [this, &timeBegin, &timeEnd, &columnMin, &columnMax](Note& InOutNote, const Column& InColumn)
     {
         if((InOutNote.Type == Note::EType::Common || InOutNote.Type == Note::EType::HoldBegin) && (InColumn >= columnMin && InColumn <= columnMax))
             _SelectedNotes.PushNote(InColumn, &InOutNote);
     });
+
+    PUSH_NOTIFICATION("Selected %d Notes", _SelectedNotes.NoteAmount);
 
     return true;
 }
@@ -344,7 +353,7 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
 
         if(_IsMovingNote)
         {
-            column = static_Cursor.Column;
+            column = static_Cursor.CursorColumn;
             timePoint = static_Cursor.TimePoint;
 
             switch (_DraggingNote->Type)
@@ -385,7 +394,7 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
     if(!_IsAreaSelecting)
         return;
 
-    InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(_AnchoredCursor.Column, _AnchoredCursor.UnsnappedTimePoint, 
+    InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(_AnchoredCursor.CursorColumn, _AnchoredCursor.UnsnappedTimePoint, 
     [this](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
     {
         sf::RectangleShape rectangle;
@@ -403,7 +412,7 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
 
 int SelectEditMode::GetDelteColumn() 
 {
-    int deltaColumn = int(static_Cursor.Column) - int(_MostLeftColumn);
+    int deltaColumn = int(static_Cursor.CursorColumn) - int(_MostLeftColumn);
     int keyAmount = static_Chart->KeyAmount - 1;
 
     if(int(_MostRightColumn) + deltaColumn > keyAmount)

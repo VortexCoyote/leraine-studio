@@ -9,6 +9,7 @@
 void NoteReferenceCollection::PushNote(Column InColumn, Note* InNote) 
 {
 	HasNotes = true;
+	NoteAmount++;
 
 	Notes[InColumn].insert(InNote);
 
@@ -27,6 +28,7 @@ void NoteReferenceCollection::PushNote(Column InColumn, Note* InNote)
 void NoteReferenceCollection::Clear() 
 {
 	HasNotes = false;
+	NoteAmount = 0;
 
 	Notes.clear();
 

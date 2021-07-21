@@ -62,6 +62,8 @@ Chart* ChartParserModule::ParseAndGenerateChartSet(std::string InPath)
 	_CurrentChartPath = InPath;
 	std::ifstream chartFile(InPath);
 
+	PUSH_NOTIFICATION("Opened %s", InPath.c_str());
+
 	return ParseChartOsuImpl(chartFile, InPath);
 }
 
@@ -340,6 +342,8 @@ void ChartParserModule::ExportChartSet(Chart* InChart)
 	std::ofstream chartFile(_CurrentChartPath);
 
 	ExportChartOsuImpl(InChart, chartFile);
+
+	PUSH_NOTIFICATION("Saved to %s", _CurrentChartPath.c_str());
 }
 
 void ChartParserModule::ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfStream)

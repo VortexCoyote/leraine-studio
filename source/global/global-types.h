@@ -9,3 +9,4 @@
 #include "../structures/window-metrics.h"
 #include "../structures/timefield-metrics.h"
 #include "../structures/waveform-data.h"
+#include "../structures/notification-message.h"

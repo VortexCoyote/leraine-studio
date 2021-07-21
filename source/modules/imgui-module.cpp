@@ -41,6 +41,7 @@ void ImGuiModule::Init(sf::RenderWindow* const InOutRenderWindow)
     _RenderWindow = InOutRenderWindow;
 
     ImGui::SFML::Init(*_RenderWindow);
+    ImGui::GetIO().IniFilename = nullptr;
     ApplyTheme();
 }
 

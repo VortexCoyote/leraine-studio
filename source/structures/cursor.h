@@ -15,7 +15,7 @@ struct Cursor
 
 	Time TimePoint = 0;
 	Time UnsnappedTimePoint = 0;
-	Column Column = 0;
+	Column CursorColumn = 0;
 
 	std::vector<const Note*> HoveredNotes;
 

@@ -83,6 +83,8 @@ struct NoteReferenceCollection
 	Time MaxTimePoint;
 
 	bool HasNotes = false;
+
+	int NoteAmount = 0;
 };
 
 struct Chart
