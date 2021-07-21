@@ -30,3 +30,8 @@ void NotificationMessage::PushNotification(const char* InMessage, ...)
 
         Messages.insert(Messages.begin(), message);
 }
+
+void NotificationMessage::SetLifeTime(const float InLifeTime) 
+{
+    Messages[0].LifeTime = InLifeTime;
+}

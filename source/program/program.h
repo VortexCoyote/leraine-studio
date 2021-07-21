@@ -15,6 +15,7 @@ public: //abstractions
 
 	void MenuBar();
 	void SetUpNewChart();
+	void ShowShortCuts();
 	void GoToTimePoint();
 	void ScrollShortcutRoutines();
 	void InputActions();

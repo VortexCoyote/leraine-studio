@@ -23,9 +23,10 @@ namespace
 	int CurrentSnap = 2;
 	
 	NewChartData SetUpChartData = NewChartData();
-	bool ShouldSetUpNewChart = false;
 
+	bool ShouldSetUpNewChart = false;
 	bool DebugShowTimeSliceBoundaries = false;
+	bool ShowWaveform = true;
 
 	std::string TimeToGo = "0";
 }
@@ -108,7 +109,8 @@ void Program::InnerRender(sf::RenderTarget *const InOutRenderTarget)
 	if (!SelectedChart)
 		return;
 
-	MOD(WaveFormModule).RenderWaveForm(WaveformRenderGraph, WindowTimeBegin, WindowTimeEnd, MOD(TimefieldRenderModule).GetTimefieldMetrics().LeftSidePosition + MOD(TimefieldRenderModule).GetTimefieldMetrics().FieldWidthHalf, ZoomLevel, InOutRenderTarget->getView().getSize().y);
+	if(ShowWaveform)
+		MOD(WaveFormModule).RenderWaveForm(WaveformRenderGraph, WindowTimeBegin, WindowTimeEnd, MOD(TimefieldRenderModule).GetTimefieldMetrics().LeftSidePosition + MOD(TimefieldRenderModule).GetTimefieldMetrics().FieldWidthHalf, ZoomLevel, InOutRenderTarget->getView().getSize().y);
 
 	MOD(BeatModule).IterateThroughBeatlines([this, &InOutRenderTarget](const BeatLine &InBeatLine)
 	{
@@ -257,6 +259,7 @@ void Program::MenuBar()
 				}
 			}
 
+			ImGui::Checkbox("Show Waveform", &ShowWaveform);
 			ImGui::Checkbox("Use Auto Timing", &EditMode::static_Flags.UseAutoTiming);
 
 			ImGui::EndMenu();
@@ -264,7 +267,8 @@ void Program::MenuBar()
 
 		if (ImGui::BeginMenu("Help"))
 		{
-			if (ImGui::MenuItem("Shortcuts", "F1"));
+			if (ImGui::MenuItem("Shortcuts", "F1"))
+				ShowShortCuts();
 
 			ImGui::EndMenu();
 		}
@@ -359,6 +363,55 @@ void Program::SetUpNewChart()
 	});
 }
 
+void Program::ShowShortCuts() 
+{
+	MOD(PopupModule).OpenPopup("New Chart", [this](bool& OutOpen)
+	{
+		ImGui::Text("Select Edit Mode"); ImGui::SameLine(196.f); ImGui::Text("NUM 1");
+		ImGui::Text("Select Area"); ImGui::SameLine(196.f); ImGui::Text("Left Click+Drag");
+		
+		ImGui::Spacing();
+		
+		ImGui::Text("Note Edit Mode"); ImGui::SameLine(196.f); ImGui::Text("NUM 2");
+		ImGui::Text("Place Note"); ImGui::SameLine(196.f); ImGui::Text("Left Click");
+		ImGui::Text("Remove Note"); ImGui::SameLine(196.f); ImGui::Text("Right Click");
+		ImGui::Text("Place Hold"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+Left Click+Drag");
+		
+		ImGui::Spacing();
+		
+		ImGui::Text("Timing Edit Mode"); ImGui::SameLine(196.f); ImGui::Text("NUM 3");
+		ImGui::Text("Place BPM Node"); ImGui::SameLine(196.f); ImGui::Text("Left Click");
+		ImGui::Text("Remove BPM Node"); ImGui::SameLine(196.f); ImGui::Text("Right Click");
+		
+		ImGui::Spacing();
+		
+		ImGui::Text("Scroll"); ImGui::SameLine(196.f); ImGui::Text("Mouse Wheel");
+		ImGui::Text("Zoom"); ImGui::SameLine(196.f); ImGui::Text("CTRL+Mouse Wheel");
+		ImGui::Text("Audio Playback Speed"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+Mouse Wheel");
+		ImGui::Text("Snap Division"); ImGui::SameLine(196.f); ImGui::Text("ALT+Mouse Wheel");
+
+		ImGui::Spacing();
+
+		ImGui::Text("Undo"); ImGui::SameLine(196.f); ImGui::Text("CTRL+Z");
+		ImGui::Text("Copy"); ImGui::SameLine(196.f); ImGui::Text("CTRL+C");
+		ImGui::Text("Paste"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
+		ImGui::Text("Delete"); ImGui::SameLine(196.f); ImGui::Text("DELETE");
+		ImGui::Text("Mirror"); ImGui::SameLine(196.f); ImGui::Text("CTRL+H");
+		ImGui::Text("Go To Timepoint"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
+		
+		ImGui::Spacing();
+
+		ImGui::Text("New Chart"); ImGui::SameLine(196.f); ImGui::Text("CTRL+N");
+		ImGui::Text("Open"); ImGui::SameLine(196.f); ImGui::Text("CTRL+O");
+		ImGui::Text("Save"); ImGui::SameLine(196.f); ImGui::Text("CTRL+S");
+		ImGui::Text("Set Background"); ImGui::SameLine(196.f); ImGui::Text("CTRL+B");
+		
+		ImGui::NewLine();
+		
+		OutOpen = !ImGui::Button("close");
+	});
+}
+
 void Program::GoToTimePoint() 
 {
 	MOD(PopupModule).OpenPopup("Go To Timepoint", [this](bool& OutOpen)
@@ -447,19 +500,19 @@ void Program::InputActions()
 	if (MOD(InputModule).IsAltKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
-			return void(CurrentSnap = MOD(BeatModule).GetNextSnap(CurrentSnap)), PUSH_NOTIFICATION("Snap %d", CurrentSnap);
+			return void(CurrentSnap = MOD(BeatModule).GetNextSnap(CurrentSnap)), PUSH_NOTIFICATION_LIFETIME(0.5f, "Snap %d", CurrentSnap);
 
 		if (MOD(InputModule).IsScrollingDown())
-			return void(CurrentSnap = MOD(BeatModule).GetPreviousSnap(CurrentSnap)), PUSH_NOTIFICATION("Snap %d", CurrentSnap);
+			return void(CurrentSnap = MOD(BeatModule).GetPreviousSnap(CurrentSnap)), PUSH_NOTIFICATION_LIFETIME(0.5f, "Snap %d", CurrentSnap);
 	}
 
 	if (MOD(InputModule).IsShiftKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
-			return MOD(AudioModule).ChangeSpeed(0.05f), PUSH_NOTIFICATION("Speed %f", MOD(AudioModule).GetPlaybackSpeed());
+			return MOD(AudioModule).ChangeSpeed(0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %fx", MOD(AudioModule).GetPlaybackSpeed());
 
 		if (MOD(InputModule).IsScrollingDown())
-			return MOD(AudioModule).ChangeSpeed(-0.05f), PUSH_NOTIFICATION("Speed %f", MOD(AudioModule).GetPlaybackSpeed());
+			return MOD(AudioModule).ChangeSpeed(-0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %fx", MOD(AudioModule).GetPlaybackSpeed());
 	}
 
 	if (MOD(InputModule).IsScrollingUp())
@@ -510,6 +563,9 @@ void Program::InputActions()
 
 void Program::GlobalInputActions() 
 {
+	if (MOD(InputModule).WasKeyPressed(sf::Keyboard::F1))
+		ShowShortCuts();
+
 	if (MOD(InputModule).IsCtrlKeyDown())
 	{
 		if (SelectedChart && MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::S))
