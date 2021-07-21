@@ -21,6 +21,7 @@ file(GLOB_RECURSE HEADER_FILES "source/*.h" "source/*.hpp")
 find_package(SFML COMPONENTS system window graphics audio CONFIG REQUIRED)
 find_package(ImGui-SFML CONFIG REQUIRED)
 find_package(ImGui CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
 
 add_executable($ENV{PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
@@ -38,4 +39,5 @@ target_link_libraries($ENV{PROJECT_NAME} PRIVATE
     sfml-system
     bass
     bass_fx
+    ZLIB::ZLIB
 )

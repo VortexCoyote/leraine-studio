@@ -47,15 +47,15 @@ void Skin::LoadResources(const int InKeyAmount)
 		subPath.make_preferred();
 
 		if (_HasOverlay = !!std::ifstream(subPath))
-			NoteOverlayTextures[key].loadFromFile(subPath);
+			NoteOverlayTextures[key].loadFromFile(subPath.string());
 	}
 	
-	HoldBodyTexture.loadFromFile(path / "holdbody.png");
-	HoldBodyCapTexture.loadFromFile(path / "holdcap.png");
+	HoldBodyTexture.loadFromFile((path / "holdbody.png").string());
+	HoldBodyCapTexture.loadFromFile((path / "holdcap.png").string());
 
 	std::filesystem::path hitlinePath = "data/skin/hitline.png";
 
-	HitlineTexture.loadFromFile(hitlinePath);
+	HitlineTexture.loadFromFile(hitlinePath.string());
 	HitlineSprite.setTexture(HitlineTexture);
 	
 	HoldBodySprite.setTexture(HoldBodyTexture);

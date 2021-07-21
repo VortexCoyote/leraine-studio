@@ -23,7 +23,7 @@ void NotificationMessage::PushNotification(const char* InMessage, ...)
             nsize = vsnprintf(buffer, size, InMessage, vl);
         }
 
-        message.Message = buffer;
+        message.NotiMessage = buffer;
 
         va_end(vl);
         delete[] buffer;

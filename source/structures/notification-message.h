@@ -14,7 +14,7 @@ struct NotificationMessage
 
     struct Message
     {
-        std::string Message;
+        std::string NotiMessage;
         float LifeTime = 2.0f;
 
         bool operator==(const NotificationMessage::Message& InOther)

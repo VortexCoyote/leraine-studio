@@ -26,7 +26,7 @@ bool NotificationModule::Tick(const float& InDeltaTime)
 
 	    ImGui::Begin(std::to_string((int)&message).c_str(), &open, windowFlags);    
 
-        ImGui::Text(message.Message.c_str());
+        ImGui::Text(message.NotiMessage.c_str());
 
 	    ImGui::SetWindowPos({ _RenderWindow->getView().getSize().x - (ImGui::GetWindowWidth() + 8.f), _StartY + 48.f * float(placement)});
         
@@ -52,7 +52,7 @@ bool NotificationModule::Tick(const float& InDeltaTime)
 bool NotificationModule::RenderBack(sf::RenderTarget* const InOutRenderTarget) 
 {
     if(!_RenderWindow)
-        _RenderWindow = InOutRenderTarget;
+        _RenderWindow = (sf::RenderWindow*)InOutRenderTarget;
 
     return true;
 }
