@@ -11,6 +11,7 @@ struct NewChartData
 
     std::string ChartPath = "";
     std::string AudioPath = "";
+    std::string BackgroundPath = "";
 
     int KeyAmount = 4;
     float OD = 8.0f;

@@ -9,9 +9,22 @@
 #define PARSE_COMMA_VALUE(stringstream, target) stringstream >> target; if (stringstream.peek() == ',') stringstream.ignore()
 #define REMOVE_POTENTIAL_NEWLINE(str) if(str.find('\r') != std::string::npos) str.resize(str.size() - 1)
 
-void ChartParserModule::SetCurrentChartPath(const std::string InPath)
+void ChartParserModule::SetCurrentChartPath(const std::string& InPath)
 {
 	_CurrentChartPath = InPath;
+}
+
+void ChartParserModule::SetBackground(Chart* OutChart, const std::string& InPath) 
+{
+	std::filesystem::path chartFolderPath = _CurrentChartPath;
+	chartFolderPath.remove_filename();
+
+	std::filesystem::path backgroundPath = InPath;
+	std::filesystem::path targetBackgroundPath = chartFolderPath / backgroundPath.filename();
+
+	std::filesystem::copy_file(backgroundPath, targetBackgroundPath);
+
+	OutChart->BackgroundPath = targetBackgroundPath.string();
 }
 
 std::string ChartParserModule::CreateNewChart(const NewChartData& InNewChartData) 
@@ -19,9 +32,11 @@ std::string ChartParserModule::CreateNewChart(const NewChartData& InNewChartData
 	Chart dummyChart;
 
 	std::filesystem::path audioPath = InNewChartData.AudioPath;
+	std::filesystem::path backgroundPath = InNewChartData.BackgroundPath;
 	std::filesystem::path chartFolderPath = InNewChartData.ChartPath;
 
 	audioPath.make_preferred();
+	backgroundPath.make_preferred();
 	chartFolderPath.make_preferred();
 
 	std::string chartFileName = "";
@@ -36,9 +51,13 @@ std::string ChartParserModule::CreateNewChart(const NewChartData& InNewChartData
 	chartFileName += "].osu";
 
 	std::filesystem::path chartFilePath = chartFolderPath / chartFileName;
-	std::filesystem::path targetPath = chartFolderPath / audioPath.filename();
+	std::filesystem::path targetAudioPath = chartFolderPath / audioPath.filename();
+	std::filesystem::path targetBackgroundPath = chartFolderPath / backgroundPath.filename();
 
-	std::filesystem::copy_file(audioPath, targetPath);
+	std::filesystem::copy_file(audioPath, targetAudioPath);
+
+	if(InNewChartData.BackgroundPath.size() != 0)
+		std::filesystem::copy_file(backgroundPath, targetBackgroundPath);
 
 	SetCurrentChartPath(chartFilePath.string());
 
@@ -46,8 +65,8 @@ std::string ChartParserModule::CreateNewChart(const NewChartData& InNewChartData
 	dummyChart.SongTitle = InNewChartData.SongTitle;
 	dummyChart.Charter = InNewChartData.Charter;
 	dummyChart.DifficultyName = InNewChartData.DifficultyName;
-	dummyChart.AudioPath = targetPath.string();
-	dummyChart.BackgroundPath = "";
+	dummyChart.AudioPath = targetAudioPath.string();
+	dummyChart.BackgroundPath = targetBackgroundPath.string();
 	dummyChart.HP = InNewChartData.HP;
 	dummyChart.OD = InNewChartData.OD;
 	dummyChart.KeyAmount = InNewChartData.KeyAmount;
@@ -57,7 +76,7 @@ std::string ChartParserModule::CreateNewChart(const NewChartData& InNewChartData
 	return chartFilePath.string();
 }
 
-Chart* ChartParserModule::ParseAndGenerateChartSet(std::string InPath)
+Chart* ChartParserModule::ParseAndGenerateChartSet(const std::string& InPath)
 {
 	_CurrentChartPath = InPath;
 	std::ifstream chartFile(InPath);

@@ -14,10 +14,11 @@ class ChartParserModule : public Module
 {
 public:
 	
-	Chart* ParseAndGenerateChartSet(std::string InPath);
+	Chart* ParseAndGenerateChartSet(const std::string& InPath);
 	void ExportChartSet(Chart* InChart);
 
-	void SetCurrentChartPath(const std::string InPath);
+	void SetCurrentChartPath(const std::string& InPath);
+	void SetBackground(Chart* OutChart, const std::string& InPath);
 
 	//this is for now osu impl only, in the future I'll make some template magic for which format is present
 	std::string CreateNewChart(const NewChartData& InNewChartData); 

@@ -23,7 +23,7 @@ namespace
 	int CurrentSnap = 2;
 	
 	NewChartData SetUpChartData = NewChartData();
-	bool IsSettingUpNewChart = false;
+	bool ShouldSetUpNewChart = false;
 
 	bool DebugShowTimeSliceBoundaries = false;
 
@@ -73,7 +73,7 @@ void Program::InnerTick()
 	 MenuBar();
 	 GlobalInputActions();
 
-	if(IsSettingUpNewChart)
+	if(ShouldSetUpNewChart)
 		SetUpNewChart();
 
 	if (!SelectedChart)
@@ -171,7 +171,7 @@ void Program::MenuBar()
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::MenuItem("New Chart", "CTRL+N"))
-				IsSettingUpNewChart = true;
+				ShouldSetUpNewChart = true;
 
 			ImGui::Separator();
 
@@ -189,9 +189,18 @@ void Program::MenuBar()
 					MOD(ChartParserModule).ExportChartSet(SelectedChart);
 			}
 
-			/*ImGui::Separator();
+			ImGui::Separator();
 
-			if (ImGui::MenuItem("Export", "CTRL+E"))
+			if (ImGui::MenuItem("Set Background", "CTRL+B") && SelectedChart)
+			{
+				MOD(DialogModule).OpenFileDialog(".png;.jpg", [this](const std::string &InPath)
+				{
+					MOD(ChartParserModule).SetBackground(SelectedChart, InPath);
+					MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
+				});
+			}
+
+			/*if (ImGui::MenuItem("Export", "CTRL+E"))
 			{
 				
 			}*/
@@ -291,28 +300,40 @@ void Program::SetUpNewChart()
 
 			std::string audioButtonName =  SetUpChartData.AudioPath == "" ? "Pick an audio file" : SetUpChartData.AudioPath;
 			std::string chartButtonName =  SetUpChartData.ChartPath == "" ? "Pick a chart folder path" : SetUpChartData.ChartPath;
+			std::string backgroundButtonName =  SetUpChartData.BackgroundPath == "" ? "Pick a background (optional)" : SetUpChartData.BackgroundPath;
 			
 			ImGui::Text("Relevant Paths");
 			
 			if(ImGui::Button(audioButtonName.c_str()))
 			{
-				IsSettingUpNewChart = OutOpen = false;
+				ShouldSetUpNewChart = OutOpen = false;
 
 				MOD(DialogModule).OpenFileDialog(".mp3", [this](const std::string &InPath) 
 				{
 					SetUpChartData.AudioPath = InPath;
-					IsSettingUpNewChart = true;
+					ShouldSetUpNewChart = true;
 				}, true);
 			}
 
 			if(ImGui::Button(chartButtonName.c_str()))
 			{
-				IsSettingUpNewChart = OutOpen = false;
+				ShouldSetUpNewChart = OutOpen = false;
 
 				MOD(DialogModule).OpenFolderDialog([this](const std::string &InPath) 
 				{
 					SetUpChartData.ChartPath = InPath;
-					IsSettingUpNewChart = true;
+					ShouldSetUpNewChart = true;
+				}, true);
+			}
+
+			if(ImGui::Button(backgroundButtonName.c_str()))
+			{
+				ShouldSetUpNewChart = OutOpen = false;
+
+				MOD(DialogModule).OpenFileDialog(".png;.jpg", [this](const std::string &InPath) 
+				{
+					SetUpChartData.BackgroundPath = InPath;
+					ShouldSetUpNewChart = true;
 				}, true);
 			}
 
@@ -322,7 +343,7 @@ void Program::SetUpNewChart()
 			{
 				OpenChart(MOD(ChartParserModule).CreateNewChart(SetUpChartData));
 
-				IsSettingUpNewChart = OutOpen = false;
+				ShouldSetUpNewChart = OutOpen = false;
 				SetUpChartData = NewChartData();
 			}
 
@@ -330,10 +351,10 @@ void Program::SetUpNewChart()
 			
 			if(ImGui::Button("Close"))
 			{
-				IsSettingUpNewChart = OutOpen = false;
+				ShouldSetUpNewChart = OutOpen = false;
 				SetUpChartData = NewChartData();
 			}
-		});
+	});
 }
 
 void Program::GoToTimePoint() 
@@ -410,6 +431,15 @@ void Program::InputActions()
 
 		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::T))
 			GoToTimePoint();
+
+		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::B))
+		{
+			MOD(DialogModule).OpenFileDialog(".png;.jpg", [this](const std::string &InPath)
+			{
+				MOD(ChartParserModule).SetBackground(SelectedChart, InPath);
+				MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
+			});
+		}
 	}
 
 	if (MOD(InputModule).IsAltKeyDown())
@@ -492,7 +522,7 @@ void Program::GlobalInputActions()
 		}
 
 		if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::N))
-			IsSettingUpNewChart = true;
+			ShouldSetUpNewChart = true;
 	}
 }
 
