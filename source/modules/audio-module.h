@@ -26,6 +26,7 @@ public:
 	double GetTimeSeconds();
 	Time GetTimeMilliSeconds();
 	Time GetSongLengthMilliSeconds();
+	float GetPlaybackSpeed();
 	
 	[[nodiscard]] WaveFormData* GenerateAndGetWaveformData(const std::string& InPath);
 

@@ -244,6 +244,8 @@ void Program::MenuBar()
 			{
 				MOD(AudioModule).ResetSpeed();
 				MOD(AudioModule).UsePitch = !MOD(AudioModule).UsePitch;
+
+				PUSH_NOTIFICATION("Speed Reset");
 			}
 
 			if(ImGui::Checkbox("Show Column Lines", &MOD(TimefieldRenderModule).GetSkin().ShowColumnLines))
@@ -445,19 +447,19 @@ void Program::InputActions()
 	if (MOD(InputModule).IsAltKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
-			return void(CurrentSnap = MOD(BeatModule).GetNextSnap(CurrentSnap));
+			return void(CurrentSnap = MOD(BeatModule).GetNextSnap(CurrentSnap)), PUSH_NOTIFICATION("Snap %d", CurrentSnap);
 
 		if (MOD(InputModule).IsScrollingDown())
-			return void(CurrentSnap = MOD(BeatModule).GetPreviousSnap(CurrentSnap));
+			return void(CurrentSnap = MOD(BeatModule).GetPreviousSnap(CurrentSnap)), PUSH_NOTIFICATION("Snap %d", CurrentSnap);
 	}
 
 	if (MOD(InputModule).IsShiftKeyDown())
 	{
 		if (MOD(InputModule).IsScrollingUp())
-			return MOD(AudioModule).ChangeSpeed(0.05f);
+			return MOD(AudioModule).ChangeSpeed(0.05f), PUSH_NOTIFICATION("Speed %f", MOD(AudioModule).GetPlaybackSpeed());
 
 		if (MOD(InputModule).IsScrollingDown())
-			return MOD(AudioModule).ChangeSpeed(-0.05f);
+			return MOD(AudioModule).ChangeSpeed(-0.05f), PUSH_NOTIFICATION("Speed %f", MOD(AudioModule).GetPlaybackSpeed());
 	}
 
 	if (MOD(InputModule).IsScrollingUp())

@@ -124,6 +124,11 @@ Time AudioModule::GetSongLengthMilliSeconds()
 	return BASS_ChannelBytes2Seconds(_StreamHandle, BASS_ChannelGetLength(_StreamHandle, BASS_POS_BYTE)) * 1000;
 }
 
+float AudioModule::GetPlaybackSpeed() 
+{
+	return _Speed;
+}
+
 WaveFormData* AudioModule::GenerateAndGetWaveformData(const std::string& InPath) 
 {
 	HSTREAM decoder = BASS_StreamCreateFile(FALSE, InPath.c_str(), 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_DECODE);
