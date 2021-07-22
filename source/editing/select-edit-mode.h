@@ -30,11 +30,14 @@ public:
 private:
 
 	int GetDelteColumn();
+	void SetNewPreviewPasteLocation();
 
 	NoteReferenceCollection _SelectedNotes;
+	NoteReferenceCollection _DraggingNotes;
 	std::vector<std::pair<Column, Note>> _PastePreviewNotes;
 
 	Time _LowestPasteTimePoint = INT_MAX;
+	Time _HighestPasteTimepoint = INT_MIN;
 	Cursor _AnchoredCursor;
 
 	bool _IsAreaSelecting = false;

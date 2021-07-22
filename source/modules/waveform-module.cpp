@@ -21,6 +21,9 @@ void WaveFormModule::RenderWaveForm(TimefieldRenderGraph& InOutRenderGraph, cons
 {
     //TODO: Represent lowpass and highpass filters through cool shaders
 
+    if(!_WaveFormData)
+        return;
+
     const Time timeHeight = InTimeEnd - InTimeBegin;
 
     if(timeHeight <= 0) 

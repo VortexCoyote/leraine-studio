@@ -215,34 +215,46 @@ void SelectEditMode::Tick()
 bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 {
     _AnchoredCursor = static_Cursor;
-    _SelectedNotes.Clear();  
 
     if(_HoveredNote != nullptr)
     {
+        if(_SelectedNotes.NoteAmount > 1)
+        {
+            for(auto& [column, notes] : _SelectedNotes.Notes)
+                for(auto& note : notes)
+                {
+                    Note noteCopy = *note;
+                    noteCopy.BeatSnap = -1;
+
+                    _MostRightColumn = std::max(_MostRightColumn, column);
+                    _MostLeftColumn = std::min(_MostLeftColumn, column);
+
+                    _LowestPasteTimePoint = std::min(INT32_MAX, noteCopy.TimePoint);
+                    _PastePreviewNotes.push_back({column, noteCopy});
+                    _DraggingNotes.PushNote(column, note);
+                }
+        }
+    
+        _SelectedNotes.Clear();
+        
         _DraggingNote = _HoveredNote;
         return _IsMovingNote = true;
     }
 
+    _SelectedNotes.Clear();  
+    
     _IsAreaSelecting = true;
 
     if(!_IsPreviewingPaste)
         return true;
     
-    for(auto& [column, note] : _PastePreviewNotes)
-    {
-        Column newColumn = column + GetDelteColumn();
-
-        note.TimePoint = static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint;
-        note.TimePointBegin = static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint;
-        note.TimePointEnd = static_Cursor.TimePoint + note.TimePointEnd - _LowestPasteTimePoint;
-
-        column = newColumn;
-    }
+    SetNewPreviewPasteLocation();
 
     PUSH_NOTIFICATION("Placed %d Notes", _PastePreviewNotes.size());
 
     static_Chart->BulkPlaceNotes(_PastePreviewNotes);
     _IsPreviewingPaste = false;
+    _PastePreviewNotes.clear();
 
     return true;
 }
@@ -251,6 +263,28 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
 {
     if(_IsMovingNote)
     {
+        if(_PastePreviewNotes.size() > 0)
+        {   
+            SetNewPreviewPasteLocation();
+            
+            static_Chart->RegisterTimeSliceHistoryRanged(_LowestPasteTimePoint - TIMESLICE_LENGTH, _HighestPasteTimepoint + TIMESLICE_LENGTH);
+            static_Chart->BulkRemoveNotes(_DraggingNotes, true);
+            static_Chart->BulkPlaceNotes(_PastePreviewNotes, true);
+
+            PUSH_NOTIFICATION("Moved %d Notes", _PastePreviewNotes.size());
+
+            _LowestPasteTimePoint = INT32_MAX;
+            _HighestPasteTimepoint = INT32_MIN;
+
+            _MostRightColumn = 0;
+            _MostLeftColumn = static_Chart->KeyAmount - 1;
+
+            _PastePreviewNotes.clear();
+            _DraggingNotes.Clear();
+            
+            return _IsMovingNote = false;
+        }
+
         if (_DraggingNote->Type == Note::EType::HoldEnd && _DraggingNote->TimePointBegin >= static_Cursor.TimePoint)
         {
             // TODO : Make the one-undo implementation
@@ -305,7 +339,7 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
 
 void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRenderGraph, const Time InTimeBegin, const Time InTimeEnd)
 {
-    if(_IsPreviewingPaste)
+    if(_PastePreviewNotes.size() != 0 || _IsPreviewingPaste)
     {
         for(auto& [column, note] : _PastePreviewNotes)
         {
@@ -426,4 +460,20 @@ int SelectEditMode::GetDelteColumn()
         deltaColumn = deltaColumn - (int(_MostLeftColumn) + deltaColumn);
 
     return deltaColumn;
+}
+
+void SelectEditMode::SetNewPreviewPasteLocation() 
+{
+    for(auto& [column, note] : _PastePreviewNotes)
+    {
+        Column newColumn = column + GetDelteColumn();
+
+        note.TimePoint = static_Cursor.TimePoint + note.TimePoint - _LowestPasteTimePoint;
+        note.TimePointBegin = static_Cursor.TimePoint + note.TimePointBegin - _LowestPasteTimePoint;
+        note.TimePointEnd = static_Cursor.TimePoint + note.TimePointEnd - _LowestPasteTimePoint;
+
+        column = newColumn;
+
+        _HighestPasteTimepoint = std::max(_HighestPasteTimepoint, note.TimePoint);
+    }
 }
