@@ -125,7 +125,8 @@ public: //accessors
 	bool PlaceBpmPoint(const Time InTime, const double InBpm, const double InBeatLength);
 
 	void BulkPlaceNotes(const std::vector<std::pair<Column, Note>>& InNotes, const bool InSkipHistoryRegistering = false, const bool InSkipOnModified = false);
-	void MirrorNotes(NoteReferenceCollection& InNotes);
+	void MirrorNotes(NoteReferenceCollection& OutNotes);
+	void MirrorNotes(std::vector<std::pair<Column, Note>>& OutNotes);
 
 	bool RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks = false, const bool InSkipHistoryRegistering = false, const bool InSkipOnModified = false);
 	bool RemoveBpmPoint(BpmPoint& InBpmPoint, const bool InSkipHistoryRegistering = false);

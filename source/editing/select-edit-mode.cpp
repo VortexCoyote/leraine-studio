@@ -159,6 +159,14 @@ bool SelectEditMode::OnPaste()
 
 bool SelectEditMode::OnMirror() 
 {
+    if(_IsPreviewingPaste)
+    {
+        static_Chart->MirrorNotes(_PastePreviewNotes);
+        PUSH_NOTIFICATION("Mirrored %d Paste Notes", _PastePreviewNotes.size());
+        
+        return true;
+    }
+    
     if(_SelectedNotes.HasNotes)
     {
         PUSH_NOTIFICATION("Mirrored %d Notes", _SelectedNotes.NoteAmount);
@@ -280,7 +288,6 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
             _MostLeftColumn = static_Chart->KeyAmount - 1;
 
             _PastePreviewNotes.clear();
-            _DraggingNotes.Clear();
             
             return _IsMovingNote = false;
         }

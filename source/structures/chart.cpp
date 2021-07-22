@@ -100,13 +100,13 @@ void Chart::BulkPlaceNotes(const std::vector<std::pair<Column, Note>> &InNotes, 
 	}
 }
 
-void Chart::MirrorNotes(NoteReferenceCollection& InNotes)
+void Chart::MirrorNotes(NoteReferenceCollection& OutNotes)
 {
 	std::vector<std::pair<Column, Note>> bulkOfNotes;
 
-	RegisterTimeSliceHistoryRanged(InNotes.MinTimePoint, InNotes.MaxTimePoint);
+	RegisterTimeSliceHistoryRanged(OutNotes.MinTimePoint, OutNotes.MaxTimePoint);
 
-	for (auto& [column, notes] : InNotes.Notes)
+	for (auto& [column, notes] : OutNotes.Notes)
 	{
 		Column newColumn = (KeyAmount - 1) - column;
 
@@ -124,12 +124,18 @@ void Chart::MirrorNotes(NoteReferenceCollection& InNotes)
 
 	BulkPlaceNotes(bulkOfNotes, true, true);
 
-	IterateTimeSlicesInTimeRange(InNotes.MinTimePoint, InNotes.MaxTimePoint, [this](TimeSlice& InTimeSlice)
+	IterateTimeSlicesInTimeRange(OutNotes.MinTimePoint, OutNotes.MaxTimePoint, [this](TimeSlice& InTimeSlice)
 	{
 		_OnModified(InTimeSlice);
 	});
 
-	InNotes.Clear();
+	OutNotes.Clear();
+}
+
+void Chart::MirrorNotes(std::vector<std::pair<Column, Note>>& OutNotes) 
+{
+	for(auto& [column, notes] : OutNotes)
+		column = (KeyAmount - 1) - column;
 }
 
 bool Chart::RemoveNote(const Time InTime, const Column InColumn, const bool InIgnoreHoldChecks, const bool InSkipHistoryRegistering, const bool InSkipOnModified)
