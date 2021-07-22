@@ -1,5 +1,5 @@
 # leraine-studio
-A cross-platform open-source VSRG chart editor
+A cross-platform open-source VSRG chart editor written in C++ with SFML.
 
 ![screenshot](https://i.imgur.com/WmF2Gny.png "screenshot")
 
