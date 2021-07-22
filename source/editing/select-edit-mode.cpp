@@ -237,10 +237,11 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
                     _MostRightColumn = std::max(_MostRightColumn, column);
                     _MostLeftColumn = std::min(_MostLeftColumn, column);
 
-                    _LowestPasteTimePoint = std::min(INT32_MAX, noteCopy.TimePoint);
                     _PastePreviewNotes.push_back({column, noteCopy});
                     _DraggingNotes.PushNote(column, note);
                 }
+            
+            _LowestPasteTimePoint = static_Cursor.TimePoint;
         }
     
         _SelectedNotes.Clear();
