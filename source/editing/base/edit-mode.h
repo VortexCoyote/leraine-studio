@@ -33,6 +33,7 @@ public:
 
 	static void SetChart(Chart* const InOutChart);
 	static void SetCursorData(const Cursor& InCursor);
+	static void SetShiftKeyState(const bool InIsShiftDown);
 
 	static EditFlags static_Flags;
 	
@@ -40,6 +41,7 @@ protected:
 
 	static Chart* static_Chart;
 	static Cursor static_Cursor;
+	static bool static_ShiftKeyState;
 };
 
 

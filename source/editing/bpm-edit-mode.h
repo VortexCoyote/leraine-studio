@@ -21,6 +21,8 @@ private:
 
 	void DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, const int InScreenY, const bool InIsPinned = false);
 
+	Time GetCursorTime();
+
 	std::vector<BpmPoint*>* _VisibleBpmPoints = nullptr;
 	BpmPoint* _HoveredBpmPoint = nullptr;
 	BpmPoint* _MovableBpmPoint = nullptr;

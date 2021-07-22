@@ -8,7 +8,7 @@ public: //constants
 
 	int NoteScreenPivotsLookup[16] = { 0, 0, 0, 0, 32, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	int HitLine = 196;
+	int HitLine = 256;
 	int KeyAmount = 0;
 	int SideSpace = 64;
 	

@@ -382,6 +382,7 @@ void Program::ShowShortCuts()
 		ImGui::Text("Timing Edit Mode"); ImGui::SameLine(196.f); ImGui::Text("NUM 3");
 		ImGui::Text("Place BPM Node"); ImGui::SameLine(196.f); ImGui::Text("Left Click");
 		ImGui::Text("Remove BPM Node"); ImGui::SameLine(196.f); ImGui::Text("Right Click");
+		ImGui::Text("Snap BPM Node"); ImGui::SameLine(196.f); ImGui::Text("SHIFT");
 		
 		ImGui::Spacing();
 		
@@ -408,7 +409,8 @@ void Program::ShowShortCuts()
 		
 		ImGui::NewLine();
 		
-		OutOpen = !ImGui::Button("close");
+		if(ImGui::Button("close") || MOD(InputModule).WasKeyPressed(sf::Keyboard::Escape))
+			OutOpen = false;
 	});
 }
 
@@ -434,6 +436,8 @@ void Program::GoToTimePoint()
 
 void Program::InputActions()
 {
+	MOD(EditModule).SetShiftKeyState(MOD(InputModule).IsShiftKeyDown());
+
 	if (MOD(InputModule).IsTogglingPause())
 		MOD(AudioModule).TogglePause();
 

@@ -110,7 +110,7 @@ void BpmEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRender
             if(_HoveredBpmPoint == bpmPointPtr)
             {
                 bpmLine.setPosition(InTimefieldMetrics.LeftSidePosition, InScreenY - 8);
-                bpmLine.setSize(sf::Vector2f(InTimefieldMetrics.FieldWidth, 16));
+                bpmLine.setSize(sf::Vector2f(InTimefieldMetrics.FieldWidth, 8));
                 bpmLine.setFillColor(sf::Color(128, 255, 128, 255));
             }
             else
@@ -140,7 +140,7 @@ void BpmEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRender
     if(static_Cursor.TimefieldSide != Cursor::FieldPosition::Middle || _HoveredBpmPoint != nullptr)
         return;
 
-    InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(0, static_Cursor.UnsnappedTimePoint, 
+    InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(0, GetCursorTime(), 
     [this](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
     {
         sf::RectangleShape rectangle;
@@ -158,7 +158,7 @@ void BpmEditMode::Tick()
 {
     if(_MovableBpmPoint)
     {
-        _MovableBpmPoint->TimePoint = static_Cursor.UnsnappedTimePoint;
+        _MovableBpmPoint->TimePoint = GetCursorTime();
 
         if(!static_Flags.UseAutoTiming)
             return;
@@ -190,7 +190,7 @@ void BpmEditMode::Tick()
 
     for (auto& bpmPointPtr : *_VisibleBpmPoints)
 	{
-        if(abs(static_Cursor.UnsnappedTimePoint - bpmPointPtr->TimePoint) < 20 && static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle)
+        if(abs(GetCursorTime() - bpmPointPtr->TimePoint) < 20 && static_Cursor.TimefieldSide == Cursor::FieldPosition::Middle)
             return void(_HoveredBpmPoint = bpmPointPtr);
     }
 
@@ -199,10 +199,10 @@ void BpmEditMode::Tick()
 
 void BpmEditMode::PlaceAutoTimePoint() 
 {
-    Time cursorTime = static_Cursor.UnsnappedTimePoint;
+    Time cursorTime = GetCursorTime() ;
     BpmPoint* placedBpmPoint = nullptr;
 
-    if(BpmPoint* previousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(static_Cursor.UnsnappedTimePoint))
+    if(BpmPoint* previousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(GetCursorTime()))
     {
         Time deltaTime = abs(previousBpmPoint->TimePoint - cursorTime);
 	
@@ -228,12 +228,12 @@ void BpmEditMode::PlaceAutoTimePoint()
 
 void BpmEditMode::PlaceTimePoint() 
 {
-    BpmPoint* previousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(static_Cursor.UnsnappedTimePoint);
+    BpmPoint* previousBpmPoint = static_Chart->GetPreviousBpmPointFromTimePoint(GetCursorTime() );
 
     if(previousBpmPoint)
-        static_Chart->PlaceBpmPoint(static_Cursor.UnsnappedTimePoint, previousBpmPoint->Bpm, previousBpmPoint->BeatLength);
+        static_Chart->PlaceBpmPoint(GetCursorTime(), previousBpmPoint->Bpm, previousBpmPoint->BeatLength);
     else
-        static_Chart->PlaceBpmPoint(static_Cursor.UnsnappedTimePoint, 120.0, 60000.0 / 120.0);
+        static_Chart->PlaceBpmPoint(GetCursorTime(), 120.0, 60000.0 / 120.0);
 }
 
 
@@ -280,4 +280,9 @@ void BpmEditMode::DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, cons
     
     ImGui::SameLine();
 	ImGui::End();
+}
+
+Time BpmEditMode::GetCursorTime() 
+{
+    return static_ShiftKeyState ? static_Cursor.TimePoint : static_Cursor.UnsnappedTimePoint;
 }

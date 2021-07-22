@@ -3,6 +3,7 @@
 Chart* EditMode::static_Chart = nullptr;
 Cursor EditMode::static_Cursor;
 EditFlags EditMode::static_Flags;
+bool EditMode::static_ShiftKeyState;
 
 void EditMode::SetChart(Chart* const InOutChart)
 {
@@ -12,6 +13,11 @@ void EditMode::SetChart(Chart* const InOutChart)
 void EditMode::SetCursorData(const Cursor& InCursor)
 {
 	static_Cursor = InCursor;
+}
+
+void EditMode::SetShiftKeyState(const bool InIsShiftDown) 
+{
+	static_ShiftKeyState = InIsShiftDown;
 }
 
 bool EditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
