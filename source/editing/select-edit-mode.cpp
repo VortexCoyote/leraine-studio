@@ -228,6 +228,7 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
     {
         if(_SelectedNotes.NoteAmount > 1)
         {
+            Time smallestDis = INT32_MAX;
             for(auto& [column, notes] : _SelectedNotes.Notes)
                 for(auto& note : notes)
                 {
@@ -239,9 +240,13 @@ bool SelectEditMode::OnMouseLeftButtonClicked(const bool InIsShiftDown)
 
                     _PastePreviewNotes.push_back({column, noteCopy});
                     _DraggingNotes.PushNote(column, note);
+
+                    if(abs(static_Cursor.UnsnappedTimePoint - note->TimePoint) < smallestDis)
+                    {
+                        smallestDis = abs(static_Cursor.UnsnappedTimePoint - note->TimePoint);
+                        _LowestPasteTimePoint = note->TimePoint;
+                    }
                 }
-            
-            _LowestPasteTimePoint = static_Cursor.TimePoint;
         }
     
         _SelectedNotes.Clear();
@@ -276,7 +281,10 @@ bool SelectEditMode::OnMouseLeftButtonReleased()
         {   
             SetNewPreviewPasteLocation();
             
-            static_Chart->RegisterTimeSliceHistoryRanged(_LowestPasteTimePoint - TIMESLICE_LENGTH, _HighestPasteTimepoint + TIMESLICE_LENGTH);
+            Time minTimePoint = (_HighestPasteTimepoint < _DraggingNotes.MaxTimePoint) ? _HighestPasteTimepoint - (_DraggingNotes.MaxTimePoint - _DraggingNotes.MinTimePoint) : _DraggingNotes.MinTimePoint;
+            Time maxTimePoint = (_HighestPasteTimepoint < _DraggingNotes.MaxTimePoint) ? _DraggingNotes.MaxTimePoint : _HighestPasteTimepoint;
+            
+            static_Chart->RegisterTimeSliceHistoryRanged(minTimePoint - TIMESLICE_LENGTH, maxTimePoint + TIMESLICE_LENGTH);
             static_Chart->BulkRemoveNotes(_DraggingNotes, true);
             static_Chart->BulkPlaceNotes(_PastePreviewNotes, true);
 
