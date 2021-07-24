@@ -86,7 +86,7 @@ void Program::InnerTick()
 	WindowTimeBegin = MOD(TimefieldRenderModule).GetWindowTimePointBegin(MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	WindowTimeEnd = MOD(TimefieldRenderModule).GetWindowTimePointEnd(MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 
-	if (!ImGui::GetIO().WantCaptureMouse)
+	if (!ImGui::GetIO().WantCaptureMouse && !ImGui::GetIO().WantTextInput)
 		InputActions();
 
 	MOD(TimefieldRenderModule).UpdateMetrics(_WindowMetrics);
@@ -314,7 +314,7 @@ void Program::SetUpNewChart()
 			{
 				ShouldSetUpNewChart = OutOpen = false;
 
-				MOD(DialogModule).OpenFileDialog(".mp3", [this](const std::string &InPath) 
+				MOD(DialogModule).OpenFileDialog(".mp3;.ogg;.wav", [this](const std::string &InPath) 
 				{
 					SetUpChartData.AudioPath = InPath;
 					ShouldSetUpNewChart = true;
