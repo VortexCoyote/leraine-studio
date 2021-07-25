@@ -33,4 +33,8 @@ sfml:x64-linux
 additional linux packages:
 ```
 libglade2-dev
+libx11-dev
+xorg-dev
+freeglut3-dev
+libudev-dev
 ```
