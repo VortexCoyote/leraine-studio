@@ -14,7 +14,7 @@ public: //inner program sequences
 public: //abstractions
 
 	void MenuBar();
-	void SetUpNewChart();
+	void SetUpMetadata();
 	void ShowShortCuts();
 	void GoToTimePoint();
 	void ScrollShortcutRoutines();

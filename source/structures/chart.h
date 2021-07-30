@@ -105,16 +105,16 @@ public: //meta
 	std::string Source;
 	std::string Tags;
 
-	std::string BeatmapID;
-	std::string BeatmapSetID;
+	std::string BeatmapID = "0";
+	std::string BeatmapSetID = "0";
 
 	std::string AudioPath;
 	std::string BackgroundPath;
 
-	int KeyAmount;
+	int KeyAmount = 0;
 
-	float HP;
-	float OD;
+	float HP = 0;
+	float OD = 0;
 
 	std::vector<std::string> InheritedTimingPoints;
 

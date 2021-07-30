@@ -4,7 +4,7 @@
 
 #include <fstream>
 
-#include "../structures/newchart-data.h"
+#include "../structures/chart-metadata.h"
 
 
 /*
@@ -20,9 +20,10 @@ public:
 	void SetCurrentChartPath(const std::string& InPath);
 	void SetBackground(Chart* OutChart, const std::string& InPath);
 
+	void GetChartMetadata(ChartMetadata& OutMetadata, Chart* InChart);
 	//this is for now osu impl only, in the future I'll make some template magic for which format is present
-	std::string CreateNewChart(const NewChartData& InNewChartData); 
-
+	std::string SetChartMetadata(Chart* Outchart, const ChartMetadata& InMetadata);
+	std::string CreateNewChart(const ChartMetadata& InNewChartData);
 private:
 
 	std::string _CurrentChartPath;

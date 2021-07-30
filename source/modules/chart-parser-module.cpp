@@ -27,51 +27,77 @@ void ChartParserModule::SetBackground(Chart* OutChart, const std::string& InPath
 	OutChart->BackgroundPath = targetBackgroundPath.string();
 }
 
-std::string ChartParserModule::CreateNewChart(const NewChartData& InNewChartData) 
+void ChartParserModule::GetChartMetadata(ChartMetadata& OutMetadata, Chart* InChart)
+{
+	std::filesystem::path chartFolderPath = _CurrentChartPath;
+	chartFolderPath.remove_filename();
+
+	OutMetadata.Artist = InChart->Artist;
+	OutMetadata.SongTitle = InChart->SongTitle;
+	OutMetadata.Charter = InChart->Charter;
+	OutMetadata.DifficultyName = InChart->DifficultyName;
+
+	OutMetadata.ChartFolderPath = chartFolderPath.string();
+	OutMetadata.AudioPath = InChart->AudioPath;
+	OutMetadata.BackgroundPath = InChart->BackgroundPath;
+
+	OutMetadata.KeyAmount = InChart->KeyAmount;
+	OutMetadata.OD = InChart->OD;
+	OutMetadata.HP = InChart->HP;
+}
+
+std::string ChartParserModule::CreateNewChart(const ChartMetadata& InNewChartData) 
 {
 	Chart dummyChart;
 
-	std::filesystem::path audioPath = InNewChartData.AudioPath;
-	std::filesystem::path backgroundPath = InNewChartData.BackgroundPath;
-	std::filesystem::path chartFolderPath = InNewChartData.ChartPath;
+	return SetChartMetadata(&dummyChart, InNewChartData);
+}
+
+std::string ChartParserModule::SetChartMetadata(Chart* OutChart, const ChartMetadata& InChartMetadata)
+{
+	std::filesystem::path audioPath = InChartMetadata.AudioPath;
+	std::filesystem::path backgroundPath = InChartMetadata.BackgroundPath;
+	std::filesystem::path chartFolderPath = InChartMetadata.ChartFolderPath;
 
 	audioPath.make_preferred();
 	backgroundPath.make_preferred();
 	chartFolderPath.make_preferred();
 
 	std::string chartFileName = "";
-	chartFileName += InNewChartData.Artist;
+	chartFileName += InChartMetadata.Artist;
 	chartFileName += " - ";
-	chartFileName += InNewChartData.SongTitle;
+	chartFileName += InChartMetadata.SongTitle;
 	chartFileName += " (";
-	chartFileName += InNewChartData.Charter;
+	chartFileName += InChartMetadata.Charter;
 	chartFileName += ") ";
 	chartFileName += "[";
-	chartFileName += InNewChartData.DifficultyName;
+	chartFileName += InChartMetadata.DifficultyName;
 	chartFileName += "].osu";
 
 	std::filesystem::path chartFilePath = chartFolderPath / chartFileName;
 	std::filesystem::path targetAudioPath = chartFolderPath / audioPath.filename();
 	std::filesystem::path targetBackgroundPath = chartFolderPath / backgroundPath.filename();
 
-	std::filesystem::copy_file(audioPath, targetAudioPath);
+	if (audioPath != targetAudioPath)
+		std::filesystem::copy_file(audioPath, targetAudioPath);
 
-	if(InNewChartData.BackgroundPath.size() != 0)
+	if (InChartMetadata.BackgroundPath.size() != 0 && backgroundPath != targetBackgroundPath){
 		std::filesystem::copy_file(backgroundPath, targetBackgroundPath);
+	}
 
 	SetCurrentChartPath(chartFilePath.string());
 
-	dummyChart.Artist = InNewChartData.Artist;
-	dummyChart.SongTitle = InNewChartData.SongTitle;
-	dummyChart.Charter = InNewChartData.Charter;
-	dummyChart.DifficultyName = InNewChartData.DifficultyName;
-	dummyChart.AudioPath = targetAudioPath.string();
-	dummyChart.BackgroundPath = targetBackgroundPath.string();
-	dummyChart.HP = InNewChartData.HP;
-	dummyChart.OD = InNewChartData.OD;
-	dummyChart.KeyAmount = InNewChartData.KeyAmount;
+	OutChart->Artist = InChartMetadata.Artist;
+	OutChart->SongTitle = InChartMetadata.SongTitle;
+	OutChart->Charter = InChartMetadata.Charter;
+	OutChart->DifficultyName = InChartMetadata.DifficultyName;
+	OutChart->AudioPath = targetAudioPath.string();
+	OutChart->BackgroundPath = targetBackgroundPath.string();
+	OutChart->HP = InChartMetadata.HP;
+	OutChart->OD = InChartMetadata.OD;
+	if (!OutChart->KeyAmount) OutChart->KeyAmount = InChartMetadata.KeyAmount;
 
-	ExportChartSet(&dummyChart);
+	ExportChartSet(OutChart);
 
 	return chartFilePath.string();
 }
