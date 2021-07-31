@@ -29,6 +29,9 @@ namespace
 	bool ShowWaveform = true;
 
 	std::string TimeToGo = "0";
+
+	int ZoomIndex = 3;
+	std::vector<float> LegalZoomLevels = { 0.25f, 0.4f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f };
 }
 
 //module includes
@@ -111,6 +114,7 @@ void Program::InnerRender(sf::RenderTarget *const InOutRenderTarget)
 
 	if(ShowWaveform)
 		MOD(WaveFormModule).RenderWaveForm(WaveformRenderGraph, WindowTimeBegin, WindowTimeEnd, MOD(TimefieldRenderModule).GetTimefieldMetrics().LeftSidePosition + MOD(TimefieldRenderModule).GetTimefieldMetrics().FieldWidthHalf, ZoomLevel, InOutRenderTarget->getView().getSize().y);
+		//MOD(WaveFormModule).RenderWaveFormPolygon(InOutRenderTarget, WindowTimeBegin, WindowTimeEnd, MOD(TimefieldRenderModule).GetTimefieldMetrics().LeftSidePosition + MOD(TimefieldRenderModule).GetTimefieldMetrics().FieldWidthHalf, ZoomLevel, InOutRenderTarget->getView().getSize().y);
 
 	MOD(BeatModule).IterateThroughBeatlines([this, &InOutRenderTarget](const BeatLine &InBeatLine)
 	{
@@ -261,6 +265,7 @@ void Program::MenuBar()
 
 			ImGui::Checkbox("Show Waveform", &ShowWaveform);
 			ImGui::Checkbox("Use Auto Timing", &EditMode::static_Flags.UseAutoTiming);
+			ImGui::Checkbox("Show Column Heatmap", &EditMode::static_Flags.ShowColumnHeatmap);
 
 			ImGui::EndMenu();
 		}
@@ -471,10 +476,10 @@ void Program::InputActions()
 		}
 
 		if (MOD(InputModule).IsScrollingUp())
-			return ApplyDeltaToZoom(0.1f);
+			return ApplyDeltaToZoom(1.0f);
 
 		if (MOD(InputModule).IsScrollingDown())
-			return ApplyDeltaToZoom(-0.1f);
+			return ApplyDeltaToZoom(-1.0f);
 
 		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::C))
 			return void(MOD(EditModule).OnCopy());
@@ -611,13 +616,18 @@ void Program::OpenChart(const std::string InPath)
 
 void Program::ApplyDeltaToZoom(const float InDelta)
 {
-	ZoomLevel += InDelta;
+	if(InDelta > 0)
+		ZoomIndex++;
+	else
+		ZoomIndex--;
 
-	if (ZoomLevel < 0.25f)
-		ZoomLevel = 0.25f;
+	if(ZoomIndex > int(LegalZoomLevels.size() - 1))
+		ZoomIndex =	LegalZoomLevels.size() - 1;
 
-	if (ZoomLevel > 2.0f)
-		ZoomLevel = 2.0f;
+	if(ZoomIndex < 0)
+		ZoomIndex = 0;
+
+	ZoomLevel = LegalZoomLevels[ZoomIndex];
 }
 
 void Program::UpdateCursor()

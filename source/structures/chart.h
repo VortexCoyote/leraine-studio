@@ -78,6 +78,7 @@ struct NoteReferenceCollection
 	void TrySetMinMaxTime(Time InTime);
 
 	std::unordered_map<Column, std::unordered_set<Note *>> Notes;
+	std::unordered_map<Column, int> ColumnNoteCount;
 
 	Time MinTimePoint;
 	Time MaxTimePoint;
@@ -85,6 +86,7 @@ struct NoteReferenceCollection
 	bool HasNotes = false;
 
 	int NoteAmount = 0;
+	int HighestColumnAmount = 0;
 };
 
 struct Chart
@@ -105,8 +107,8 @@ public: //meta
 	std::string Source;
 	std::string Tags;
 
-	std::string BeatmapID;
-	std::string BeatmapSetID;
+	std::string BeatmapID = "-1";
+	std::string BeatmapSetID = "-1";
 
 	std::string AudioPath;
 	std::string BackgroundPath;

@@ -11,7 +11,13 @@ void NoteReferenceCollection::PushNote(Column InColumn, Note* InNote)
 	HasNotes = true;
 	NoteAmount++;
 
+	if(ColumnNoteCount.find(InColumn) == ColumnNoteCount.end())
+		ColumnNoteCount[InColumn] = 0;
+
+	ColumnNoteCount[InColumn] += 1;
 	Notes[InColumn].insert(InNote);
+
+	HighestColumnAmount = std::max(HighestColumnAmount, ColumnNoteCount[InColumn]);
 
 	switch (InNote->Type)
 	{
@@ -29,8 +35,10 @@ void NoteReferenceCollection::Clear()
 {
 	HasNotes = false;
 	NoteAmount = 0;
+	HighestColumnAmount = 0;
 
 	Notes.clear();
+	ColumnNoteCount.clear();
 
 	MinTimePoint = std::numeric_limits<int>::max();
 	MaxTimePoint = std::numeric_limits<int>::min();
