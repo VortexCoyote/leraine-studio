@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <climits>
 #include <sstream>
+#include <cmath>
 
 #include "imgui.h"
 
@@ -398,6 +399,37 @@ void SelectEditMode::SubmitToRenderGraph(TimefieldRenderGraph& InOutTimefieldRen
                 InRenderTarget->draw(rectangle);
             }); 
         }
+    }
+
+    if(_SelectedNotes.HasNotes && static_Flags.ShowColumnHeatmap)
+    {
+         for(const auto& [column, count] : _SelectedNotes.ColumnNoteCount)
+         {
+             sf::Uint8 alpha = sf::Uint8(std::pow(float(count) / float(_SelectedNotes.HighestColumnAmount), 1.f) * 255.f);
+            
+            //TODO: rendercommand for multiple timepoints and columns since this is extremely hacky
+            int* minY = new int();
+
+            InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(column, _SelectedNotes.MinTimePoint ,
+            [minY](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
+            { *minY = InScreenY; });
+
+            InOutTimefieldRenderGraph.SubmitTimefieldRenderCommand(column, _SelectedNotes.MaxTimePoint,
+            [alpha, minY](sf::RenderTarget* const InRenderTarget, const TimefieldMetrics& InTimefieldMetrics, const int InScreenX, const int InScreenY)
+            {
+                sf::RectangleShape rectangle;
+
+                rectangle.setPosition(InScreenX, InScreenY - InTimefieldMetrics.NoteScreenPivot);
+                rectangle.setSize(sf::Vector2f(InTimefieldMetrics.ColumnSize, *minY - InScreenY + InTimefieldMetrics.ColumnSize));
+
+                rectangle.setFillColor(sf::Color(alpha, 255 - alpha, 0, 128));
+                rectangle.setOutlineThickness(0.0f);
+
+                InRenderTarget->draw(rectangle);
+
+                delete minY;
+            }); 
+         }
     }
 
     if(_HoveredNote || _IsMovingNote)
