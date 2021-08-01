@@ -16,6 +16,7 @@ namespace
 	TimefieldRenderGraph NoteRenderGraph;
 	TimefieldRenderGraph PreviewRenderGraph;
 	TimefieldRenderGraph WaveformRenderGraph;
+	TimefieldRenderGraph DebugRenderGraph;
 
 	Chart* SelectedChart = nullptr;
 
@@ -26,7 +27,6 @@ namespace
 
 	bool ShouldSetUpMetadata = false;
 	bool ShouldSetUpNewChart = false;
-	bool DebugShowTimeSliceBoundaries = false;
 	bool ShowWaveform = true;
 
 	std::string TimeToGo = "0";
@@ -50,6 +50,7 @@ namespace
 #include "../modules/popup-module.h"
 #include "../modules/notification-module.h"
 #include "../modules/shortcut-menu-module.h"
+#include "../modules/debug-module.h"
 
 void Program::RegisterModules()
 {
@@ -67,6 +68,7 @@ void Program::RegisterModules()
 	ModuleManager::Register<WaveFormModule>();
 	ModuleManager::Register<BeatModule>();
 	ModuleManager::Register<EditModule>();
+	ModuleManager::Register<DebugModule>();
 }
 
 void Program::InnerStartUp()
@@ -123,37 +125,15 @@ void Program::InnerRender(sf::RenderTarget *const InOutRenderTarget)
 		MOD(TimefieldRenderModule).RenderBeatLine(InOutRenderTarget, InBeatLine.TimePoint, InBeatLine.BeatSnap, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	});
 
+	MOD(DebugModule).RenderTimeSliceBoundaries(DebugRenderGraph, SelectedChart, WindowTimeBegin, WindowTimeEnd);
+
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, WaveformRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
+	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, DebugRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel, false);
 
 	MOD(TimefieldRenderModule).RenderReceptors(InOutRenderTarget, CurrentSnap);
 
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, NoteRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel);
 	MOD(TimefieldRenderModule).RenderTimefieldGraph(InOutRenderTarget, PreviewRenderGraph, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel, false);
-
-	if(DebugShowTimeSliceBoundaries)
-	{
-		SelectedChart->IterateTimeSlicesInTimeRange(WindowTimeBegin, WindowTimeEnd, [this, InOutRenderTarget](TimeSlice InTimeSlice)
-		{
-			auto& timeFieldMetrics = MOD(TimefieldRenderModule).GetTimefieldMetrics();
-
-			sf::RectangleShape line(sf::Vector2f(timeFieldMetrics.FieldWidth, 6));
-			line.setPosition(timeFieldMetrics.LeftSidePosition, MOD(TimefieldRenderModule).GetScreenPointFromTime(InTimeSlice.TimePoint, MOD(AudioModule).GetTimeMilliSeconds(), ZoomLevel));
-	
-			line.setFillColor(sf::Color(255, 0, 255, 255));
-
-			InOutRenderTarget->draw(line);
-
-			ImGuiWindowFlags flags = ImGuiWindowFlags_None;
-			flags |= ImGuiWindowFlags_NoTitleBar;
-			flags |= ImGuiWindowFlags_NoResize;
-			flags |= ImGuiWindowFlags_AlwaysAutoResize;
-
-			ImGui::SetNextWindowPos({line.getPosition().x + timeFieldMetrics.FieldWidth + 6.f, line.getPosition().y});
-			ImGui::Begin(std::to_string(InTimeSlice.TimePoint).c_str(), &DebugShowTimeSliceBoundaries, flags);			
-			ImGui::Text(std::to_string(InTimeSlice.TimePoint).c_str());
-			ImGui::End();
-		});
-	}
 
 	MOD(MiniMapModule).Render(InOutRenderTarget);
 
@@ -163,6 +143,7 @@ void Program::InnerRender(sf::RenderTarget *const InOutRenderTarget)
 	NoteRenderGraph.ClearRenderCommands();
 	PreviewRenderGraph.ClearRenderCommands();
 	WaveformRenderGraph.ClearRenderCommands();
+	DebugRenderGraph.ClearRenderCommands();
 }
 
 void Program::InnerShutDown()
@@ -273,12 +254,12 @@ void Program::MenuBar()
 			MOD(ShortcutMenuModule).EndMenu();
 		}
 		
-		/*if (ImGui::BeginMenu("Debug"))
+		if (ImGui::BeginMenu("Debug"))
 		{
-			ImGui::Checkbox("Show TimeSlice Boundaries", &DebugShowTimeSliceBoundaries);		
+			ImGui::Checkbox("Show TimeSlice Boundaries", &MOD(DebugModule).ShowTimeSliceBoundaries);		
 
 			ImGui::EndMenu();
-		}*/
+		}
 
 
 		ImGui::EndMainMenuBar();
