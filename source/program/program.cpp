@@ -22,7 +22,7 @@ namespace
 	float ZoomLevel = 1.0f;
 	int CurrentSnap = 2;
 	
-	ChartMetadata SetUpChartMetadata = ChartMetadata();
+	ChartMetadata ChartMetadataSetup;
 
 	bool ShouldSetUpMetadata = false;
 	bool ShouldSetUpNewChart = false;
@@ -175,6 +175,7 @@ void Program::MenuBar()
 		{
 			if (ImGui::MenuItem("New Chart", "CTRL+N"))
 			{
+				ChartMetadataSetup = ChartMetadata();
 				ShouldSetUpNewChart = true;
 				ShouldSetUpMetadata = true;
 			}
@@ -194,17 +195,6 @@ void Program::MenuBar()
 
 			if (ImGui::MenuItem("Save", "CTRL+S") && SelectedChart)
 				MOD(ChartParserModule).ExportChartSet(SelectedChart);
-
-			ImGui::Separator();
-
-			if (ImGui::MenuItem("Set Background", "CTRL+B") && SelectedChart)
-			{
-				MOD(DialogModule).OpenFileDialog(".png;.jpg", [this](const std::string &InPath)
-				{
-					MOD(ChartParserModule).SetBackground(SelectedChart, InPath);
-					MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
-				});
-			}
 
 			/*if (ImGui::MenuItem("Export", "CTRL+E"))
 			{
@@ -291,38 +281,36 @@ void Program::MenuBar()
 
 void Program::SetUpMetadata() 
 {
-	std::string titleName = "New Chart";
-	if (!ShouldSetUpNewChart){
-		MOD(ChartParserModule).GetChartMetadata(SetUpChartMetadata, SelectedChart);
-		titleName = "Edit Metadata";
-	}
+	std::string titleName;
+	if (ShouldSetUpNewChart) titleName = "New Chart";
+	else titleName = "Edit Metadata";
 
 	MOD(PopupModule).OpenPopup(titleName, [this](bool& OutOpen)
 	{
 			ImGui::Text("Meta Data");
-			ImGui::InputText("Artist", &SetUpChartMetadata.Artist);
-			ImGui::InputText("Song Title", &SetUpChartMetadata.SongTitle);
-			ImGui::InputText("Charter", &SetUpChartMetadata.Charter);
-			ImGui::InputText("Difficulty Name", &SetUpChartMetadata.DifficultyName);
+			ImGui::InputText("Artist", &ChartMetadataSetup.Artist);
+			ImGui::InputText("Song Title", &ChartMetadataSetup.SongTitle);
+			ImGui::InputText("Charter", &ChartMetadataSetup.Charter);
+			ImGui::InputText("Difficulty Name", &ChartMetadataSetup.DifficultyName);
 
 			ImGui::NewLine();
 
 			ImGui::Text("Difficulty");
-			if (ShouldSetUpNewChart) ImGui::SliderInt("Key Amount", &SetUpChartMetadata.KeyAmount, 4, 10);
+			if (ShouldSetUpNewChart) ImGui::SliderInt("Key Amount", &ChartMetadataSetup.KeyAmount, 4, 10);
 			else {
 				std::string key = "Key = ";
 				key.append(std::to_string(SelectedChart->KeyAmount));
 				ImGui::Text(key.c_str());
 			}
 
-			ImGui::DragFloat("OD", &SetUpChartMetadata.OD, 0.1f, 1.0f, 10.0f);
-			ImGui::DragFloat("HP", &SetUpChartMetadata.HP, 0.1f, 1.0f, 10.0f);
+			ImGui::DragFloat("OD", &ChartMetadataSetup.OD, 0.1f, 1.0f, 10.0f);
+			ImGui::DragFloat("HP", &ChartMetadataSetup.HP, 0.1f, 1.0f, 10.0f);
 
 			ImGui::NewLine();
 
-			std::string audioButtonName =  SetUpChartMetadata.AudioPath == "" ? "Pick an audio file" : SetUpChartMetadata.AudioPath;
-			std::string chartButtonName =  SetUpChartMetadata.ChartFolderPath == "" ? "Pick a chart folder path" : SetUpChartMetadata.ChartFolderPath;
-			std::string backgroundButtonName =  SetUpChartMetadata.BackgroundPath == "" ? "Pick a background (optional)" : SetUpChartMetadata.BackgroundPath;
+			std::string audioButtonName =  ChartMetadataSetup.AudioPath == "" ? "Pick an audio file" : ChartMetadataSetup.AudioPath;
+			std::string chartButtonName =  ChartMetadataSetup.ChartFolderPath == "" ? "Pick a chart folder path" : ChartMetadataSetup.ChartFolderPath;
+			std::string backgroundButtonName =  ChartMetadataSetup.BackgroundPath == "" ? "Pick a background (optional)" : ChartMetadataSetup.BackgroundPath;
 			
 			ImGui::Text("Relevant Paths");
 			
@@ -332,7 +320,7 @@ void Program::SetUpMetadata()
 
 				MOD(DialogModule).OpenFileDialog(".mp3;.ogg;.wav", [this](const std::string &InPath) 
 				{
-					SetUpChartMetadata.AudioPath = InPath;
+					ChartMetadataSetup.AudioPath = InPath;
 					ShouldSetUpMetadata = true;
 				}, true);
 			}
@@ -343,7 +331,7 @@ void Program::SetUpMetadata()
 
 				MOD(DialogModule).OpenFolderDialog([this](const std::string &InPath) 
 				{
-					SetUpChartMetadata.ChartFolderPath = InPath;
+					ChartMetadataSetup.ChartFolderPath = InPath;
 					ShouldSetUpMetadata = true;
 				}, true);
 			}
@@ -354,7 +342,7 @@ void Program::SetUpMetadata()
 
 				MOD(DialogModule).OpenFileDialog(".png;.jpg", [this](const std::string &InPath) 
 				{
-					SetUpChartMetadata.BackgroundPath = InPath;
+					ChartMetadataSetup.BackgroundPath = InPath;
 					ShouldSetUpMetadata = true;
 				}, true);
 			}
@@ -365,10 +353,9 @@ void Program::SetUpMetadata()
 			{
 				if(ImGui::Button("Create"))
 				{
-					OpenChart(MOD(ChartParserModule).CreateNewChart(SetUpChartMetadata));
+					OpenChart(MOD(ChartParserModule).CreateNewChart(ChartMetadataSetup));
 
 					ShouldSetUpMetadata = ShouldSetUpNewChart = OutOpen = false;
-					SetUpChartMetadata = ChartMetadata();
 				}
 			}
 
@@ -376,10 +363,9 @@ void Program::SetUpMetadata()
 			{
 				if(ImGui::Button("Save"))
 				{
-					OpenChart(MOD(ChartParserModule).SetChartMetadata(SelectedChart, SetUpChartMetadata));
+					OpenChart(MOD(ChartParserModule).SetChartMetadata(SelectedChart, ChartMetadataSetup));
 
 					ShouldSetUpMetadata = ShouldSetUpNewChart = OutOpen = false;
-					SetUpChartMetadata = ChartMetadata();
 				}
 			}
 
@@ -387,8 +373,9 @@ void Program::SetUpMetadata()
 			
 			if(ImGui::Button("Close"))
 			{
+				if (ShouldSetUpNewChart) ChartMetadataSetup = ChartMetadata();
+				else ChartMetadataSetup = MOD(ChartParserModule).GetChartMetadata(SelectedChart);
 				ShouldSetUpMetadata = ShouldSetUpNewChart = OutOpen = false;
-				SetUpChartMetadata = ChartMetadata();
 			}
 	});
 }
@@ -520,15 +507,6 @@ void Program::InputActions()
 
 		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::T))
 			GoToTimePoint();
-
-		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::B))
-		{
-			MOD(DialogModule).OpenFileDialog(".png;.jpg", [this](const std::string &InPath)
-			{
-				MOD(ChartParserModule).SetBackground(SelectedChart, InPath);
-				MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
-			});
-		}
 	}
 
 	if (MOD(InputModule).IsAltKeyDown())
@@ -632,6 +610,7 @@ void Program::OpenChart(const std::string InPath)
 	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 	MOD(WaveFormModule).SetWaveFormData(MOD(AudioModule).GenerateAndGetWaveformData(SelectedChart->AudioPath), MOD(AudioModule).GetSongLengthMilliSeconds());
 	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
+	ChartMetadataSetup = MOD(ChartParserModule).GetChartMetadata(SelectedChart);
 
 	SelectedChart->RegisterOnModifiedCallback([this](TimeSlice &InTimeSlice) 
 	{

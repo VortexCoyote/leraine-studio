@@ -18,9 +18,8 @@ public:
 	void ExportChartSet(Chart* InChart);
 
 	void SetCurrentChartPath(const std::string& InPath);
-	void SetBackground(Chart* OutChart, const std::string& InPath);
 
-	void GetChartMetadata(ChartMetadata& OutMetadata, Chart* InChart);
+	ChartMetadata GetChartMetadata(Chart* InChart);
 	//this is for now osu impl only, in the future I'll make some template magic for which format is present
 	std::string SetChartMetadata(Chart* Outchart, const ChartMetadata& InMetadata);
 	std::string CreateNewChart(const ChartMetadata& InNewChartData);
