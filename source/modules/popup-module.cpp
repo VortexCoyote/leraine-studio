@@ -48,6 +48,15 @@ bool PopupModule::RenderBack(sf::RenderTarget* const InOutRenderTarget)
     return false;
 }
 
+bool PopupModule::ProcessEvent(const sf::Event& InEvent) 
+{
+    if(InEvent.type == sf::Event::KeyPressed)
+    {
+        if(InEvent.key.code == sf::Keyboard::Key::Escape)
+            _Open = false;
+    }
+}
+
 void PopupModule::OpenPopup(const std::string& InPopupName, std::function<void(bool&)> InWork) 
 {
     _PopupName = InPopupName;

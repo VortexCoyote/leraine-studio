@@ -13,6 +13,8 @@ public:
 	bool Tick(const float& InDeltaTime) override;
     bool RenderBack(sf::RenderTarget* const InOutRenderTarget) override;
 
+    virtual bool ProcessEvent(const sf::Event& InEvent) override;
+
 public:
 
     void OpenPopup(const std::string& InPopupName, std::function<void(bool&)> InWork);

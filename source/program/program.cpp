@@ -49,6 +49,7 @@ namespace
 #include "../modules/waveform-module.h"
 #include "../modules/popup-module.h"
 #include "../modules/notification-module.h"
+#include "../modules/shortcut-menu-module.h"
 
 void Program::RegisterModules()
 {
@@ -58,6 +59,7 @@ void Program::RegisterModules()
 	ModuleManager::Register<DialogModule>();
 	ModuleManager::Register<PopupModule>();
 	ModuleManager::Register<InputModule>();
+	ModuleManager::Register<ShortcutMenuModule>();
 	ModuleManager::Register<MiniMapModule>();
 	ModuleManager::Register<NotificationModule>();
 	ModuleManager::Register<ChartParserModule>();
@@ -76,7 +78,6 @@ void Program::InnerStartUp()
 void Program::InnerTick()
 {
 	 MenuBar();
-	 GlobalInputActions();
 
 	if(ShouldSetUpMetadata)
 		SetUpMetadata();
@@ -175,16 +176,16 @@ void Program::MenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
+		if (MOD(ShortcutMenuModule).BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New Chart", "CTRL+N"))
+			if (MOD(ShortcutMenuModule).MenuItem("New Chart", sf::Keyboard::Key::LControl, sf::Keyboard::Key::N))
 			{
 				ChartMetadataSetup = ChartMetadata();
 				ShouldSetUpNewChart = true;
 				ShouldSetUpMetadata = true;
 			}
 
-			if (ImGui::MenuItem("Open", "CTRL+O"))
+			if (MOD(ShortcutMenuModule).MenuItem("Open", sf::Keyboard::Key::LControl, sf::Keyboard::Key::O))
 			{
 				MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string &InPath) 
 				{
@@ -192,47 +193,45 @@ void Program::MenuBar()
 				});
 			}
 
-			ImGui::Separator();
+			MOD(ShortcutMenuModule).Separator();
 			
-			if (ImGui::MenuItem("Edit Metadata") && SelectedChart)
+			if (MOD(ShortcutMenuModule).MenuItem("Edit Metadata", sf::Keyboard::Key::LControl, sf::Keyboard::Key::E) && SelectedChart)
 				ShouldSetUpMetadata = true;
 
-			if (ImGui::MenuItem("Save", "CTRL+S") && SelectedChart)
+			if (MOD(ShortcutMenuModule).MenuItem("Save", sf::Keyboard::Key::LControl, sf::Keyboard::Key::S) && SelectedChart)
 				MOD(ChartParserModule).ExportChartSet(SelectedChart);
 
-			/*if (ImGui::MenuItem("Export", "CTRL+E"))
-			{
-				
-			}*/
-
-			ImGui::EndMenu();
+			MOD(ShortcutMenuModule).EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Edit"))
+		if (MOD(ShortcutMenuModule).BeginMenu("Edit"))
 		{
-			if ( ImGui::MenuItem("Undo", "CTRL+Z") && SelectedChart && SelectedChart->Undo())
+			if (MOD(ShortcutMenuModule).MenuItem("Undo", sf::Keyboard::Key::LControl, sf::Keyboard::Key::Z) && SelectedChart && SelectedChart->Undo())
 				PUSH_NOTIFICATION("Undo");
-				
-			ImGui::Separator();
+			
+			if (MOD(ShortcutMenuModule).MenuItem("Select All", sf::Keyboard::Key::LControl, sf::Keyboard::Key::A))
+				MOD(EditModule).OnSelectAll();
 
-			if (ImGui::MenuItem("Copy", "CTRL+C") && SelectedChart)
+			MOD(ShortcutMenuModule).Separator();
+
+			if (MOD(ShortcutMenuModule).MenuItem("Copy", sf::Keyboard::Key::LControl, sf::Keyboard::Key::C) && SelectedChart)
 				MOD(EditModule).OnCopy();
 
-			if (ImGui::MenuItem("Paste", "CTRL+V") && SelectedChart)
-				MOD(EditModule).OnPaste();
+			if (MOD(ShortcutMenuModule).MenuItem("Paste", sf::Keyboard::Key::LControl, sf::Keyboard::Key::V) && SelectedChart)
+			 	MOD(EditModule).OnPaste();
 
-			if (ImGui::MenuItem("Delete", "DELETE") && SelectedChart)
+			if (MOD(ShortcutMenuModule).MenuItem("Delete", sf::Keyboard::Unknown, sf::Keyboard::Key::Delete) && SelectedChart)
 				MOD(EditModule).OnDelete();
 
-			ImGui::Separator();
+			MOD(ShortcutMenuModule).Separator();
 
-			if (ImGui::MenuItem("Mirror", "CTRL+H") && SelectedChart)
+			if (MOD(ShortcutMenuModule).MenuItem("Mirror", sf::Keyboard::Key::LControl, sf::Keyboard::Key::H) && SelectedChart)
 				MOD(EditModule).OnMirror();
 
-			if (ImGui::MenuItem("Go To Timepoint", "CTRL+T") && SelectedChart)
+			if (MOD(ShortcutMenuModule).MenuItem("Go To Timepoint", sf::Keyboard::Key::LControl, sf::Keyboard::Key::T) && SelectedChart)
 				GoToTimePoint();
 				
-			ImGui::EndMenu();
+			MOD(ShortcutMenuModule).EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Options"))
@@ -247,6 +246,8 @@ void Program::MenuBar()
 
 				PUSH_NOTIFICATION("Speed Reset");
 			}
+
+			ImGui::Separator();
 
 			if(ImGui::Checkbox("Show Column Lines", &MOD(TimefieldRenderModule).GetSkin().ShowColumnLines))
 			{
@@ -264,20 +265,20 @@ void Program::MenuBar()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Help"))
+		if (MOD(ShortcutMenuModule).BeginMenu("Help"))
 		{
-			if (ImGui::MenuItem("Shortcuts", "F1"))
+			if (MOD(ShortcutMenuModule).MenuItem("Shortcuts", sf::Keyboard::Unknown, sf::Keyboard::F1))
 				ShowShortCuts();
 
-			ImGui::EndMenu();
+			MOD(ShortcutMenuModule).EndMenu();
 		}
-
-		if (ImGui::BeginMenu("Debug"))
+		
+		/*if (ImGui::BeginMenu("Debug"))
 		{
 			ImGui::Checkbox("Show TimeSlice Boundaries", &DebugShowTimeSliceBoundaries);		
 
 			ImGui::EndMenu();
-		}
+		}*/
 
 
 		ImGui::EndMainMenuBar();
@@ -287,8 +288,11 @@ void Program::MenuBar()
 void Program::SetUpMetadata() 
 {
 	std::string titleName;
-	if (ShouldSetUpNewChart) titleName = "New Chart";
-	else titleName = "Edit Metadata";
+
+	if (ShouldSetUpNewChart) 
+		titleName = "New Chart";
+	else
+		titleName = "Edit Metadata";
 
 	MOD(PopupModule).OpenPopup(titleName, [this](bool& OutOpen)
 	{
@@ -389,49 +393,9 @@ void Program::ShowShortCuts()
 {
 	MOD(PopupModule).OpenPopup("New Chart", [this](bool& OutOpen)
 	{
-		ImGui::Text("Select Edit Mode"); ImGui::SameLine(196.f); ImGui::Text("NUM 1");
-		ImGui::Text("Select Area"); ImGui::SameLine(196.f); ImGui::Text("Left Click+Drag");
-		
-		ImGui::Spacing();
-		
-		ImGui::Text("Note Edit Mode"); ImGui::SameLine(196.f); ImGui::Text("NUM 2");
-		ImGui::Text("Place Note"); ImGui::SameLine(196.f); ImGui::Text("Left Click");
-		ImGui::Text("Remove Note"); ImGui::SameLine(196.f); ImGui::Text("Right Click");
-		ImGui::Text("Place Hold"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+Left Click+Drag");
-		
-		ImGui::Spacing();
-		
-		ImGui::Text("Timing Edit Mode"); ImGui::SameLine(196.f); ImGui::Text("NUM 3");
-		ImGui::Text("Place BPM Node"); ImGui::SameLine(196.f); ImGui::Text("Left Click");
-		ImGui::Text("Remove BPM Node"); ImGui::SameLine(196.f); ImGui::Text("Right Click");
-		ImGui::Text("Snap BPM Node"); ImGui::SameLine(196.f); ImGui::Text("SHIFT");
-		
-		ImGui::Spacing();
-		
-		ImGui::Text("Scroll"); ImGui::SameLine(196.f); ImGui::Text("Mouse Wheel");
-		ImGui::Text("Zoom"); ImGui::SameLine(196.f); ImGui::Text("CTRL+Mouse Wheel");
-		ImGui::Text("Audio Playback Speed"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+Mouse Wheel");
-		ImGui::Text("Snap Division"); ImGui::SameLine(196.f); ImGui::Text("ALT+Mouse Wheel");
+		MOD(ShortcutMenuModule).ShowCheatSheet();
 
-		ImGui::Spacing();
-
-		ImGui::Text("Undo"); ImGui::SameLine(196.f); ImGui::Text("CTRL+Z");
-		ImGui::Text("Copy"); ImGui::SameLine(196.f); ImGui::Text("CTRL+C");
-		ImGui::Text("Paste"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
-		ImGui::Text("Delete"); ImGui::SameLine(196.f); ImGui::Text("DELETE");
-		ImGui::Text("Mirror"); ImGui::SameLine(196.f); ImGui::Text("CTRL+H");
-		ImGui::Text("Go To Timepoint"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
-		
-		ImGui::Spacing();
-
-		ImGui::Text("New Chart"); ImGui::SameLine(196.f); ImGui::Text("CTRL+N");
-		ImGui::Text("Open"); ImGui::SameLine(196.f); ImGui::Text("CTRL+O");
-		ImGui::Text("Save"); ImGui::SameLine(196.f); ImGui::Text("CTRL+S");
-		ImGui::Text("Set Background"); ImGui::SameLine(196.f); ImGui::Text("CTRL+B");
-		
-		ImGui::NewLine();
-		
-		if(ImGui::Button("close") || MOD(InputModule).WasKeyPressed(sf::Keyboard::Escape))
+		if(ImGui::Button("close"))
 			OutOpen = false;
 	});
 }
@@ -481,37 +445,13 @@ void Program::InputActions()
 		PUSH_NOTIFICATION("Bpm Edit Mode");
 	}
 
-	if(MOD(InputModule).IsDeleting())
-		MOD(EditModule).OnDelete();	
-
 	if (MOD(InputModule).IsCtrlKeyDown())
 	{
-		if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::Z))
-		{
-			if(SelectedChart->Undo())
-				PUSH_NOTIFICATION("Undo");
-		}
-
 		if (MOD(InputModule).IsScrollingUp())
 			return ApplyDeltaToZoom(1.0f);
 
 		if (MOD(InputModule).IsScrollingDown())
 			return ApplyDeltaToZoom(-1.0f);
-
-		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::C))
-			return void(MOD(EditModule).OnCopy());
-
-		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::V))
-			return void(MOD(EditModule).OnPaste());
-
-		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::H))
-			return void(MOD(EditModule).OnMirror());
-
-		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::A))
-			return void(MOD(EditModule).OnSelectAll());
-
-		if (MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::T))
-			GoToTimePoint();
 	}
 
 	if (MOD(InputModule).IsAltKeyDown())
@@ -576,31 +516,6 @@ void Program::InputActions()
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 		return void(MOD(EditModule).OnMouseRightButtonClicked(MOD(InputModule).IsShiftKeyDown()));
-}
-
-void Program::GlobalInputActions() 
-{
-	if (MOD(InputModule).WasKeyPressed(sf::Keyboard::F1))
-		ShowShortCuts();
-
-	if (MOD(InputModule).IsCtrlKeyDown())
-	{
-		if (SelectedChart && MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::S))
-			MOD(ChartParserModule).ExportChartSet(SelectedChart);
-
-		if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::O))
-		{
-			MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string &InPath) 
-			{
-				OpenChart(InPath);
-			});
-		}
-
-		if(MOD(InputModule).WasKeyPressed(sf::Keyboard::Key::N)){
-			ShouldSetUpNewChart = true;
-			ShouldSetUpMetadata = true;
-		}
-	}
 }
 
 void Program::OpenChart(const std::string InPath) 
