@@ -55,6 +55,8 @@ bool PopupModule::ProcessEvent(const sf::Event& InEvent)
         if(InEvent.key.code == sf::Keyboard::Key::Escape)
             _Open = false;
     }
+
+    return true;
 }
 
 void PopupModule::OpenPopup(const std::string& InPopupName, std::function<void(bool&)> InWork) 
