@@ -113,10 +113,10 @@ public: //meta
 	std::string AudioPath;
 	std::string BackgroundPath;
 
-	int KeyAmount;
+	int KeyAmount = 0;
 
-	float HP;
-	float OD;
+	float HP = 0;
+	float OD = 0;
 
 	std::vector<std::string> InheritedTimingPoints;
 
