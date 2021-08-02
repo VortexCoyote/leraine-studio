@@ -3,3 +3,6 @@ binaries/*.exe
 binaries/*.ilk
 binaries/*.pdb
 cmake/
+
+binaries/data/skins/*
+!binaries/data/skins/default/

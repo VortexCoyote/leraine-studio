@@ -218,7 +218,7 @@ const TimefieldMetrics& TimefieldRenderModule::GetTimefieldMetrics()
 	return _TimefieldMetrics;
 }
 
-void TimefieldRenderModule::SetKeyAmount(const int InKeyAmount) 
+void TimefieldRenderModule::InitializeResources(const int InKeyAmount, const std::filesystem::path& InSkinFolderPath) 
 {
 	_KeyAmount = InKeyAmount;
 
@@ -233,7 +233,7 @@ void TimefieldRenderModule::SetKeyAmount(const int InKeyAmount)
 
 	_ResultingSegmentedRenderTexture.create(_TimefieldMetrics.NoteFieldWidth, 2160);
 
-	_Skin.LoadResources(InKeyAmount);
+	_Skin.LoadResources(InKeyAmount, InSkinFolderPath);
 }
 
 void TimefieldRenderModule::UpdateMetrics(const WindowMetrics& InWindowMetrics) 

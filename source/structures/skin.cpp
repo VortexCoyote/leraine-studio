@@ -3,11 +3,10 @@
 #include <algorithm>
 #include <functional>
 #include <fstream>
-#include <filesystem>
 
 #include <SFML/Graphics.hpp>
 
-void Skin::LoadResources(const int InKeyAmount)
+void Skin::LoadResources(const int InKeyAmount, const std::filesystem::path& InSkinFolderPath)
 {
 	ResetTexturesAndSprites();
 
@@ -26,7 +25,8 @@ void Skin::LoadResources(const int InKeyAmount)
 
 	SnapColorTable[-1] = sf::Color(75, 75, 75, 255);
 
-	std::filesystem::path path = "data/skin/";
+	std::filesystem::path path = InSkinFolderPath;
+	path += "/";
 	path += std::to_string(InKeyAmount);
 	path += "k/"; 
 

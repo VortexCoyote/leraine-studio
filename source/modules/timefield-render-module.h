@@ -38,7 +38,7 @@ public: //data gathering
 
 public: //data setting
 
-	void SetKeyAmount(const int InKeyAmount);
+	void InitializeResources(const int InKeyAmount, const std::filesystem::path& InSkinFolderPath);
 	void UpdateMetrics(const WindowMetrics& InWindowMetrics);
 
 private: //data ownership
