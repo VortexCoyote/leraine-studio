@@ -25,6 +25,8 @@ namespace
 	
 	ChartMetadata ChartMetadataSetup;
 
+	std::filesystem::path SkinFolderPath = "data/skin/default";
+
 	bool ShouldSetUpMetadata = false;
 	bool ShouldSetUpNewChart = false;
 	bool ShowWaveform = true;
@@ -220,12 +222,28 @@ void Program::MenuBar()
 			std::string togglePitch = "Toggle Pitch (";
 			togglePitch += MOD(AudioModule).UsePitch ? "Pitched)" : "Stretched)";
 
-			if(ImGui::Button(togglePitch.c_str()))
+			if(ImGui::MenuItem(togglePitch.c_str()))
 			{
 				MOD(AudioModule).ResetSpeed();
 				MOD(AudioModule).UsePitch = !MOD(AudioModule).UsePitch;
 
 				PUSH_NOTIFICATION("Speed Reset");
+			}
+
+			ImGui::Separator();
+
+			if(ImGui::MenuItem("Select Skin"))
+			{
+				MOD(DialogModule).OpenFolderDialog([this](const std::string &InPath) 
+				{
+					SkinFolderPath = InPath;
+
+					if (SelectedChart){
+						MOD(TimefieldRenderModule).InitializeResources(SelectedChart->KeyAmount, SkinFolderPath);
+					}
+
+					PUSH_NOTIFICATION("Skin Changed");
+				}, true);
 			}
 
 			ImGui::Separator();
@@ -507,10 +525,9 @@ void Program::OpenChart(const std::string InPath)
 	MOD(AudioModule).LoadAudio(SelectedChart->AudioPath);
 	MOD(EditModule).SetChart(SelectedChart);
 	MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
-	MOD(TimefieldRenderModule).SetKeyAmount(SelectedChart->KeyAmount);
+	MOD(TimefieldRenderModule).InitializeResources(SelectedChart->KeyAmount, SkinFolderPath);
 	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 	MOD(WaveFormModule).SetWaveFormData(MOD(AudioModule).GenerateAndGetWaveformData(SelectedChart->AudioPath), MOD(AudioModule).GetSongLengthMilliSeconds());
-	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 	ChartMetadataSetup = MOD(ChartParserModule).GetChartMetadata(SelectedChart);
 
 	SelectedChart->RegisterOnModifiedCallback([this](TimeSlice &InTimeSlice) 

@@ -4,13 +4,14 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+#include <filesystem>
 #include <map>
 
 #include "timefield-metrics.h"
 
 struct Skin
 {
-	void LoadResources(const int InKeyAmount);
+	void LoadResources(const int InKeyAmount, const std::filesystem::path& InSkinFolderPath);
 
 	void RenderNote(const int InColumn, const int InPositionY, sf::RenderTarget* InRenderTarget, const int InBeatSnap = -1, const sf::Int8 InAlpha = 255);
 	void RenderHoldBody(const int InColumn, const int InPositionY, const int InHeight, sf::RenderTarget* InRenderTarget, const sf::Int8 InAlpha = 255);
