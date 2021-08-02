@@ -25,7 +25,7 @@ namespace
 	
 	ChartMetadata ChartMetadataSetup;
 
-	std::filesystem::path SkinFolderPath = "data/skin/default";
+	std::filesystem::path SkinFolderPath = "data/skins/default";
 
 	bool ShouldSetUpMetadata = false;
 	bool ShouldSetUpNewChart = false;
