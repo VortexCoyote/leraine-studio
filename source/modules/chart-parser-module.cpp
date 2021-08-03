@@ -96,8 +96,10 @@ std::string ChartParserModule::SetChartMetadata(Chart* OutChart, const ChartMeta
 
 Chart* ChartParserModule::ParseAndGenerateChartSet(const std::string& InPath)
 {
-	_CurrentChartPath = InPath;
 	std::ifstream chartFile(InPath);
+	if (!chartFile.is_open()) return nullptr;
+	
+	_CurrentChartPath = InPath;
 
 	PUSH_NOTIFICATION("Opened %s", InPath.c_str());
 

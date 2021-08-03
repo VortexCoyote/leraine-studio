@@ -64,3 +64,13 @@ void Configuration::RegisterRecentFile(const std::string InPath)
   if (RecentFilePaths.size() >= RecentFilePathsMaxSize) RecentFilePaths.pop_back();
   RecentFilePaths.insert(RecentFilePaths.begin(), InPath);
 }
+
+void Configuration::DeleteRecentFile(const std::string InPath)
+{
+  for (auto path = RecentFilePaths.begin(); path != RecentFilePaths.end(); ++path){
+    if (*path == InPath){
+      RecentFilePaths.erase(path);
+      return;
+    }
+  }
+}

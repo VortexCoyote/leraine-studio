@@ -22,4 +22,5 @@ struct Configuration
   bool Load();
   void Save();
   void RegisterRecentFile(const std::string InPath);
+  void DeleteRecentFile(const std::string InPath);
 };
