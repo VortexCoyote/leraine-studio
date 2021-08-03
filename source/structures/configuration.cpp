@@ -1,6 +1,6 @@
 #include "configuration.h"
 
-// true if loading successful, false if config.yaml isn't found
+// true if loading successful, false if config.yaml isn't found (so it creates one)
 bool Configuration::Load()
 {
   YAML::Node configFile;
@@ -13,6 +13,12 @@ bool Configuration::Load()
   }
 
   if (configFile["SkinFolderPath"]) SkinFolderPath = configFile["SkinFolderPath"].as<std::string>();
+
+  if (configFile["RecentFilePaths"].IsSequence())
+  for (YAML::const_iterator it = configFile["RecentFilePaths"].begin(); it != configFile["RecentFilePaths"].end(); ++it){
+      RecentFilePaths.push_back(it->as<std::string>());
+    }
+
   if (configFile["UsePitch"]) UsePitch = configFile["UsePitch"].as<bool>();
   if (configFile["ShowColumnLines"]) ShowColumnLines = configFile["ShowColumnLines"].as<bool>();
   if (configFile["ShowWaveform"]) ShowWaveform = configFile["ShowWaveform"].as<bool>();
@@ -27,6 +33,8 @@ void Configuration::Save()
   out << YAML::BeginMap;
   out << YAML::Key << "SkinFolderPath";
   out << YAML::Value << SkinFolderPath.string();
+  out << YAML::Key << "RecentFilePaths";
+  out << YAML::Value << RecentFilePaths;
   out << YAML::Key << "UsePitch";
   out << YAML::Value << UsePitch;
   out << YAML::Key << "ShowColumnLines";
@@ -42,5 +50,17 @@ void Configuration::Save()
   std::ofstream configFile("config.yaml");
 
   configFile << out.c_str();
+}
 
+void Configuration::RegisterRecentFile(const std::string InPath)
+{
+  for (auto path = RecentFilePaths.begin(); path != RecentFilePaths.end(); ++path){
+    if (*path == InPath){
+      RecentFilePaths.erase(path);
+      break;
+    }
+  }
+  
+  if (RecentFilePaths.size() >= RecentFilePathsMaxSize) RecentFilePaths.pop_back();
+  RecentFilePaths.insert(RecentFilePaths.begin(), InPath);
 }

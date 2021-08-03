@@ -3,6 +3,7 @@
 #include "yaml-cpp/yaml.h"
 #include <filesystem>
 #include <fstream>
+#include <array>
 
 struct Configuration
 {
@@ -14,6 +15,11 @@ struct Configuration
   bool UseAutoTiming = false;
   bool ShowColumnHeatmap = false;
 
+  const int RecentFilePathsMaxSize = 10;
+  //FIFO, but needs to remove invalid paths on access (like if the files have moved)
+  std::vector<std::string> RecentFilePaths;
+
   bool Load();
   void Save();
+  void RegisterRecentFile(const std::string InPath);
 };

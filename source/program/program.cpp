@@ -187,6 +187,12 @@ void Program::MenuBar()
 			if (MOD(ShortcutMenuModule).MenuItem("Save", sf::Keyboard::Key::LControl, sf::Keyboard::Key::S) && SelectedChart)
 				MOD(ChartParserModule).ExportChartSet(SelectedChart);
 
+			MOD(ShortcutMenuModule).Separator();
+
+			for (auto path : Config.RecentFilePaths)
+				if (MOD(ShortcutMenuModule).MenuItem(path.c_str(), sf::Keyboard::Unknown, sf::Keyboard::Unknown))
+					OpenChart(path);
+
 			MOD(ShortcutMenuModule).EndMenu();
 		}
 
@@ -534,6 +540,9 @@ void Program::InputActions()
 void Program::OpenChart(const std::string InPath) 
 {
 	SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
+
+	Config.RegisterRecentFile(InPath);
+	Config.Save();
 
 	MOD(BeatModule).AssignNotesToSnapsInChart(SelectedChart);
 	MOD(AudioModule).LoadAudio(SelectedChart->AudioPath);
