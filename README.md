@@ -19,7 +19,7 @@ preferred compiler: `msvc`
 vcpkg packages: 
 ```
 imgui-sfml:x64-windows
-sfml:x64-windows
+yaml-cpp:x64-windows
 ```
 ## **Linux**
 
@@ -28,7 +28,7 @@ preferred compiler: `gcc`
 vcpkg packages: 
 ```
 imgui-sfml:x64-linux
-sfml:x64-linux
+yaml-cpp:x64-linux
 ```
 additional linux packages:
 ```
