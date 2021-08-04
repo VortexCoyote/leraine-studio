@@ -1,5 +1,7 @@
 #include "configuration.h"
 
+#include "yaml-cpp/yaml.h"
+
 // true if loading successful, false if config.yaml isn't found (so it creates one)
 bool Configuration::Load()
 {

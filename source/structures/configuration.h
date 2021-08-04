@@ -1,9 +1,10 @@
 #pragma once
 
-#include "yaml-cpp/yaml.h"
 #include <filesystem>
 #include <fstream>
 #include <array>
+#include <vector>
+#include <string>
 
 struct Configuration
 {
