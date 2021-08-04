@@ -4,32 +4,41 @@
 bool Configuration::Load()
 {
   YAML::Node configFile;
-  try {
+  
+  try 
+  {
     configFile = YAML::LoadFile("config.yaml");
   }
-  catch (YAML::BadFile) {
+  catch (YAML::BadFile) 
+  {
     Save();
     return false;
   }
 
-  if (configFile["SkinFolderPath"]) SkinFolderPath = configFile["SkinFolderPath"].as<std::string>();
+  if (configFile["SkinFolderPath"]) 
+    SkinFolderPath = configFile["SkinFolderPath"].as<std::string>();
 
   if (configFile["RecentFilePaths"].IsSequence())
-  for (YAML::const_iterator it = configFile["RecentFilePaths"].begin(); it != configFile["RecentFilePaths"].end(); ++it){
+  {
+    for (YAML::const_iterator it = configFile["RecentFilePaths"].begin(); it != configFile["RecentFilePaths"].end(); ++it)
+    {
       RecentFilePaths.push_back(it->as<std::string>());
     }
+  }
 
   if (configFile["UsePitch"]) UsePitch = configFile["UsePitch"].as<bool>();
   if (configFile["ShowColumnLines"]) ShowColumnLines = configFile["ShowColumnLines"].as<bool>();
   if (configFile["ShowWaveform"]) ShowWaveform = configFile["ShowWaveform"].as<bool>();
   if (configFile["UseAutoTiming"]) UseAutoTiming = configFile["UseAutoTiming"].as<bool>();
   if (configFile["ShowColumnHeatmap"]) ShowColumnHeatmap = configFile["ShowColumnHeatmap"].as<bool>();
+  
   return true;
 }
 
 void Configuration::Save()
 {
   YAML::Emitter out;
+  
   out << YAML::BeginMap;
   out << YAML::Key << "SkinFolderPath";
   out << YAML::Value << SkinFolderPath.string();
@@ -54,21 +63,27 @@ void Configuration::Save()
 
 void Configuration::RegisterRecentFile(const std::string InPath)
 {
-  for (auto path = RecentFilePaths.begin(); path != RecentFilePaths.end(); ++path){
-    if (*path == InPath){
+  for (auto path = RecentFilePaths.begin(); path != RecentFilePaths.end(); ++path)
+  {
+    if (*path == InPath)
+    {
       RecentFilePaths.erase(path);
       break;
     }
   }
   
-  if (RecentFilePaths.size() >= RecentFilePathsMaxSize) RecentFilePaths.pop_back();
+  if (RecentFilePaths.size() >= RecentFilePathsMaxSize) 
+    RecentFilePaths.pop_back();
+  
   RecentFilePaths.insert(RecentFilePaths.begin(), InPath);
 }
 
 void Configuration::DeleteRecentFile(const std::string InPath)
 {
-  for (auto path = RecentFilePaths.begin(); path != RecentFilePaths.end(); ++path){
-    if (*path == InPath){
+  for (auto path = RecentFilePaths.begin(); path != RecentFilePaths.end(); ++path)
+  {
+    if (*path == InPath)
+    {
       RecentFilePaths.erase(path);
       return;
     }
