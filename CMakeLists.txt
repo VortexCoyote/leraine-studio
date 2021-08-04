@@ -22,6 +22,7 @@ find_package(SFML COMPONENTS system window graphics audio CONFIG REQUIRED)
 find_package(ImGui-SFML CONFIG REQUIRED)
 find_package(ImGui CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 add_executable($ENV{PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
@@ -40,4 +41,5 @@ target_link_libraries($ENV{PROJECT_NAME} PRIVATE
     bass
     bass_fx
     ZLIB::ZLIB
+    yaml-cpp
 )

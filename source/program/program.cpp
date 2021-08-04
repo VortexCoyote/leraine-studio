@@ -5,6 +5,7 @@
 #include "../utilities/imgui/std/imgui-stdlib.h"
 
 #include "../structures/chart-metadata.h"
+#include "../structures/configuration.h"
 
 namespace
 {
@@ -25,11 +26,10 @@ namespace
 	
 	ChartMetadata ChartMetadataSetup;
 
-	std::filesystem::path SkinFolderPath = "data/skins/default";
+	Configuration Config;
 
 	bool ShouldSetUpMetadata = false;
 	bool ShouldSetUpNewChart = false;
-	bool ShowWaveform = true;
 
 	std::string TimeToGo = "0";
 
@@ -77,6 +77,9 @@ void Program::InnerStartUp()
 {
 	MOD(ImGuiModule).Init(_RenderWindow);
 	MOD(NotificationModule).SetStartY(_WindowMetrics.MenuBarHeight + 16);
+
+	if(Config.Load()) PUSH_NOTIFICATION("Config loaded");
+	else PUSH_NOTIFICATION("Config file not found. Created a new one");
 }
 
 void Program::InnerTick()
@@ -118,7 +121,7 @@ void Program::InnerRender(sf::RenderTarget *const InOutRenderTarget)
 	if (!SelectedChart)
 		return;
 
-	if(ShowWaveform)
+	if(Config.ShowWaveform)
 		MOD(WaveFormModule).RenderWaveForm(WaveformRenderGraph, WindowTimeBegin, WindowTimeEnd, MOD(TimefieldRenderModule).GetTimefieldMetrics().LeftSidePosition + MOD(TimefieldRenderModule).GetTimefieldMetrics().FieldWidthHalf, ZoomLevel, InOutRenderTarget->getView().getSize().y);
 		//MOD(WaveFormModule).RenderWaveFormPolygon(InOutRenderTarget, WindowTimeBegin, WindowTimeEnd, MOD(TimefieldRenderModule).GetTimefieldMetrics().LeftSidePosition + MOD(TimefieldRenderModule).GetTimefieldMetrics().FieldWidthHalf, ZoomLevel, InOutRenderTarget->getView().getSize().y);
 
@@ -184,6 +187,12 @@ void Program::MenuBar()
 			if (MOD(ShortcutMenuModule).MenuItem("Save", sf::Keyboard::Key::LControl, sf::Keyboard::Key::S) && SelectedChart)
 				MOD(ChartParserModule).ExportChartSet(SelectedChart);
 
+			MOD(ShortcutMenuModule).Separator();
+
+			for (auto path : Config.RecentFilePaths)
+				if (MOD(ShortcutMenuModule).MenuItem(path.c_str(), sf::Keyboard::Unknown, sf::Keyboard::Unknown))
+					OpenChart(path);
+
 			MOD(ShortcutMenuModule).EndMenu();
 		}
 
@@ -220,12 +229,15 @@ void Program::MenuBar()
 		if (ImGui::BeginMenu("Options"))
 		{
 			std::string togglePitch = "Toggle Pitch (";
-			togglePitch += MOD(AudioModule).UsePitch ? "Pitched)" : "Stretched)";
+			togglePitch += Config.UsePitch ? "Pitched)" : "Stretched)";
 
 			if(ImGui::MenuItem(togglePitch.c_str()))
 			{
+				Config.UsePitch = !Config.UsePitch;
+				Config.Save();
+
 				MOD(AudioModule).ResetSpeed();
-				MOD(AudioModule).UsePitch = !MOD(AudioModule).UsePitch;
+				MOD(AudioModule).UsePitch = Config.UsePitch;
 
 				PUSH_NOTIFICATION("Speed Reset");
 			}
@@ -233,13 +245,14 @@ void Program::MenuBar()
 			ImGui::Separator();
 
 			if(ImGui::MenuItem("Select Skin"))
-			{
+			{ 
 				MOD(DialogModule).OpenFolderDialog([this](const std::string &InPath) 
 				{
-					SkinFolderPath = InPath;
+					Config.SkinFolderPath = InPath;
+					Config.Save();
 
 					if (SelectedChart){
-						MOD(TimefieldRenderModule).InitializeResources(SelectedChart->KeyAmount, SkinFolderPath);
+						MOD(TimefieldRenderModule).InitializeResources(SelectedChart->KeyAmount, Config.SkinFolderPath);
 					}
 
 					PUSH_NOTIFICATION("Skin Changed");
@@ -248,18 +261,25 @@ void Program::MenuBar()
 
 			ImGui::Separator();
 
-			if(ImGui::Checkbox("Show Column Lines", &MOD(TimefieldRenderModule).GetSkin().ShowColumnLines))
+			if(ImGui::Checkbox("Show Column Lines", &Config.ShowColumnLines))
 			{
-				if(!SelectedChart)
-				{
-					MOD(TimefieldRenderModule).GetSkin().ShowColumnLines = false;
-					PUSH_NOTIFICATION("Open a Chart First");
-				}
+				MOD(TimefieldRenderModule).GetSkin().ShowColumnLines = Config.ShowColumnLines;
+				Config.Save();
 			}
 
-			ImGui::Checkbox("Show Waveform", &ShowWaveform);
-			ImGui::Checkbox("Use Auto Timing", &EditMode::static_Flags.UseAutoTiming);
-			ImGui::Checkbox("Show Column Heatmap", &EditMode::static_Flags.ShowColumnHeatmap);
+			if (ImGui::Checkbox("Show Waveform", &Config.ShowWaveform)) Config.Save();
+
+			if (ImGui::Checkbox("Use Auto Timing", &Config.UseAutoTiming))
+			{
+				EditMode::static_Flags.UseAutoTiming = Config.UseAutoTiming;
+				Config.Save();
+			}
+
+			if (ImGui::Checkbox("Show Column Heatmap", &Config.ShowColumnHeatmap))
+			{
+				EditMode::static_Flags.ShowColumnHeatmap = Config.ShowColumnHeatmap;
+				Config.Save();
+			}
 
 			ImGui::EndMenu();
 		}
@@ -520,12 +540,22 @@ void Program::InputActions()
 void Program::OpenChart(const std::string InPath) 
 {
 	SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
+	
+	if (!SelectedChart){
+		PUSH_NOTIFICATION("File not found! It might have been deleted?");
+		Config.DeleteRecentFile(InPath);
+		Config.Save();
+		return;
+	}
+
+	Config.RegisterRecentFile(InPath);
+	Config.Save();
 
 	MOD(BeatModule).AssignNotesToSnapsInChart(SelectedChart);
 	MOD(AudioModule).LoadAudio(SelectedChart->AudioPath);
 	MOD(EditModule).SetChart(SelectedChart);
 	MOD(BackgroundModule).LoadBackground(SelectedChart->BackgroundPath);
-	MOD(TimefieldRenderModule).InitializeResources(SelectedChart->KeyAmount, SkinFolderPath);
+	MOD(TimefieldRenderModule).InitializeResources(SelectedChart->KeyAmount, Config.SkinFolderPath);
 	MOD(MiniMapModule).Generate(SelectedChart, MOD(TimefieldRenderModule).GetSkin(), MOD(AudioModule).GetSongLengthMilliSeconds());
 	MOD(WaveFormModule).SetWaveFormData(MOD(AudioModule).GenerateAndGetWaveformData(SelectedChart->AudioPath), MOD(AudioModule).GetSongLengthMilliSeconds());
 	ChartMetadataSetup = MOD(ChartParserModule).GetChartMetadata(SelectedChart);
