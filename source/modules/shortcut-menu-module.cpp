@@ -92,7 +92,7 @@ bool ShortcutMenuModule::MenuItem(const std::string InLabel, sf::Keyboard::Key I
 		else if(_ShiftKey && InModifierKey == sf::Keyboard::Key::LShift)
 			return actionKeyDown;
 
-		else 
+		else if(InModifierKey == sf::Keyboard::Key::Unknown)
 			return actionKeyDown;
 	}
 
