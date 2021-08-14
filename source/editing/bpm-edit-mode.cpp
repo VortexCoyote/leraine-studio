@@ -255,16 +255,12 @@ void BpmEditMode::DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, cons
     if(InIsPinned)
     {
         if(ImGui::Button("Unpin"))
-        {
             _PinnedBpmPoint = nullptr;
-        }
     }
     else
     {
 	    if(ImGui::Button("Pin"))
-        {
             _PinnedBpmPoint = &InBpmPoint;
-        }        
     }
 
 	ImGui::SameLine();
@@ -278,7 +274,17 @@ void BpmEditMode::DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, cons
 	InBpmPoint.Bpm = double(bpmFloat);
     InBpmPoint.BeatLength = 60000.0 / InBpmPoint.Bpm;
     
-    ImGui::SameLine();
+    if(InIsPinned)
+    {
+        if(ImGui::Button("+1 MS"))
+            InBpmPoint.TimePoint++;
+
+        ImGui::SameLine();
+
+        if(ImGui::Button("-1 MS"))
+            InBpmPoint.TimePoint--;
+    }
+
 	ImGui::End();
 }
 
