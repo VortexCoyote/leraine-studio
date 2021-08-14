@@ -1,7 +1,7 @@
 # leraine-studio
 A cross-platform open-source VSRG chart editor written in C++ with SFML.
 
-![screenshot](https://i.imgur.com/WmF2Gny.png "screenshot")
+![screenshot](https://imgur.com/fM2neAg "banner")
 
 ## Why does this exist?
 As a VSRG charter myself, I've always been discontent with the current availible editors. All having their own perks, while all are lacking features from each other. This chart editor is a personal attempt to combine the editing convenience from the osu!mania editor, the look and UI of Arrow Vortex and the timing tools from DDreamStudio, while keeping myself as the target audience as a priority. 
@@ -38,3 +38,7 @@ xorg-dev
 freeglut3-dev
 libudev-dev
 ```
+
+# Screenshots
+
+![screenshot](https://i.imgur.com/WmF2Gny.png "screenshot")
