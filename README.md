@@ -9,9 +9,10 @@ As a VSRG charter myself, I've always been discontent with the current availible
 ## Why "Leraine"?
 "Leraine" by Kettel and Secede is one of my favourite songs from one of my favourite albums. Since this editor is somewhat personal, I thought it would be nice to name it accordingly.
 # Supported formats
-## Implemented
+**Implemented:**
 `.osu`
-## Planned
+
+**Planned:**
 `.sm`
 `.qua`
 `.bms`
