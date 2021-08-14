@@ -20,6 +20,11 @@ void Program::Init()
     _RenderWindow->setVerticalSyncEnabled(false);
     _RenderWindow->setActive(true);
 
+    sf::Image icon;
+    icon.loadFromFile("data/leraine-icon.png");
+
+    _RenderWindow->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
     ModuleManager::Init();
     
     RegisterModules();
