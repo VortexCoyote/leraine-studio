@@ -27,6 +27,9 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 
 	else if (InEvent.type == sf::Event::KeyPressed)
 	{
+		if(InEvent.key.code == sf::Keyboard::Unknown)
+			return false;
+
 		_KeyboardPressedStates[InEvent.key.code] = true;
 
 		if(InEvent.key.code == sf::Keyboard::LAlt)
@@ -41,6 +44,9 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 
 	else if (InEvent.type == sf::Event::KeyReleased)
 	{
+		if(InEvent.key.code == sf::Keyboard::Unknown)
+			return false;
+
 		_KeyboardPressedStates[InEvent.key.code] = false;
 
 		if(InEvent.key.code == sf::Keyboard::LAlt)
