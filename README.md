@@ -14,6 +14,7 @@ As a VSRG charter myself, I've always been discontent with the current availible
 ## Planned
 `.sm`
 `.qua`
+`.bms`
 # Compilation
 This project uses [cmake tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) for [vscode](https://code.visualstudio.com/) and [vcpkg](https://github.com/microsoft/vcpkg).
 
