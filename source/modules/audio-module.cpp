@@ -10,12 +10,12 @@ bool AudioModule::Tick(const float& InDeltaTime)
 	return true;
 }
 
-void AudioModule::LoadAudio(const std::string& InPath)
+void AudioModule::LoadAudio(const std::filesystem::path& InPath)
 {
 	BASS_Free();
 	BASS_Init(_Device, _Freq, 0, 0, NULL);
 
-	_StreamHandle = BASS_FX_TempoCreate(BASS_StreamCreateFile(FALSE, InPath.c_str(), 0, 0, BASS_STREAM_DECODE | BASS_STREAM_PRESCAN), BASS_FX_FREESOURCE);
+	_StreamHandle = BASS_FX_TempoCreate(BASS_StreamCreateFile(FALSE, InPath.string().c_str(), 0, 0, BASS_STREAM_DECODE | BASS_STREAM_PRESCAN), BASS_FX_FREESOURCE);
 
 	auto error = BASS_ErrorGetCode();
 	if (error != 0)
@@ -129,9 +129,9 @@ float AudioModule::GetPlaybackSpeed()
 	return _Speed;
 }
 
-WaveFormData* AudioModule::GenerateAndGetWaveformData(const std::string& InPath) 
+WaveFormData* AudioModule::GenerateAndGetWaveformData(const std::filesystem::path& InPath) 
 {
-	HSTREAM decoder = BASS_StreamCreateFile(FALSE, InPath.c_str(), 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_DECODE);
+	HSTREAM decoder = BASS_StreamCreateFile(FALSE, InPath.string().c_str(), 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_DECODE);
 
 	if (_WaveFormData != nullptr)
 	{

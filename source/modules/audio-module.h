@@ -5,6 +5,7 @@
 #include <bass.h>
 #include <bass_fx.h>
 
+#include <filesystem>
 class AudioModule : public Module
 {
 public:
@@ -13,7 +14,7 @@ public:
 
 public:
 
-	void LoadAudio(const std::string& InPath);
+	void LoadAudio(const std::filesystem::path& InPath);
 	
 	void TogglePause();
 	void SetPause(bool InPause);
@@ -28,7 +29,7 @@ public:
 	Time GetSongLengthMilliSeconds();
 	float GetPlaybackSpeed();
 	
-	[[nodiscard]] WaveFormData* GenerateAndGetWaveformData(const std::string& InPath);
+	[[nodiscard]] WaveFormData* GenerateAndGetWaveformData(const std::filesystem::path& InPath);
 
 	bool UsePitch = true;
 

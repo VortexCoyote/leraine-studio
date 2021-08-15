@@ -4,6 +4,7 @@
 
 #include "base/module.h"
 
+#include <filesystem>
 class BackgroundModule : public Module
 {
 public:
@@ -12,7 +13,7 @@ public:
 
 public:
 
-    void LoadBackground(const std::string& InPath);
+    void LoadBackground(const std::filesystem::path& InPath);
 
 private:
     

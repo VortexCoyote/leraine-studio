@@ -14,11 +14,11 @@ bool BackgroundModule::RenderBack(sf::RenderTarget* const InOutRenderTarget)
     return true;
 }
 
-void BackgroundModule::LoadBackground(const std::string& InPath) 
+void BackgroundModule::LoadBackground(const std::filesystem::path& InPath) 
 {
 	_BackgroundTexture = sf::Texture();
 	_BackgroundSprite = sf::Sprite();
 
-    _BackgroundTexture.loadFromFile(InPath);
+    _BackgroundTexture.loadFromFile(InPath.string());
 	_BackgroundSprite.setTexture(_BackgroundTexture);
 }

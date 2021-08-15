@@ -389,8 +389,8 @@ void ChartParserModule::ExportChartSet(Chart* InChart)
 
 void ChartParserModule::ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfStream)
 {	
-	std::string backgroundFileName = InChart->BackgroundPath.filename();
-	std::string audioFileName = InChart->AudioPath.filename();
+	std::string backgroundFileName = InChart->BackgroundPath.filename().string();
+	std::string audioFileName = InChart->AudioPath.filename().string();
 	
 	std::stringstream chartStream;
 

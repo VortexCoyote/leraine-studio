@@ -336,9 +336,9 @@ void Program::SetUpMetadata()
 
 			ImGui::NewLine();
 
-			std::string audioButtonName =  ChartMetadataSetup.AudioPath == "" ? "Pick an audio file" : ChartMetadataSetup.AudioPath;
-			std::string chartButtonName =  ChartMetadataSetup.ChartFolderPath == "" ? "Pick a chart folder path" : ChartMetadataSetup.ChartFolderPath;
-			std::string backgroundButtonName =  ChartMetadataSetup.BackgroundPath == "" ? "Pick a background (optional)" : ChartMetadataSetup.BackgroundPath;
+			std::string audioButtonName =  ChartMetadataSetup.AudioPath.string() == "" ? "Pick an audio file" : ChartMetadataSetup.AudioPath.string();
+			std::string chartButtonName =  ChartMetadataSetup.ChartFolderPath.string() == "" ? "Pick a chart folder path" : ChartMetadataSetup.ChartFolderPath.string();
+			std::string backgroundButtonName =  ChartMetadataSetup.BackgroundPath.string() == "" ? "Pick a background (optional)" : ChartMetadataSetup.BackgroundPath.string();
 			
 			ImGui::Text("Relevant Paths");
 			
