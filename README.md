@@ -30,11 +30,8 @@ install vcpkg packages with `vcpkg --feature-flags="versions" install`
 
 preferred compiler: `gcc`
 
-vcpkg packages: 
-```
-imgui-sfml:x64-linux
-yaml-cpp:x64-linux
-```
+install vcpkg packages with `vcpkg --feature-flags="versions" install`
+
 additional linux packages:
 ```
 libglade2-dev
