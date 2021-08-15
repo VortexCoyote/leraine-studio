@@ -21,6 +21,10 @@ This project uses [cmake tools](https://marketplace.visualstudio.com/items?itemN
 
 Define `VCPKG_ROOT` within `.vscode/settings.json` with your full vcpkg install location.
 
+Define `VCPKG_TARGET_TRIPLET` within `.vscode/settings.json` with your system type:
+* Windows: `x64-windows`
+* Linux: `x64-linux`
+
 ## **Windows**
 
 preferred compiler: `msvc` 
@@ -30,11 +34,8 @@ install vcpkg packages with `vcpkg --feature-flags="versions" install`
 
 preferred compiler: `gcc`
 
-vcpkg packages: 
-```
-imgui-sfml:x64-linux
-yaml-cpp:x64-linux
-```
+install vcpkg packages with `vcpkg --feature-flags="versions" install`
+
 additional linux packages:
 ```
 libglade2-dev
