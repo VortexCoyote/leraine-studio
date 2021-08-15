@@ -1,0 +1,12 @@
+{
+    "name": "leraine-studio",
+    "version": "1.0.1",
+    "builtin-baseline": "6bc4362fb49e53f1fff7f51e4e27e1946755ecc6",
+    "dependencies": [
+        "imgui-sfml",
+        "yaml-cpp"
+    ],
+    "overrides": [
+        { "name": "yaml-cpp", "version": "0.6.3" }
+    ]
+}

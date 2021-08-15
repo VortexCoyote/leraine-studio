@@ -25,11 +25,7 @@ Define `VCPKG_ROOT` within `.vscode/settings.json` with your full vcpkg install 
 
 preferred compiler: `msvc` 
 
-vcpkg packages: 
-```
-imgui-sfml:x64-windows
-yaml-cpp:x64-windows
-```
+install vcpkg packages with `vcpkg --feature-flags="versions" install`
 ## **Linux**
 
 preferred compiler: `gcc`

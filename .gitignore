@@ -1,4 +1,5 @@
 binaries/*.ini
+binaries/*.dll
 binaries/*.exe
 binaries/*.ilk
 binaries/*.pdb
@@ -9,3 +10,7 @@ binaries/data/skins/*
 
 *.yaml
 binaries/*.yaml
+vcpkg_installed/
+
+!binaries/bass_fx.dll
+!binaries/bass.dll
