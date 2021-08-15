@@ -8,6 +8,7 @@
 #include <utility>
 #include <functional>
 #include <unordered_set>
+#include <filesystem>
 
 /*
 * these types should not have any dependencies on any systems or modules.
@@ -110,8 +111,8 @@ public: //meta
 	std::string BeatmapID = "-1";
 	std::string BeatmapSetID = "-1";
 
-	std::string AudioPath;
-	std::string BackgroundPath;
+	std::filesystem::path AudioPath;
+	std::filesystem::path BackgroundPath;
 
 	int KeyAmount = 0;
 

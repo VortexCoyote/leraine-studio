@@ -3,6 +3,7 @@
 #include "base/module.h"
 
 #include <fstream>
+#include <filesystem>
 
 #include "../structures/chart-metadata.h"
 
@@ -14,21 +15,22 @@ class ChartParserModule : public Module
 {
 public:
 	
-	Chart* ParseAndGenerateChartSet(const std::string& InPath);
+	Chart* ParseAndGenerateChartSet(const std::filesystem::path& InPath);
 	void ExportChartSet(Chart* InChart);
-
-	void SetCurrentChartPath(const std::string& InPath);
+	
+	void SetCurrentChartPath(const std::filesystem::path& InPath);
 
 	ChartMetadata GetChartMetadata(Chart* InChart);
+
 	//this is for now osu impl only, in the future I'll make some template magic for which format is present
 	std::string SetChartMetadata(Chart* Outchart, const ChartMetadata& InMetadata);
 	std::string CreateNewChart(const ChartMetadata& InNewChartData);
 private:
 
-	std::string _CurrentChartPath;
+	std::filesystem::path _CurrentChartPath;
 
-	Chart* ParseChartOsuImpl(std::ifstream& InIfstream, std::string InPath);
-	Chart* ParseChartStepmaniaImpl(std::ifstream& InIfstream, std::string InPath);
+	Chart* ParseChartOsuImpl(std::ifstream& InIfstream, std::filesystem::path InPath);
+	Chart* ParseChartStepmaniaImpl(std::ifstream& InIfstream, std::filesystem::path InPath);
 
 	void ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfStream);
 	void ExportChartStepmaniaImpl(Chart* InChart, std::ofstream& InOfStream);

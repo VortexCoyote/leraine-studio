@@ -173,7 +173,7 @@ void Program::MenuBar()
 
 			if (MOD(ShortcutMenuModule).MenuItem("Open", sf::Keyboard::Key::LControl, sf::Keyboard::Key::O))
 			{
-				MOD(DialogModule).OpenFileDialog(".osu", [this](const std::string &InPath) 
+				MOD(DialogModule).OpenFileDialog(".osu;.sm", [this](const std::string &InPath) 
 				{
 					OpenChart(InPath);
 				});
@@ -541,7 +541,8 @@ void Program::OpenChart(const std::string InPath)
 {
 	SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
 	
-	if (!SelectedChart){
+	if (!SelectedChart)
+	{
 		PUSH_NOTIFICATION("File not found! It might have been deleted?");
 		Config.DeleteRecentFile(InPath);
 		Config.Save();

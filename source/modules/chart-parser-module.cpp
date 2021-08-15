@@ -1,6 +1,5 @@
 #include "chart-parser-module.h"
 
-#include <filesystem>
 #include <sstream>
 #include <algorithm>
 
@@ -9,7 +8,7 @@
 #define PARSE_COMMA_VALUE(stringstream, target) stringstream >> target; if (stringstream.peek() == ',') stringstream.ignore()
 #define REMOVE_POTENTIAL_NEWLINE(str) if(str.find('\r') != std::string::npos) str.resize(str.size() - 1)
 
-void ChartParserModule::SetCurrentChartPath(const std::string& InPath)
+void ChartParserModule::SetCurrentChartPath(const std::filesystem::path& InPath)
 {
 	_CurrentChartPath = InPath;
 }
@@ -50,10 +49,6 @@ std::string ChartParserModule::SetChartMetadata(Chart* OutChart, const ChartMeta
 	std::filesystem::path backgroundPath = InChartMetadata.BackgroundPath;
 	std::filesystem::path chartFolderPath = InChartMetadata.ChartFolderPath;
 
-	audioPath.make_preferred();
-	backgroundPath.make_preferred();
-	chartFolderPath.make_preferred();
-
 	std::string chartFileName = "";
 	chartFileName += InChartMetadata.Artist;
 	chartFileName += " - ";
@@ -69,32 +64,32 @@ std::string ChartParserModule::SetChartMetadata(Chart* OutChart, const ChartMeta
 	std::filesystem::path targetAudioPath = chartFolderPath / audioPath.filename();
 	std::filesystem::path targetBackgroundPath = chartFolderPath / backgroundPath.filename();
 
-	if (audioPath != targetAudioPath){
+	if (audioPath != targetAudioPath)
 		std::filesystem::copy_file(audioPath, targetAudioPath, std::filesystem::copy_options::overwrite_existing);
-	}
 
-	if (InChartMetadata.BackgroundPath.size() != 0 && backgroundPath != targetBackgroundPath){
+	if (!InChartMetadata.BackgroundPath.empty() && backgroundPath != targetBackgroundPath)
 		std::filesystem::copy_file(backgroundPath, targetBackgroundPath, std::filesystem::copy_options::overwrite_existing);
-	}
 
-	SetCurrentChartPath(chartFilePath.string());
+	SetCurrentChartPath(chartFilePath);
 
 	OutChart->Artist = InChartMetadata.Artist;
 	OutChart->SongTitle = InChartMetadata.SongTitle;
 	OutChart->Charter = InChartMetadata.Charter;
 	OutChart->DifficultyName = InChartMetadata.DifficultyName;
-	OutChart->AudioPath = targetAudioPath.string();
-	OutChart->BackgroundPath = targetBackgroundPath.string();
+	OutChart->AudioPath = targetAudioPath;
+	OutChart->BackgroundPath = targetBackgroundPath;
 	OutChart->HP = InChartMetadata.HP;
 	OutChart->OD = InChartMetadata.OD;
-	if (!OutChart->KeyAmount) OutChart->KeyAmount = InChartMetadata.KeyAmount;
+	
+	if (!OutChart->KeyAmount) 
+		OutChart->KeyAmount = InChartMetadata.KeyAmount;
 
 	ExportChartSet(OutChart);
 
 	return chartFilePath.string();
 }
 
-Chart* ChartParserModule::ParseAndGenerateChartSet(const std::string& InPath)
+Chart* ChartParserModule::ParseAndGenerateChartSet(const std::filesystem::path& InPath)
 {
 	std::ifstream chartFile(InPath);
 	if (!chartFile.is_open()) return nullptr;
@@ -103,10 +98,17 @@ Chart* ChartParserModule::ParseAndGenerateChartSet(const std::string& InPath)
 
 	PUSH_NOTIFICATION("Opened %s", InPath.c_str());
 
-	return ParseChartOsuImpl(chartFile, InPath);
+	Chart* chart = nullptr;
+
+	if(InPath.extension() == ".osu")
+		chart = ParseChartOsuImpl(chartFile, InPath);
+	else if(InPath.extension() == ".sm")
+		chart = ParseChartStepmaniaImpl(chartFile, InPath);
+
+	return chart;
 }
 
-Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::string InPath)
+Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::filesystem::path InPath)
 {
 	Chart* chart = new Chart();
 
@@ -151,7 +153,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 					std::filesystem::path resultedParentPath = parentPath;
 					std::filesystem::path songPath = resultedParentPath / value;
 
-					chart->AudioPath = songPath.string();
+					chart->AudioPath = songPath;
 				}
 			}
 		}
@@ -284,7 +286,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 				std::filesystem::path resultedParentPath = parentPath;
 				std::filesystem::path backgroundPath = resultedParentPath / background;
 
-				chart->BackgroundPath = backgroundPath.string();
+				chart->BackgroundPath = backgroundPath;
 				
 				break;
 			}
@@ -371,7 +373,7 @@ Chart* ChartParserModule::ParseChartOsuImpl(std::ifstream& InIfstream, std::stri
 	return chart;
 }
 
-Chart* ChartParserModule::ParseChartStepmaniaImpl(std::ifstream& InIfstream, std::string InPath)
+Chart* ChartParserModule::ParseChartStepmaniaImpl(std::ifstream& InIfstream, std::filesystem::path InPath)
 {
 	return nullptr;
 }
@@ -387,13 +389,8 @@ void ChartParserModule::ExportChartSet(Chart* InChart)
 
 void ChartParserModule::ExportChartOsuImpl(Chart* InChart, std::ofstream& InOfStream)
 {	
-	std::string backgroundFileName;
-	for (std::string::reverse_iterator rit = InChart->BackgroundPath.rbegin(); rit != InChart->BackgroundPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
-		backgroundFileName.insert(backgroundFileName.begin(), *rit);
-
-	std::string audioFileName;
-	for (std::string::reverse_iterator rit = InChart->AudioPath.rbegin(); rit != InChart->AudioPath.rend() && *rit != '/' && *rit != '\\'; ++rit)
-		audioFileName.insert(audioFileName.begin(), *rit);
+	std::string backgroundFileName = InChart->BackgroundPath.filename();
+	std::string audioFileName = InChart->AudioPath.filename();
 	
 	std::stringstream chartStream;
 

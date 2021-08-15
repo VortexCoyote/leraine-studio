@@ -9,9 +9,9 @@ struct ChartMetadata
     std::string Charter = "";
     std::string DifficultyName = "";
 
-    std::string ChartFolderPath = "";
-    std::string AudioPath = "";
-    std::string BackgroundPath = "";
+    std::filesystem::path ChartFolderPath = "";
+    std::filesystem::path AudioPath = "";
+    std::filesystem::path BackgroundPath = "";
 
     int KeyAmount = 4;
     float OD = 8.0f;
