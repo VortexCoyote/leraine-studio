@@ -33,8 +33,8 @@ namespace
 
 	std::string TimeToGo = "0";
 
-	int ZoomIndex = 3;
-	std::vector<float> LegalZoomLevels = { 0.25f, 0.4f, 0.5f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f };
+	int ZoomIndex = 5;
+	std::vector<float> LegalZoomLevels = { 0.25f, 0.4f, 0.5f, 0.6f, 0.75f, 1.0f, 1.25f, 1.4f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f };
 }
 
 //module includes
