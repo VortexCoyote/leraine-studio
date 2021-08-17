@@ -42,8 +42,8 @@ void ShortcutMenuModule::ShowCheatSheet()
 
 	ImGui::Text("New Chart"); ImGui::SameLine(196.f); ImGui::Text("CTRL+N");
 	ImGui::Text("Open"); ImGui::SameLine(196.f); ImGui::Text("CTRL+O");
+	ImGui::Text("Edit Metadata"); ImGui::SameLine(196.f); ImGui::Text("CTRL+E");
 	ImGui::Text("Save"); ImGui::SameLine(196.f); ImGui::Text("CTRL+S");
-	ImGui::Text("Set Background"); ImGui::SameLine(196.f); ImGui::Text("CTRL+B");
 		
 	ImGui::NewLine();
 }
