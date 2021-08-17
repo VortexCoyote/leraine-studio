@@ -13,6 +13,11 @@ public:
 	bool IsScrollingUp();
 	bool IsScrollingDown();
 
+	bool IsUpKeyPressed();
+	bool IsDownKeyPressed();
+	bool IsLeftKeyPressed();
+	bool IsRightKeyPressed();
+
 	bool IsTogglingPause();
 
 	bool IsDeleting();
@@ -25,7 +30,7 @@ public:
 	bool IsCtrlKeyDown();
 	bool IsShiftKeyDown();
 	bool IsAltKeyDown();
-
+	
 private:
 
 	bool _KeyboardPressedStates[sf::Keyboard::KeyCount];

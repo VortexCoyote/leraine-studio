@@ -33,8 +33,8 @@ namespace
 
 	std::string TimeToGo = "0";
 
-	int ZoomIndex = 3;
-	std::vector<float> LegalZoomLevels = { 0.25f, 0.4f, 0.5f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f };
+	int ZoomIndex = 5;
+	std::vector<float> LegalZoomLevels = { 0.25f, 0.4f, 0.5f, 0.6f, 0.75f, 1.0f, 1.25f, 1.4f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f };
 }
 
 //module includes
@@ -484,17 +484,17 @@ void Program::InputActions()
 
 	if (MOD(InputModule).IsShiftKeyDown())
 	{
-		if (MOD(InputModule).IsScrollingUp())
-			return MOD(AudioModule).ChangeSpeed(0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %fx", MOD(AudioModule).GetPlaybackSpeed());
+		if (MOD(InputModule).IsScrollingUp() || MOD(InputModule).IsRightKeyPressed())
+			return MOD(AudioModule).ChangeSpeed(0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %.2fx", MOD(AudioModule).GetPlaybackSpeed());
 
-		if (MOD(InputModule).IsScrollingDown())
-			return MOD(AudioModule).ChangeSpeed(-0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %fx", MOD(AudioModule).GetPlaybackSpeed());
+		if (MOD(InputModule).IsScrollingDown() || MOD(InputModule).IsLeftKeyPressed())
+			return MOD(AudioModule).ChangeSpeed(-0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %.2fx", MOD(AudioModule).GetPlaybackSpeed());
 	}
 
-	if (MOD(InputModule).IsScrollingUp())
+	if (MOD(InputModule).IsScrollingUp() || MOD(InputModule).IsDownKeyPressed())
 		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetPreviousBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
 
-	if (MOD(InputModule).IsScrollingDown())
+	if (MOD(InputModule).IsScrollingDown() || MOD(InputModule).IsUpKeyPressed())
 		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
 
 	if (ImGui::GetIO().WantCaptureMouse)

@@ -24,9 +24,9 @@ void ShortcutMenuModule::ShowCheatSheet()
 		
 	ImGui::Spacing();
 		
-	ImGui::Text("Scroll"); ImGui::SameLine(196.f); ImGui::Text("Mouse Wheel");
+	ImGui::Text("Scroll"); ImGui::SameLine(196.f); ImGui::Text("Mouse Wheel/Up&Down");
 	ImGui::Text("Zoom"); ImGui::SameLine(196.f); ImGui::Text("CTRL+Mouse Wheel");
-	ImGui::Text("Audio Playback Speed"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+Mouse Wheel");
+	ImGui::Text("Audio Playback Speed"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+[Mouse Wheel/Left&Right]");
 	ImGui::Text("Snap Division"); ImGui::SameLine(196.f); ImGui::Text("ALT+Mouse Wheel");
 
 	ImGui::Spacing();
@@ -36,14 +36,14 @@ void ShortcutMenuModule::ShowCheatSheet()
 	ImGui::Text("Paste"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
 	ImGui::Text("Delete"); ImGui::SameLine(196.f); ImGui::Text("DELETE");
 	ImGui::Text("Mirror"); ImGui::SameLine(196.f); ImGui::Text("CTRL+H");
-	ImGui::Text("Go To Timepoint"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
+	ImGui::Text("Go To Timepoint"); ImGui::SameLine(196.f); ImGui::Text("CTRL+T");
 		
 	ImGui::Spacing();
 
 	ImGui::Text("New Chart"); ImGui::SameLine(196.f); ImGui::Text("CTRL+N");
 	ImGui::Text("Open"); ImGui::SameLine(196.f); ImGui::Text("CTRL+O");
+	ImGui::Text("Edit Metadata"); ImGui::SameLine(196.f); ImGui::Text("CTRL+E");
 	ImGui::Text("Save"); ImGui::SameLine(196.f); ImGui::Text("CTRL+S");
-	ImGui::Text("Set Background"); ImGui::SameLine(196.f); ImGui::Text("CTRL+B");
 		
 	ImGui::NewLine();
 }
