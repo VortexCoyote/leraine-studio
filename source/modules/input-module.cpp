@@ -85,6 +85,16 @@ bool InputModule::IsDeleting()
 	return WasKeyPressed(sf::Keyboard::Delete);
 }
 
+bool InputModule::IsUpKeyPressed()
+{
+	return WasKeyPressed(sf::Keyboard::Up);
+}
+
+bool InputModule::IsDownKeyPressed()
+{
+	return WasKeyPressed(sf::Keyboard::Down);
+}
+
 bool InputModule::WasKeyPressed(const sf::Keyboard::Key InKey)
 {
 	bool pressed = _KeyboardPressedStates[InKey];

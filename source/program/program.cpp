@@ -491,10 +491,10 @@ void Program::InputActions()
 			return MOD(AudioModule).ChangeSpeed(-0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %.2fx", MOD(AudioModule).GetPlaybackSpeed());
 	}
 
-	if (MOD(InputModule).IsScrollingUp())
+	if (MOD(InputModule).IsScrollingUp() || MOD(InputModule).IsDownKeyPressed())
 		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetPreviousBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
 
-	if (MOD(InputModule).IsScrollingDown())
+	if (MOD(InputModule).IsScrollingDown() || MOD(InputModule).IsUpKeyPressed())
 		return MOD(AudioModule).SetTimeMilliSeconds(MOD(BeatModule).GetNextBeatLine(MOD(AudioModule).GetTimeMilliSeconds()).TimePoint);
 
 	if (ImGui::GetIO().WantCaptureMouse)

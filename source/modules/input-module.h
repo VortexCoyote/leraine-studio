@@ -25,6 +25,8 @@ public:
 	bool IsCtrlKeyDown();
 	bool IsShiftKeyDown();
 	bool IsAltKeyDown();
+	bool IsUpKeyPressed();
+	bool IsDownKeyPressed();
 
 private:
 
