@@ -45,4 +45,6 @@ private:
 	int _MouseWheelDelta = 0;
 
 	bool _GainedFocusLastFrame = false;
+	
+	void ClearKey();
 };

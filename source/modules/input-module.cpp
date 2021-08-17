@@ -4,6 +4,7 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 {
 	if (_GainedFocusLastFrame)
 	{
+		ClearKey();
 		_GainedFocusLastFrame = false;
 		return false;
 	}
@@ -142,4 +143,11 @@ bool InputModule::IsShiftKeyDown()
 bool InputModule::IsAltKeyDown()
 {
 	return _AltKey;
+}
+
+void InputModule::ClearKey()
+{
+	_CtrlKey = false;
+	_ShiftKey =  false;
+	_AltKey = false;
 }
