@@ -36,7 +36,7 @@ void ShortcutMenuModule::ShowCheatSheet()
 	ImGui::Text("Paste"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
 	ImGui::Text("Delete"); ImGui::SameLine(196.f); ImGui::Text("DELETE");
 	ImGui::Text("Mirror"); ImGui::SameLine(196.f); ImGui::Text("CTRL+H");
-	ImGui::Text("Go To Timepoint"); ImGui::SameLine(196.f); ImGui::Text("CTRL+V");
+	ImGui::Text("Go To Timepoint"); ImGui::SameLine(196.f); ImGui::Text("CTRL+T");
 		
 	ImGui::Spacing();
 
