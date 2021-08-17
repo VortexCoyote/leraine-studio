@@ -541,7 +541,7 @@ void Program::InputActions()
 		return void(MOD(EditModule).OnMouseRightButtonClicked(MOD(InputModule).IsShiftKeyDown()));
 }
 
-void Program::OpenChart(const std::string InPath) 
+void Program::OpenChart(const std::string& InPath) 
 {
 	SelectedChart = MOD(ChartParserModule).ParseAndGenerateChartSet(InPath);
 	
@@ -628,7 +628,7 @@ void Program::UpdateCursor()
 	std::sort(EditCursor.HoveredNotes.begin(), EditCursor.HoveredNotes.end(), [](const Note *lhs, const Note *rhs) { return lhs->TimePoint < rhs->TimePoint; });
 }
 
-void Program::SetConfig(Configuration config)
+void Program::SetConfig(const Configuration& InConfig)
 {
 	MOD(AudioModule).UsePitch = Config.UsePitch;
 	MOD(TimefieldRenderModule).GetSkin().ShowColumnLines = Config.ShowColumnLines;

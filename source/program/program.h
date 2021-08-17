@@ -23,8 +23,8 @@ public: //abstractions
 	void GlobalInputActions();
 	void ApplyDeltaToZoom(const float InDelta);
 	void UpdateCursor();
-	void OpenChart(const std::string InPath);
-	void SetConfig(Configuration config);
+	void OpenChart(const std::string& InPath);
+	void SetConfig(const Configuration& InConfig);
 
 public: //meta program sequences
 
