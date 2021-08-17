@@ -24,9 +24,9 @@ void ShortcutMenuModule::ShowCheatSheet()
 		
 	ImGui::Spacing();
 		
-	ImGui::Text("Scroll"); ImGui::SameLine(196.f); ImGui::Text("Mouse Wheel");
+	ImGui::Text("Scroll"); ImGui::SameLine(196.f); ImGui::Text("Mouse Wheel/Up&Down");
 	ImGui::Text("Zoom"); ImGui::SameLine(196.f); ImGui::Text("CTRL+Mouse Wheel");
-	ImGui::Text("Audio Playback Speed"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+Mouse Wheel");
+	ImGui::Text("Audio Playback Speed"); ImGui::SameLine(196.f); ImGui::Text("SHIFT+[Mouse Wheel/Left&Right]");
 	ImGui::Text("Snap Division"); ImGui::SameLine(196.f); ImGui::Text("ALT+Mouse Wheel");
 
 	ImGui::Spacing();

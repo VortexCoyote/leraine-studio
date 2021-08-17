@@ -95,6 +95,16 @@ bool InputModule::IsDownKeyPressed()
 	return WasKeyPressed(sf::Keyboard::Down);
 }
 
+bool InputModule::IsLeftKeyPressed()
+{
+	return WasKeyPressed(sf::Keyboard::Left);
+}
+
+bool InputModule::IsRightKeyPressed()
+{
+	return WasKeyPressed(sf::Keyboard::Right);
+}
+
 bool InputModule::WasKeyPressed(const sf::Keyboard::Key InKey)
 {
 	bool pressed = _KeyboardPressedStates[InKey];

@@ -484,10 +484,10 @@ void Program::InputActions()
 
 	if (MOD(InputModule).IsShiftKeyDown())
 	{
-		if (MOD(InputModule).IsScrollingUp())
+		if (MOD(InputModule).IsScrollingUp() || MOD(InputModule).IsRightKeyPressed())
 			return MOD(AudioModule).ChangeSpeed(0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %.2fx", MOD(AudioModule).GetPlaybackSpeed());
 
-		if (MOD(InputModule).IsScrollingDown())
+		if (MOD(InputModule).IsScrollingDown() || MOD(InputModule).IsLeftKeyPressed())
 			return MOD(AudioModule).ChangeSpeed(-0.05f), PUSH_NOTIFICATION_LIFETIME(0.5f, "Speed %.2fx", MOD(AudioModule).GetPlaybackSpeed());
 	}
 
