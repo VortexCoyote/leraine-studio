@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../structures/configuration.h"
 #include "../modules/manager/module-manager.h"
 
 class Program
@@ -23,6 +24,7 @@ public: //abstractions
 	void ApplyDeltaToZoom(const float InDelta);
 	void UpdateCursor();
 	void OpenChart(const std::string InPath);
+	void SetConfig(Configuration config);
 
 public: //meta program sequences
 

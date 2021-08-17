@@ -78,7 +78,11 @@ void Program::InnerStartUp()
 	MOD(ImGuiModule).Init(_RenderWindow);
 	MOD(NotificationModule).SetStartY(_WindowMetrics.MenuBarHeight + 16);
 
-	if(Config.Load()) PUSH_NOTIFICATION("Config loaded");
+	if(Config.Load())
+	{
+		SetConfig(Config);
+		PUSH_NOTIFICATION("Config loaded");
+	}
 	else PUSH_NOTIFICATION("Config file not found. Created a new one");
 }
 
@@ -622,4 +626,12 @@ void Program::UpdateCursor()
 	MOD(TimefieldRenderModule).GetOverlappedOnScreenNotes(EditCursor.CursorColumn, EditCursor.Y, EditCursor.HoveredNotes);
 
 	std::sort(EditCursor.HoveredNotes.begin(), EditCursor.HoveredNotes.end(), [](const Note *lhs, const Note *rhs) { return lhs->TimePoint < rhs->TimePoint; });
+}
+
+void Program::SetConfig(Configuration config)
+{
+	MOD(AudioModule).UsePitch = Config.UsePitch;
+	MOD(TimefieldRenderModule).GetSkin().ShowColumnLines = Config.ShowColumnLines;
+	EditMode::static_Flags.UseAutoTiming = Config.UseAutoTiming;
+	EditMode::static_Flags.ShowColumnHeatmap = Config.ShowColumnHeatmap;
 }
