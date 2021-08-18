@@ -4,7 +4,6 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 {
 	if (_GainedFocusLastFrame)
 	{
-		ClearKey();
 		_GainedFocusLastFrame = false;
 		return false;
 	}
@@ -62,6 +61,9 @@ bool InputModule::ProcessEvent(const sf::Event& InEvent)
 
 	else if (InEvent.type == sf::Event::GainedFocus)
 		_GainedFocusLastFrame = true;
+
+	else if (InEvent.type == sf::Event::LostFocus)
+		ClearKey();
 
 	return true;
 }
