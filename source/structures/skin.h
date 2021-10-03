@@ -17,24 +17,24 @@ struct Skin
 	void RenderHoldBody(const int InColumn, const int InPositionY, const int InHeight, sf::RenderTarget* InRenderTarget, const sf::Int8 InAlpha = 255);
 	void RenderHoldCap(const int InColumn, const int InPositionY, sf::RenderTarget* InRenderTarget, const sf::Int8 InAlpha = 255);
 
-	void RenderHitline(sf::RenderTarget* InRenderTarget);
+	// void RenderHitline(sf::RenderTarget* InRenderTarget);
 	void RenderReceptors(sf::RenderTarget* InRenderTarget, const int InBeatSnap = -1);
 	void RenderTimeFieldBackground(sf::RenderTarget* InRenderTarget);
 
 	sf::Texture NoteTextures[16];
 	sf::Texture NoteOverlayTextures[16];
 
-	sf::Texture HoldBodyTexture;
-	sf::Texture HoldBodyCapTexture;
+	sf::Texture HoldBodyTextures[16];
+	sf::Texture HoldBodyCapTextures[16];
 
 	sf::Texture SelectTexture;
-	sf::Texture HitlineTexture;
+	// sf::Texture HitlineTexture;
 
 	sf::Sprite NoteSprite;
 	sf::Sprite HoldBodySprite;
 	sf::Sprite HoldCapSprite;
 
-	sf::Sprite HitlineSprite;
+	// sf::Sprite HitlineSprite;
 
 	std::map<int, sf::Color> SnapColorTable;
 
