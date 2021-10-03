@@ -26,41 +26,45 @@ void Skin::LoadResources(const int InKeyAmount, const std::filesystem::path& InS
 	SnapColorTable[-1] = sf::Color(75, 75, 75, 255);
 
 	std::filesystem::path path = InSkinFolderPath;
-	path += "/";
-	path += std::to_string(InKeyAmount);
-	path += "k/"; 
-
+	path += "/" + std::to_string(InKeyAmount) + "k/";
 	path.make_preferred();
+
+	std::filesystem::path defaultHoldBodyPath = path;
+	defaultHoldBodyPath += "holdbody.png";
+	defaultHoldBodyPath.make_preferred();
+
+	std::filesystem::path defaultHoldBodyCapPath = path;
+	defaultHoldBodyCapPath += "holdcap.png";
+	defaultHoldBodyCapPath.make_preferred();
 
 	for (int key = 0; key < InKeyAmount; key++)
 	{
 		std::filesystem::path subPath = path;
 		subPath /= "column_" + std::to_string(key + 1) + ".png";
 
-		subPath.make_preferred();
-
-		NoteTextures[key].loadFromFile(subPath.string());
+		NoteTextures[key].loadFromFile(subPath.make_preferred().string());
 
 		subPath = path;
 		subPath /= "column_" + std::to_string(key + 1) + "_overlay.png";
 
-		subPath.make_preferred();
-
 		if (_HasOverlay = !!std::ifstream(subPath))
-			NoteOverlayTextures[key].loadFromFile(subPath.string());
+			NoteOverlayTextures[key].loadFromFile(subPath.make_preferred().string());
+	
+		subPath = path;
+		subPath /= "column_" + std::to_string(key + 1) + "_holdbody.png";
+
+		if (!HoldBodyTextures[key].loadFromFile(subPath.make_preferred().string()))
+			HoldBodyTextures[key].loadFromFile(defaultHoldBodyPath.string());
+
+		subPath = path;
+		subPath /= "column_" + std::to_string(key + 1) + "_holdcap.png";
+
+		if (!HoldBodyCapTextures[key].loadFromFile(subPath.make_preferred().string()))
+			HoldBodyCapTextures[key].loadFromFile(defaultHoldBodyCapPath.string());
 	}
-	
-	HoldBodyTexture.loadFromFile((path / "holdbody.png").string());
-	HoldBodyCapTexture.loadFromFile((path / "holdcap.png").string());
 
-	std::filesystem::path hitlinePath = "data/skin/hitline.png";
-
-	HitlineTexture.loadFromFile(hitlinePath.string());
-	HitlineSprite.setTexture(HitlineTexture);
-	
-	HoldBodySprite.setTexture(HoldBodyTexture);
-	HoldCapSprite.setTexture(HoldBodyCapTexture);
-
+	// HitlineTexture.loadFromFile(hitlinePath.string());
+	// HitlineSprite.setTexture(HitlineTexture);
 }
 
 void Skin::RenderNote(const int InColumn, const int InPositionY, sf::RenderTarget* InOutRenderTarget, const int InBeatSnap, const sf::Int8 InAlpha)
@@ -96,8 +100,10 @@ void Skin::RenderHoldBody(const int InColumn, const int InPositionY, const int I
 	color.a = InAlpha;
 
 	HoldBodySprite.setColor(color);
-	HoldBodySprite.setScale((float)_TimefieldMetrics.ColumnSize / (float)HoldBodyTexture.getSize().x,
-							(float)(std::max(0, InHeight - int(_TimefieldMetrics.ColumnSize / 2))) / (float)HoldBodyTexture.getSize().y);
+
+	HoldBodySprite.setTexture(HoldBodyTextures[InColumn]);
+	HoldBodySprite.setScale((float)_TimefieldMetrics.ColumnSize / (float)HoldBodyTextures[InColumn].getSize().x,
+							(float)(std::max(0, InHeight - int(_TimefieldMetrics.ColumnSize / 2))) / (float)HoldBodyTextures[InColumn].getSize().y);
 	
 	HoldBodySprite.setPosition(_TimefieldMetrics.FirstColumnPosition + InColumn * _TimefieldMetrics.ColumnSize, InPositionY);
 	InOutRenderTarget->draw(HoldBodySprite);
@@ -109,20 +115,23 @@ void Skin::RenderHoldCap(const int InColumn, const int InPositionY, sf::RenderTa
 	color.a = InAlpha;
 	
 	HoldCapSprite.setColor(color);
-	HoldCapSprite.setScale((float)_TimefieldMetrics.ColumnSize / (float)HoldBodyCapTexture.getSize().x,
-						   (float)_TimefieldMetrics.ColumnSize / (float)HoldBodyCapTexture.getSize().y);
+
+	HoldCapSprite.setTexture(HoldBodyCapTextures[InColumn]);
+	HoldCapSprite.setScale((float)_TimefieldMetrics.ColumnSize / (float)HoldBodyCapTextures[InColumn].getSize().x,
+						   (float)_TimefieldMetrics.ColumnSize / (float)HoldBodyCapTextures[InColumn].getSize().y);
 	
 	HoldCapSprite.setPosition(_TimefieldMetrics.FirstColumnPosition + InColumn * _TimefieldMetrics.ColumnSize, InPositionY - _TimefieldMetrics.ColumnSize);
 	InOutRenderTarget->draw(HoldCapSprite);
 }
 
-void Skin::RenderHitline(sf::RenderTarget* InOutRenderTarget)
-{
-	HitlineSprite.setScale((float)_TimefieldMetrics.NoteFieldWidth / (float)HitlineTexture.getSize().x, 1.0);
+// unused
+// void Skin::RenderHitline(sf::RenderTarget* InOutRenderTarget)
+// {
+// 	HitlineSprite.setScale((float)_TimefieldMetrics.NoteFieldWidth / (float)HitlineTexture.getSize().x, 1.0);
 
-	HitlineSprite.setPosition(_TimefieldMetrics.FirstColumnPosition, _TimefieldMetrics.HitLinePosition);
-	InOutRenderTarget->draw(HitlineSprite);
-}
+// 	HitlineSprite.setPosition(_TimefieldMetrics.FirstColumnPosition, _TimefieldMetrics.HitLinePosition);
+// 	InOutRenderTarget->draw(HitlineSprite);
+// }
 
 void Skin::RenderReceptors(sf::RenderTarget* InRenderTarget, const int InBeatSnap) 
 {
@@ -167,17 +176,16 @@ void Skin::ResetTexturesAndSprites()
 	{
 		NoteTextures[i] = sf::Texture();
 		NoteOverlayTextures[i] = sf::Texture();
+		HoldBodyTextures[i] = sf::Texture();
+		HoldBodyCapTextures[i] = sf::Texture();
 	}
-
-	HoldBodyTexture = sf::Texture();
-	HoldBodyCapTexture = sf::Texture();
-
+	
 	SelectTexture = sf::Texture();
-	HitlineTexture = sf::Texture();
+	// HitlineTexture = sf::Texture();
 
 	NoteSprite = sf::Sprite();
 	HoldBodySprite = sf::Sprite();
 	HoldCapSprite = sf::Sprite();
 
-	HitlineSprite = sf::Sprite();
+	// HitlineSprite = sf::Sprite();
 }
