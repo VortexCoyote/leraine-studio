@@ -19,11 +19,9 @@ As a VSRG charter myself, I've always been discontent with the current availible
 # Compilation
 This project uses [cmake tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) for [vscode](https://code.visualstudio.com/) and [vcpkg](https://github.com/microsoft/vcpkg).
 
-Define `VCPKG_ROOT` within `.vscode/settings.json` with your full vcpkg install location.
+Define `VCPKG_ROOT` within global `settings.json` with your full vcpkg install location.
 
-Define `VCPKG_TARGET_TRIPLET` within `.vscode/settings.json` with your system type:
-* Windows: `x64-windows`
-* Linux: `x64-linux`
+Define `CMAKE_TOOLCHAIN_FILE` within global `settings.json` with `"${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"`.
 
 ## **Windows**
 

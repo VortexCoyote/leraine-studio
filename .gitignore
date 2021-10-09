@@ -1,9 +1,19 @@
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# binaries
 binaries/*.ini
 binaries/*.dll
 binaries/*.exe
 binaries/*.ilk
 binaries/*.pdb
+
+# CMake
 cmake/
+build/
 
 binaries/data/skins/*
 !binaries/data/skins/default/

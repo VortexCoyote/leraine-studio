@@ -1,6 +1,7 @@
 #meta
 cmake_minimum_required(VERSION 3.0.0)
-project($ENV{PROJECT_NAME} VERSION 0.1.0)
+set(PROJECT_NAME leraine-studio)
+project(${PROJECT_NAME} VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -24,11 +25,11 @@ find_package(ImGui CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
-add_executable($ENV{PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
-set_target_properties($ENV{PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../binaries)
+set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../binaries)
 
-target_link_libraries($ENV{PROJECT_NAME} PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ImGui-SFML::ImGui-SFML
     FLAC
     OpenAL
