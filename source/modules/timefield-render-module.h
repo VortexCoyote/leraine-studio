@@ -61,8 +61,8 @@ private: //data ownership
 
 	struct _OnScreenNote 
 	{ 
-		const Note* Note; 
-		const Column Column; 
+		const Note* m_Note; 
+		const Column m_Column; 
 		const int OnScreenY; 
 	};
 
