@@ -250,7 +250,7 @@ void BpmEditMode::DisplayBpmNode(BpmPoint& InBpmPoint, const int InScreenX, cons
 	bool open = true;
 
 	ImGui::SetNextWindowPos({ float(InScreenX), float(InScreenY) });
-	ImGui::Begin(std::to_string((int)&InBpmPoint).c_str(), &open, windowFlags);    
+	ImGui::Begin(std::to_string(reinterpret_cast<intptr_t>(&InBpmPoint)).c_str(), &open, windowFlags);    
 
     if(InIsPinned)
     {

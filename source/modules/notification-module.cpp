@@ -24,7 +24,7 @@ bool NotificationModule::Tick(const float& InDeltaTime)
 
 	    bool open = true;
 
-	    ImGui::Begin(std::to_string((int)&message).c_str(), &open, windowFlags);    
+	    ImGui::Begin(std::to_string(reinterpret_cast<intptr_t>(&message)).c_str(), &open, windowFlags);    
 
         ImGui::Text(message.NotiMessage.c_str());
 
