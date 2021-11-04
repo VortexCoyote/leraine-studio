@@ -48,3 +48,6 @@ libudev-dev
 # Screenshots
 
 ![screenshot](https://i.imgur.com/WmF2Gny.png "screenshot")
+
+# Similar projects
+* [OpenChart-web](https://github.com/OpenChartProject/OpenChart-web)
