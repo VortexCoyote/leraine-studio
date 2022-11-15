@@ -198,13 +198,13 @@ void TimefieldRenderModule::GetOverlappedOnScreenNotes(const Column InColumn, co
 {
 	for(auto& onScreenNote : _OnScreenNotes)
 	{
-		if(InColumn != onScreenNote.Column)
+		if(InColumn != onScreenNote.m_Column)
 			continue;
 
 		if(!(InScreenPointY >= onScreenNote.OnScreenY - _TimefieldMetrics.ColumnSize && InScreenPointY <= onScreenNote.OnScreenY))
 			continue;
 
-		OutNoteCollection.push_back(onScreenNote.Note);
+		OutNoteCollection.push_back(onScreenNote.m_Note);
 	}
 }
 

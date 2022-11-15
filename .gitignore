@@ -1,16 +1,15 @@
-binaries/*.ini
-binaries/*.dll
-binaries/*.exe
-binaries/*.ilk
-binaries/*.pdb
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# binaries
+binaries/
+
+# CMake
 cmake/
+build/
 
-binaries/data/skins/*
-!binaries/data/skins/default/
-
-*.yaml
-binaries/*.yaml
+# vcpkg
 vcpkg_installed/
-
-!binaries/bass_fx.dll
-!binaries/bass.dll

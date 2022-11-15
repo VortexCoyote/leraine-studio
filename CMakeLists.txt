@@ -1,14 +1,13 @@
 #meta
 cmake_minimum_required(VERSION 3.0.0)
-project($ENV{PROJECT_NAME} VERSION 0.1.0)
+set(PROJECT_NAME leraine-studio)
+project(${PROJECT_NAME} VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ../binaries)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ../binaries)
-set(WORKING_DIRECTORY ../binaries/)
+set(WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/binaries")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKING_DIRECTORY}")
 
-set(CMAKE_CXX_FLAGS "-fpermissive -std=c++0x")
 set(GCC_COVERAGE_COMPILE_FLAGS "lm")
 
 #build routine
@@ -24,11 +23,28 @@ find_package(ImGui CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
-add_executable($ENV{PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
-set_target_properties($ENV{PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../binaries)
+set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
-target_link_libraries($ENV{PROJECT_NAME} PRIVATE
+# Copy asset files to binaries/
+file(GLOB_RECURSE ASSETS "${CMAKE_CURRENT_SOURCE_DIR}/assets/*")
+foreach(ONE_ASSET ${ASSETS})
+  file(RELATIVE_PATH RELATIVE_ASSET "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "${ONE_ASSET}")
+  set(ASSET_DESTINATION "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${RELATIVE_ASSET}")
+  get_filename_component(ASSET_DESTINATION_DIR "${ASSET_DESTINATION}" DIRECTORY)
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+    ${ASSET_DESTINATION_DIR})
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${ONE_ASSET}
+    ${ASSET_DESTINATION_DIR})
+endforeach()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ImGui-SFML::ImGui-SFML
     FLAC
     OpenAL
